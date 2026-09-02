@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Контент-план · Екатерина Арея</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --cond:'IBM Plex Sans Condensed',var(--sans);
+  --mono:'IBM Plex Mono',Menlo,monospace;
+  --ground:#F4F6F9; --surface:#FFF; --ink:#141C26; --ink-2:#4A5967; --ink-3:#778797;
+  --line:#D9E1EA; --line-soft:#EAF0F5;
+  --accent:#1B6C86; --accent-soft:#E2EFF3;
+  --ok:#1F7A43; --ok-bg:#DFF0E6;
+  --warn:#9A6510; --warn-bg:#F7EEDC;
+  --no:#A33A2A; --no-bg:#F8E5E1;
+  --bad:#7A3E8F; --bad-bg:#F0E6F5;
+  --shadow:0 1px 2px rgba(20,28,38,.05),0 10px 28px -14px rgba(20,28,38,.22);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);font-size:15.5px;line-height:1.62;
+  -webkit-font-smoothing:antialiased
+}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px 88px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+
+header{padding:60px 0 34px;border-bottom:2px solid var(--ink)}
+.crumb{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0 0 18px}
+.crumb a{color:var(--ink-3);text-decoration:none;border-bottom:1px solid var(--line)}
+.crumb a:hover{color:var(--accent)}
+h1{font-family:var(--cond);font-size:clamp(32px,5.4vw,52px);line-height:1.02;font-weight:700;letter-spacing:-.015em;margin:0 0 18px;text-wrap:balance;max-width:18ch}
+.lede{font-size:18px;line-height:1.55;color:var(--ink-2);max-width:64ch;margin:0}
+.lede strong{color:var(--ink);font-weight:600}
+
+.facts{display:flex;flex-wrap:wrap;gap:0;margin:32px 0 0;border:1px solid var(--line);background:var(--surface);border-radius:3px;overflow:hidden;box-shadow:var(--shadow)}
+.fact{flex:1 1 150px;min-width:140px;padding:14px 16px;border-right:1px solid var(--line-soft)}
+.fact:last-child{border-right:0}
+.fact .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:5px}
+.fact .v{font-family:var(--cond);font-size:22px;font-weight:700;line-height:1.1}
+.fact .v small{font-family:var(--sans);font-size:12.5px;font-weight:400;color:var(--ink-3);display:block;margin-top:2px;letter-spacing:0}
+
+section{margin:56px 0 0}
+h2{font-family:var(--cond);font-size:12px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;color:var(--ink-3);margin:0 0 20px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+h3{font-family:var(--cond);font-size:20px;font-weight:700;margin:0 0 8px;letter-spacing:-.005em}
+p{margin:0 0 13px;max-width:66ch}
+section>p:last-child{margin-bottom:0}
+strong{font-weight:600}
+em{color:var(--ink-2)}
+
+/* карточки роликов */
+.cards{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:3px;box-shadow:var(--shadow);overflow:hidden}
+.card-top{display:flex;gap:16px;padding:18px 20px 14px;align-items:flex-start}
+.ord{font-family:var(--cond);font-size:30px;font-weight:700;color:var(--line);line-height:.95;min-width:38px;font-variant-numeric:tabular-nums}
+.card-head{flex:1;min-width:0}
+.ttl{font-family:var(--cond);font-size:19px;font-weight:700;line-height:1.22;margin:0 0 8px;letter-spacing:-.005em;text-wrap:balance}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:2px;font-weight:600;white-space:nowrap}
+.p-grow{background:var(--ok-bg);color:var(--ok)}
+.p-cap{background:var(--accent-soft);color:var(--accent)}
+.p-cell{background:var(--line-soft);color:var(--ink-2)}
+.p-len{background:var(--line-soft);color:var(--ink-2)}
+.p-fork{background:var(--warn-bg);color:var(--warn)}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:0;border-top:1px solid var(--line-soft);background:var(--ground)}
+.met{padding:10px 14px;border-right:1px solid var(--line-soft)}
+.met:last-child{border-right:0}
+.met .k{font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:3px}
+.met .v{font-family:var(--mono);font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+.takeaway{padding:13px 20px 16px;border-top:1px solid var(--line-soft);font-size:14.5px;color:var(--ink-2)}
+.takeaway b{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:4px;font-weight:600}
+.door{padding:0 20px 14px;font-family:var(--mono);font-size:11.5px;color:var(--ink-3);line-height:1.5}
+.door b{color:var(--ink-2);font-weight:600}
+
+/* врезки */
+.call{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 3px 3px 0;padding:18px 22px;margin:22px 0}
+.call.warn{border-left-color:var(--warn)}
+.call.no{border-left-color:var(--no)}
+.call h4{font-family:var(--cond);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 9px;color:var(--accent);font-weight:700}
+.call.warn h4{color:var(--warn)}
+.call.no h4{color:var(--no)}
+.call p{font-size:15px}
+.call p:last-child{margin-bottom:0}
+
+/* ветки развилки */
+.branches{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:20px 0}
+.br{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:17px 18px;box-shadow:var(--shadow)}
+.br .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;padding:3px 8px;border-radius:2px;display:inline-block;margin-bottom:10px}
+.br.a .lbl{background:var(--ok-bg);color:var(--ok)}
+.br.b .lbl{background:var(--no-bg);color:var(--no)}
+.br.c .lbl{background:var(--warn-bg);color:var(--warn)}
+.br h4{font-family:var(--cond);font-size:16px;font-weight:700;margin:0 0 8px;line-height:1.25}
+.br p{font-size:14px;line-height:1.5;margin:0 0 9px}
+.br ul{margin:0 0 9px;padding-left:17px;font-size:14px}
+.br li{margin-bottom:5px}
+.br .verdict{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);padding-top:9px;border-top:1px solid var(--line-soft);line-height:1.45}
+
+/* таблицы */
+.scroll{overflow-x:auto;margin:18px 0;border:1px solid var(--line);border-radius:3px;background:var(--surface);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:9px 13px;text-align:left;border-bottom:1px solid var(--line-soft);vertical-align:top}
+th{font-family:var(--cond);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:700;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr:hover{background:var(--ground)}
+ul.plain{margin:0 0 14px;padding-left:19px;max-width:66ch}
+ul.plain li{margin-bottom:7px}
+ul.plain li::marker{color:var(--ink-3)}
+
+.foot{margin:64px 0 0;padding-top:20px;border-top:2px solid var(--ink);font-family:var(--mono);font-size:11.5px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 24px}
+
+@media(max-width:640px){
+  .wrap{padding:0 16px 60px}
+  header{padding:40px 0 26px}
+  .card-top{padding:15px 15px 12px;gap:11px}
+  .ord{font-size:22px;min-width:26px}
+  .ttl{font-size:17px}
+  .takeaway,.door{padding-left:15px;padding-right:15px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="crumb"><a href="/katya/">← Концепция канала</a> · Контент-план · 2 сентября 2026</p>
+  <h1>Десять роликов, каждый со своим замером</h1>
+  <p class="lede">План собран формулой, а не наитием. <strong>Ни одна тема не поставлена без замера поисковой выдачи</strong> — предсказание спроса по признакам проверялось и дало 8 угаданных из 15, что неотличимо от монетки. Всё, что не измерено, названо неизмеренным.</p>
+
+  <div class="facts">
+    <div class="fact"><span class="k">Роликов</span><span class="v num">10<small>6 рост · 4 захват</small></span></div>
+    <div class="fact"><span class="k">Длина</span><span class="v num">17–30<small>минут, ядро 17–24</small></span></div>
+    <div class="fact"><span class="k">Замерено дверей</span><span class="v num">25<small>прошли 8</small></span></div>
+    <div class="fact"><span class="k">Корпус</span><span class="v num">3 394<small>ролика у 38 каналов</small></span></div>
+    <div class="fact"><span class="k">Аномалий</span><span class="v num">258<small>≥15 000 и ×3 к медиане</small></span></div>
+  </div>
+</header>
+
+<section>
+  <h2>Как читать карточку</h2>
+  <p><strong>С</strong> — спрос: во сколько раз потолок поисковой выдачи выше её плотности, отнесённое к базе ниши ×27,2. Большой С означает, что тема поднимает высоко, а верх выдачи при этом не занят.</p>
+  <p><strong>О</strong> — отдача связки «тема × формат»: нижняя граница коридора после выбрасывания сильнейшего канала. Берётся именно нижняя — честная величина та, что переживает удаление лидера. База 1,00.</p>
+  <p><strong>Ж</strong> — живучесть: доля живых каналов этого формата против базы ниши 17,1%. Потолок показывает лучший случай, живучесть — типичный.</p>
+  <div class="call">
+    <h4>Одно правило, которое запрещено нарушать</h4>
+    <p>Пара «тема × формат» <strong>не бывает особенной</strong>. Взаимодействие проверялось перестановкой и не подтвердилось ни в одной ячейке — ни одно значение не дошло до порога значимости. Сила ячейки объясняется силой темы и силой формата по отдельности. Поэтому нигде в плане не сказано «мы нашли связку»: сказано, из чего она складывается.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Десять роликов в порядке съёмки</h2>
+  <div class="cards">
+
+    <div class="card">
+      <div class="card-top">
+        <div class="ord num">1</div>
+        <div class="card-head">
+          <p class="ttl">Как за 20 минут понять, почему мечта превратилась в фантазию: техника</p>
+          <div class="pills">
+            <span class="pill p-grow">ростовой</span>
+            <span class="pill p-cell">Желания × Техника</span>
+            <span class="pill p-len">19 мин</span>
+            <span class="pill p-fork">зависит от развилки</span>
+          </div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="met"><span class="k">С спрос</span><span class="v">20,10</span></div>
+        <div class="met"><span class="k">О отдача</span><span class="v">1,83</span></div>
+        <div class="met"><span class="k">Ж живучесть</span><span class="v">3,72</span></div>
+        <div class="met"><span class="k">R разрыв</span><span class="v">×547</span></div>
+        <div class="met"><span class="k">Плотность</span><span class="v">5 529</span></div>
+        <div class="met"><span class="k">Потолок</span><span class="v">3 023 168</span></div>
+      </div>
+      <div class="takeaway"><b>Что зритель уносит</b>Три вопроса, которые он задаёт себе сам, и письменный ответ, по которому видно, чьё это желание. Не объяснение, почему мечты превращаются в фантазии, — процедура, после которой у него на бумаге две колонки.</div>
+      <div class="door"><b>Дверь:</b> «Мечты превращаются в фантазии» · <b>держатель потолка:</b> Artur Sharifov, 38 мин, нейрофизиология мышления — по предмету не проходит, но 4 из 5 верхних в нише при пороге 3 из 5. <b>Первым — не по баллу:</b> весь потолок двери держит один чужой ролик; без него С падает с 20,10 до 3,46. Это самая дешёвая проверка самого дорогого допущения плана.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="ord num">2</div>
+        <div class="card-head">
+          <p class="ttl">Как найти своё дело, если состоялись в чужом: метод двух списков</p>
+          <div class="pills">
+            <span class="pill p-grow">ростовой</span>
+            <span class="pill p-cell">Предназначение × Техника</span>
+            <span class="pill p-len">20 мин</span>
+            <span class="pill p-fork">зависит от развилки</span>
+          </div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="met"><span class="k">С спрос</span><span class="v">25,98</span></div>
+        <div class="met"><span class="k">О отдача</span><span class="v">1,06</span></div>
+        <div class="met"><span class="k">Ж живучесть</span><span class="v">3,72</span></div>
+        <div class="met"><span class="k">R разрыв</span><span class="v">×707</span></div>
+        <div class="met"><span class="k">Плотность</span><span class="v">3 531</span></div>
+        <div class="met"><span class="k">Потолок</span><span class="v">2 494 894</span></div>
+      </div>
+      <div class="takeaway"><b>Что зритель уносит</b>Два списка на одном листе — что он делает, потому что умеет, и что делает, потому что это его, — и правило, по которому строка переносится из первого во второй.</div>
+      <div class="door"><b>Дверь:</b> «Как найти своё дело, если вы уже состоялись в чужом» · <b>держатель:</b> Маргулан Сейсембай, 14 мин — держатель совпадает с формулировкой дословно, самая чистая дверь набора. По баллу этот ролик был бы первым.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="ord num">3</div>
+        <div class="card-head">
+          <p class="ttl">Как поднять свой внутренний чек за неделю: шаг, с которого начинают</p>
+          <div class="pills">
+            <span class="pill p-grow">ростовой</span>
+            <span class="pill p-cell">Самоценность × Монолог 10–25</span>
+            <span class="pill p-len">18 мин</span>
+          </div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="met"><span class="k">С спрос</span><span class="v">11,15</span></div>
+        <div class="met"><span class="k">О отдача</span><span class="v">1,23</span></div>
+        <div class="met"><span class="k">Ж живучесть</span><span class="v">3,72</span></div>
+        <div class="met"><span class="k">R разрыв</span><span class="v">×303</span></div>
+        <div class="met"><span class="k">Плотность</span><span class="v">1 312</span></div>
+        <div class="met"><span class="k">Потолок</span><span class="v">397 905</span></div>
+      </div>
+      <div class="takeaway"><b>Что зритель уносит</b>Одно действие на ближайшую неделю, после которого он называет свою цену вслух хотя бы один раз, и способ заметить, где он её занижает по привычке.</div>
+      <div class="door"><b>Дверь:</b> «Как поднять свой внутренний чек» · <b>держатель:</b> Ицхак Пинтосевич, 8 мин. <b>Точка входа при отказе от метода:</b> этот ролик метода не требует и не меняется ни в одной ветке развилки.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="ord num">4</div>
+        <div class="card-head">
+          <p class="ttl">Как я нашла своё дело, уже состоявшись в чужом: четыре шага подряд</p>
+          <div class="pills">
+            <span class="pill p-cap">захватный</span>
+            <span class="pill p-cell">Предназначение × Монолог 10–25</span>
+            <span class="pill p-len">24 мин</span>
+          </div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="met"><span class="k">С спрос</span><span class="v">25,98</span></div>
+        <div class="met"><span class="k">О отдача</span><span class="v">0,72</span></div>
+        <div class="met"><span class="k">Ж живучесть</span><span class="v">3,72</span></div>
+        <div class="met"><span class="k">R разрыв</span><span class="v">×707</span></div>
+        <div class="met"><span class="k">Плотность</span><span class="v">3 531</span></div>
+        <div class="met"><span class="k">Первое лицо</span><span class="v">×2,60</span></div>
+      </div>
+      <div class="takeaway"><b>Что зритель уносит</b>Право уйти не в кризисе, а на пике — и порядок шагов, в котором это делается, с названными сроками. Не биография: биография в описании канала, здесь — последовательность.</div>
+      <div class="door"><b>Дверь:</b> та же, что у ролика 2 · <b>ставка:</b> кратность к подпискам у роликов от первого лица ×2,60. Две двери из восьми несут по два ролика — прямое следствие того, что вентиль закрыл 16 формулировок из 25.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="ord num">5</div>
+        <div class="card-head">
+          <p class="ttl">Как за неделю вернуть мечту из фантазии в реальный план: четыре шага</p>
+          <div class="pills">
+            <span class="pill p-grow">ростовой</span>
+            <span class="pill p-cell">Желания × Монолог 10–25</span>
+            <span class="pill p-len">22 мин</span>
+          </div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="met"><span class="k">С спрос</span><span class="v">20,10</span></div>
+        <div class="met"><span class="k">О отдача</span><span class="v">1,21</span></div>
+        <div class="met"><span class="k">Ж живучесть</span><span class="v">3,72</span></div>
+        <div class="met"><span class="k">R разрыв</span><span class="v">×547</span></div>
+        <div class="met"><span class="k">Плотность</span><span class="v">5 529</span></div>
+        <div class="met"><span class="k">Потолок</span><span class="v">3 023 168</span></div>
+      </div>
+      <div class="takeaway"><b>Что зритель уносит</b>Одна мечта, разложенная на четыре опоры, и первый шаг, который он делает до конца дня.</div>
+      <div class="door"><b>Дверь:</b> та же, что у ролика 1 · <b>переведён в монолог намеренно:</b> слово «шаг» вместо «техника» даёт тот же приём ×1,59, но не переводит ролик в формат, зависящий от развилки.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="ord num">6</div>
+        <div class="card-head">
+          <p class="ttl">Как за 30 дней перестать выбирать между делом души и деньгами: протокол</p>
+          <div class="pills">
+            <span class="pill p-grow">ростовой</span>
+            <span class="pill p-cell">Деньги × Монолог 25–60</span>
+            <span class="pill p-len">30 мин</span>
+          </div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="met"><span class="k">С спрос</span><span class="v">3,55</span></div>
+        <div class="met"><span class="k">О отдача</span><span class="v">1,26</span></div>
+        <div class="met"><span class="k">Ж живучесть</span><span class="v">3,72</span></div>
+        <div class="met"><span class="k">R разрыв</span><span class="v">×96,5</span></div>
+        <div class="met"><span class="k">Плотность</span><span class="v">17 830</span></div>
+        <div class="met"><span class="k">Каналов в ячейке</span><span class="v">17</span></div>
+      </div>
+      <div class="takeaway"><b>Что зритель уносит</b>Протокол на месяц, по которому он один раз считает, во что ему обходится сам выбор — не «дело души» и не «деньги», а колебание между ними.</div>
+      <div class="door"><b>Дверь:</b> «Дело души или деньги» · <b>держатель:</b> «Ломая концепции», 23 мин. <b>Самая широко подтверждённая ячейка плана:</b> 17 независимых каналов, узкий коридор 1,26–1,51. Оговорка: деньги дают просмотры и слабо дают подписку — ×0,80 против фона 0,95.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="ord num">7</div>
+        <div class="card-head">
+          <p class="ttl">Как перестать играть по чужим правилам: протокол на двадцать минут</p>
+          <div class="pills">
+            <span class="pill p-grow">ростовой</span>
+            <span class="pill p-cell">Желания × Монолог 10–25</span>
+            <span class="pill p-len">21 мин</span>
+          </div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="met"><span class="k">С спрос</span><span class="v">1,29</span></div>
+        <div class="met"><span class="k">О отдача</span><span class="v">1,21</span></div>
+        <div class="met"><span class="k">Ж живучесть</span><span class="v">3,72</span></div>
+        <div class="met"><span class="k">R разрыв</span><span class="v">×35,0</span></div>
+        <div class="met"><span class="k">Плотность</span><span class="v">824</span></div>
+        <div class="met"><span class="k">Потолок</span><span class="v">28 801</span></div>
+      </div>
+      <div class="takeaway"><b>Что зритель уносит</b>Список правил, по которым он живёт и которые не выбирал, — с пометкой напротив каждого, кто его написал.</div>
+      <div class="door"><b>Самая свободная и самая скромная дверь набора:</b> плотность 824 — верх выдачи практически пуст, но и потолок всего 28 801. Тема свободна, объём у неё небольшой.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="ord num">8</div>
+        <div class="card-head">
+          <p class="ttl">Как перестать держаться за то, что уже не держит: шаг за неделю</p>
+          <div class="pills">
+            <span class="pill p-cap">захватный</span>
+            <span class="pill p-cell">Самоценность × Монолог 10–25</span>
+            <span class="pill p-len">17 мин</span>
+          </div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="met"><span class="k">С спрос</span><span class="v">0,72</span></div>
+        <div class="met"><span class="k">О отдача</span><span class="v">1,23</span></div>
+        <div class="met"><span class="k">Ж живучесть</span><span class="v">3,72</span></div>
+        <div class="met"><span class="k">R разрыв</span><span class="v">×19,5</span></div>
+        <div class="met"><span class="k">Плотность</span><span class="v">137 234</span></div>
+        <div class="met"><span class="k">Потолок</span><span class="v">2 679 559</span></div>
+      </div>
+      <div class="takeaway"><b>Что зритель уносит</b>Один предмет, роль или обязательство, от которого он отказывается на этой неделе, и фраза, которой он это скажет вслух другому человеку.</div>
+      <div class="door"><b>Дверь:</b> «Внутренняя опора» · <b>держатель:</b> Садхгуру, 7 мин, все 5 из 5 верхних в нише. Плотность высокая — тема занята, поэтому ролик в захватном контуре, а не в ростовом.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="ord num">9</div>
+        <div class="card-head">
+          <p class="ttl">Как за 30 дней вернуть цель, которая перестала тянуть: протокол</p>
+          <div class="pills">
+            <span class="pill p-cap">захватный</span>
+            <span class="pill p-cell">Продуктивность × Монолог 10–25</span>
+            <span class="pill p-len">23 мин</span>
+          </div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="met"><span class="k">С спрос</span><span class="v">0,69</span></div>
+        <div class="met"><span class="k">О отдача</span><span class="v">1,16</span></div>
+        <div class="met"><span class="k">Ж живучесть</span><span class="v">3,72</span></div>
+        <div class="met"><span class="k">R разрыв</span><span class="v">×18,8</span></div>
+        <div class="met"><span class="k">Плотность</span><span class="v">299 870</span></div>
+        <div class="met"><span class="k">Лифт темы</span><span class="v">2,82</span></div>
+      </div>
+      <div class="takeaway"><b>Что зритель уносит</b>Различение «цель перестала тянуть» и «я устал» — и тридцатидневная процедура, по итогу которой он либо возвращает цель, либо снимает её с себя письменно.</div>
+      <div class="door"><b>Дверь:</b> «Кризис смыслов» · <b>тема с самым большим разрывом «мало снимают — много вылетает»:</b> 2,5% каталогов против 7,0% аномалий, лифт 2,82. Плотность в 14 раз выше медианы — дверь занята, отсюда захватный контур.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="ord num">10</div>
+        <div class="card-head">
+          <p class="ttl">Как выйти из режима «я всё сама» за месяц: инструкция по шагам</p>
+          <div class="pills">
+            <span class="pill p-cap">захватный</span>
+            <span class="pill p-cell">Продуктивность × Монолог 10–25</span>
+            <span class="pill p-len">20 мин</span>
+          </div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="met"><span class="k">С спрос</span><span class="v">0,19</span></div>
+        <div class="met"><span class="k">О отдача</span><span class="v">1,16</span></div>
+        <div class="met"><span class="k">Ж живучесть</span><span class="v">3,72</span></div>
+        <div class="met"><span class="k">R разрыв</span><span class="v">×7,4</span></div>
+        <div class="met"><span class="k">Плотность</span><span class="v">755 948</span></div>
+        <div class="met"><span class="k">Потолок</span><span class="v">5 623 912</span></div>
+      </div>
+      <div class="takeaway"><b>Что зритель уносит</b>Одна задача, снятая с себя за неделю, — с именем человека, которому она передана, и с ценой, в которую это обошлось.</div>
+      <div class="door"><b>Самая занятая дверь набора:</b> плотность 755 948, разрыв всего ×7,4 — верх выдачи плотно занят. Ставится последней и только в захватный контур: тема нужна тем, кто уже пришёл, а не для набора незнакомых.</div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <h2>Решение, которого нет в данных</h2>
+  <p>Единственное место плана, где числа упираются в выбор, который может сделать только Екатерина. Её ДНК говорит: <em>«не отдаю в кадр методологию целиком»</em>. Измеренное говорит: у каналов, где метод объясняется, медиана лучшего ролика <strong class="num">151 000</strong> против <strong class="num">23 000</strong> — разница в <span class="num">6,6</span> раза.</p>
+  <p>Два ролика из десяти — первый и второй — стоят на формате, который без объяснённого метода не существует. Остальные восемь не зависят от решения ни в одной ветке.</p>
+
+  <div class="branches">
+    <div class="br a">
+      <span class="lbl">Ветка A</span>
+      <h4>Метод объясняется на камеру</h4>
+      <p><b>Что даётся:</b></p>
+      <ul>
+        <li>×6,6 по медиане лучшего ролика</li>
+        <li>×1,59 на заголовке</li>
+        <li>формат с наибольшим лифтом по аномалиям — 2,30</li>
+        <li>самый высокий О в плане — 1,83</li>
+      </ul>
+      <p><b>Что теряется:</b> методология становится публичной.</p>
+      <div class="verdict">Цена этой потери в наших данных не измерена ни разу. Ни одного замера «скопировали метод — канал просел» в корпусе нет, обратного тоже нет. Здесь формула молчит.</div>
+    </div>
+    <div class="br b">
+      <span class="lbl">Ветка B</span>
+      <h4>Метод в кадре не отдаётся</h4>
+      <p><b>Цена, посчитанная по строкам плана:</b></p>
+      <ul>
+        <li>О ролика 1 падает с 1,83 до 1,21 — <b>минус 34%</b></li>
+        <li>О ролика 2 падает с 1,06 до 0,72 — <b>минус 32%</b></li>
+        <li>связка «Как + метод» распадается: 64 000 → 34 000, <b>минус 47%</b></li>
+        <li>разрыв ×6,6 по потолку не берётся</li>
+      </ul>
+      <div class="verdict">Контрольное число из её собственных данных: на старом канале лексика метода есть у 9 заголовков из 170 — 5% против 20% у доноров; медиана канала 674 просмотра, 119 роликов из 170 набрали меньше тысячи. Не доказательство причинности, но единственная точка, где ветка B уже проверена на ней самой.</div>
+    </div>
+    <div class="br c">
+      <span class="lbl">Ветка C</span>
+      <h4>Отдаётся один шаг, а не методология</h4>
+      <p>Переформулировка запрета: в кадре разбирается одно действие целиком, а не система целиком.</p>
+      <div class="verdict">Цена не измерена: ни один наш замер не различает «метод целиком» и «один шаг метода» — лексика заголовка считает наличие слова, а не глубину раскрытия. Добор известен и дёшев: расшифровки трёх-пяти роликов у двух каналов, живущих ровно на этой границе. Пятнадцать минут на канал, ноль квоты.</div>
+    </div>
+  </div>
+
+  <div class="call warn">
+    <h4>Как план устроен под нерешённую развилку</h4>
+    <p>Ролик 1 поставлен первым именно поэтому: он проверяет самое дорогое допущение плана одной съёмкой, а не десятью. Ролик 3 метода не требует и назначен точкой входа, если Екатерина выберет ветку B. Восемь роликов из десяти несут слова «шаг» и «протокол» — одно действие зрителя, а не методология автора; они сохраняют приём ×1,59 в любой ветке.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Что не вошло и чем за это заплачено</h2>
+  <p>Из 25 замеренных формулировок <strong>16 закрыл вентиль перехвата</strong>: верх выдачи по ним держат каналы не по теме, и попасть туда нашим роликом нельзя.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Формулировка</th><th class="n">Разрыв</th><th>Кто на самом деле держит верх</th></tr></thead>
+      <tbody>
+        <tr><td>Квантовая сессия</td><td class="n">×1464</td><td>лекция по квантовой физике</td></tr>
+        <tr><td>Тёмная ночь души</td><td class="n">×539</td><td>ролики про искусственный интеллект</td></tr>
+        <tr><td>Отделить главное от лишнего</td><td class="n">×518</td><td>похудение</td></tr>
+        <tr><td>Найти свой дар</td><td class="n">×291</td><td>даркнет и сны</td></tr>
+        <tr><td>Качели в доходе</td><td class="n">×245</td><td>музыка, UMA2RMAN</td></tr>
+        <tr><td>Главное за 20 минут</td><td class="n">×100</td><td>аудиокнига Карнеги</td></tr>
+        <tr><td>Место силы</td><td class="n">×11</td><td>аудиокнига</td></tr>
+        <tr><td>Одно дело, когда интересно всё</td><td class="n">×8,9</td><td>кино, ролик на 1 минуту</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Пять закрытых дверей из шестнадцати держат аудиокниги. Ещё одна формулировка — «Самосаботаж» — дала пустую выдачу: ноль каналов. Это не «темы нет», а «этой строкой её не найти».</p>
+  <div class="call no">
+    <h4>Прямое следствие: дверей хватило на восемь, а не на десять</h4>
+    <p>Ролики 1 и 5 идут через одну поисковую дверь, ролики 2 и 4 — через другую. Это не подгонка под красивое число, а арифметика: 25 замеров минус 16 закрытых минус одна пустая оставляют восемь входов. Чинится десятью переформулировками по закрытым темам — замер стоит секунды и не тратит квоту.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Форматы, не дошедшие до плана</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Формат</th><th class="n">Индекс</th><th class="n">Аномалий</th><th>Почему не в плане</th></tr></thead>
+      <tbody>
+        <tr><td>Шортс</td><td class="n">0,22</td><td class="n">0 из 258</td><td>134 ролика у 19 каналов — ни одной аномалии</td></tr>
+        <tr><td>Влог-выезд</td><td class="n">0,20</td><td class="n">0 из 258</td><td>самый дорогой формат при нижней трети отдачи</td></tr>
+        <tr><td>Отзыв</td><td class="n">0,32</td><td class="n">0 из 258</td><td>требует учеников с результатом</td></tr>
+        <tr><td>Монолог 3–10 мин</td><td class="n">0,82</td><td class="n">24</td><td>ниже коридора длины</td></tr>
+        <tr><td>Эфир и ответы</td><td class="n">1,15</td><td class="n">2</td><td>нужна живая аудитория с вопросами</td></tr>
+        <tr><td>Практика</td><td class="n">1,12</td><td class="n">19</td><td>исключена запретом клиента</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Первые три строки — самое дешёвое знание всей работы: <strong class="num">194</strong> произведённых ролика дали <strong>ноль</strong> аномалий, и оба признака видны до съёмки, по длительности и одному слову в заголовке.</p>
+</section>
+
+<section>
+  <h2>Чего этот план не знает</h2>
+  <ul class="plain">
+    <li><strong>Полоса до 3 тысяч подписчиков не измерена.</strong> В ней 4 канала и 1 живой — вердикт «данных недостаточно». Формат подтверждён в полосе 3–20 тысяч: 63,6% живых против 12,8%. Стартовать Екатерина будет ниже этой границы.</li>
+    <li><strong>Ни один ролик не обещает ста тысяч.</strong> Цена входа в этих форматах — около 15 500 подписчиков. Ставка плана на отдачу ячейки и на свободную поисковую дверь, а не на шестизначный ролик.</li>
+    <li><strong>Рамка «архитектура жизни» спросом не подтверждена:</strong> ноль упоминаний в 2 978 сообщениях аудитории и ноль в 320 заголовках ниши. Поэтому слова «архитектура» нет ни в одном из десяти заголовков — рамка живёт в названии канала и описании, а не в поисковых входах.</li>
+    <li><strong>Удержание, CTR, показы и доля новых зрителей недоступны в принципе</strong> — они существуют только в кабинете своего канала.</li>
+    <li><strong>План не проверен ни разу.</strong> Все числа посчитаны на тех же данных, из которых построена формула.</li>
+  </ul>
+  <div class="call">
+    <h4>Единственная непредвзятая проверка</h4>
+    <p>Заморозить эти десять предсказаний сегодня и вернуться через 90 дней. Мера — доля роликов, попавших в свой коридор отдачи; порог <strong class="num">0,5</strong>, вдвое выше случайного попадания. Стоимость: ноль работы и девяносто дней ожидания.</p>
+  </div>
+</section>
+
+<div class="foot">
+  <span>Improducer · производство авторских YouTube-каналов</span>
+  <span>Замеры: 2 сентября 2026</span>
+  <span><a href="/katya/">Концепция канала →</a></span>
+</div>
+
+</div>
+</body>
+</html>
