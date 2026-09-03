@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Доска идей · Екатерина Арея</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{--sans:'IBM Plex Sans',system-ui,sans-serif;--cond:'IBM Plex Sans Condensed',var(--sans);
+--mono:'IBM Plex Mono',Menlo,monospace;--ground:#F4F6F9;--surface:#FFF;--ink:#141C26;
+--ink-2:#4A5967;--ink-3:#778797;--line:#D9E1EA;--line-soft:#EAF0F5;--accent:#1B6C86;
+--accent-soft:#E2EFF3;--ok:#1F7A43;--ok-bg:#DFF0E6;--warn:#9A6510;--warn-bg:#F7EEDC;
+--no:#A33A2A;--no-bg:#F8E5E1;--bad:#7A3E8F;--bad-bg:#F0E6F5;
+--shadow:0 1px 2px rgba(20,28,38,.05),0 10px 28px -14px rgba(20,28,38,.22)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px 80px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+header{padding:52px 0 30px;border-bottom:2px solid var(--ink)}
+.crumb{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+color:var(--ink-3);margin:0 0 16px}
+.crumb a{color:var(--ink-3);text-decoration:none;border-bottom:1px solid var(--line)}
+h1{font-family:var(--cond);font-size:clamp(30px,5vw,48px);line-height:1.03;font-weight:700;
+letter-spacing:-.015em;margin:0 0 16px;max-width:20ch}
+.lede{font-size:17px;color:var(--ink-2);max-width:66ch;margin:0}
+.lede strong{color:var(--ink);font-weight:600}
+.facts{display:flex;flex-wrap:wrap;margin:28px 0 0;border:1px solid var(--line);
+background:var(--surface);border-radius:3px;overflow:hidden;box-shadow:var(--shadow)}
+.fact{flex:1 1 140px;padding:13px 15px;border-right:1px solid var(--line-soft)}
+.fact:last-child{border-right:0}
+.fact .k{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+color:var(--ink-3);display:block;margin-bottom:4px}
+.fact .v{font-family:var(--cond);font-size:21px;font-weight:700;line-height:1.1}
+section{margin:48px 0 0}
+h2{font-family:var(--cond);font-size:12px;letter-spacing:.15em;text-transform:uppercase;
+font-weight:700;color:var(--ink-3);margin:0 0 18px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+p{margin:0 0 12px;max-width:68ch}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:3px;
+box-shadow:var(--shadow);margin-bottom:11px;overflow:hidden;transition:opacity .15s}
+.row.m-no,.row.m-wrong{opacity:.45}
+.row-top{display:flex;gap:14px;padding:14px 16px 11px;align-items:flex-start}
+.rank{font-family:var(--cond);font-size:24px;font-weight:700;color:var(--line);
+min-width:34px;line-height:1;font-variant-numeric:tabular-nums;padding-top:2px}
+.row.m-ok .rank{color:var(--ok)}
+.rhead{flex:1;min-width:0}
+.rtitle{font-family:var(--cond);font-size:17px;font-weight:700;line-height:1.25;margin:0 0 6px}
+.rtitle a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+.rtitle a:hover{color:var(--accent)}
+.rmeta{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin:0}
+.sig{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 0}
+.s{font-family:var(--mono);font-size:10px;letter-spacing:.04em;padding:3px 7px;border-radius:2px;
+font-weight:600;white-space:nowrap}
+.s-on{background:var(--ok-bg);color:var(--ok)}
+.s-off{background:var(--line-soft);color:var(--ink-3)}
+.s-un{background:var(--warn-bg);color:var(--warn)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));
+border-top:1px solid var(--line-soft);background:var(--ground)}
+.st{padding:8px 13px;border-right:1px solid var(--line-soft)}
+.st:last-child{border-right:0}
+.st .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;
+color:var(--ink-3);display:block}
+.st .v{font-family:var(--mono);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.marks{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:11px 16px;
+border-top:1px solid var(--line-soft)}
+.mbtn{font-family:var(--sans);font-size:13px;font-weight:600;padding:5px 13px;border-radius:3px;
+border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer}
+.mbtn:hover{border-color:var(--ink-3)}
+.mbtn.on-ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.mbtn.on-no{background:var(--no-bg);border-color:var(--no);color:var(--no)}
+.mbtn.on-wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.cmt{flex:1;min-width:200px;font-family:var(--sans);font-size:13px;padding:6px 10px;
+border:1px solid var(--line);border-radius:3px;background:var(--ground);color:var(--ink);resize:vertical}
+.cmt:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+.scroll{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:3px;
+background:var(--surface);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line-soft);vertical-align:top}
+th{font-family:var(--cond);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+color:var(--ink-3);font-weight:700;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.call{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
+border-radius:0 3px 3px 0;padding:16px 20px;margin:18px 0}
+.call.warn{border-left-color:var(--warn)}
+.call h4{font-family:var(--cond);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+margin:0 0 8px;color:var(--accent);font-weight:700}
+.call.warn h4{color:var(--warn)}
+.bar{position:sticky;top:0;z-index:9;background:var(--ground);border-bottom:1px solid var(--line);
+padding:10px 0;margin-bottom:16px;font-family:var(--mono);font-size:12px;color:var(--ink-3);
+display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.bar b{color:var(--ink);font-weight:600}
+.foot{margin:56px 0 0;padding-top:18px;border-top:2px solid var(--ink);font-family:var(--mono);
+font-size:11px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 22px}
+@media(max-width:640px){.wrap{padding:0 14px 56px}.row-top{padding:12px 12px 9px;gap:10px}
+.rank{font-size:18px;min-width:24px}.rtitle{font-size:15.5px}}
+</style></head><body><div class='wrap'>
+<header>
+<p class="crumb"><a href="/katya/">Концепция</a> · <a href="/katya/plan/">Контент-план</a> · Доска идей · 03.09.2026</p>
+<h1>Доска идей: что уже сработало у похожих авторов</h1>
+<p class="lede">Каждая строка — <strong>реальный ролик, который залетел</strong>. Порядок задан числом независимых подтверждений, а не моей уверенностью: «вероятности успеха» у нас нет и взять её неоткуда. Отмечайте ✓ подходит, ✕ не подходит, ⊘ не должен был сюда попасть — третья отметка чинит отбор, а не строку.</p>
+<div class="facts">
+<div class="fact"><span class="k">Роликов на доске</span><span class="v num">17</span></div>
+<div class="fact"><span class="k">Рассмотрено</span><span class="v num">601</span></div>
+<div class="fact"><span class="k">Каналов в базе</span><span class="v num">—</span></div>
+<div class="fact"><span class="k">Меток человека</span><span class="v num">120</span></div>
+<div class="fact"><span class="k">Нужно выбрать</span><span class="v num">10</span></div>
+</div></header>
+<div class="bar"><span>отмечено подходящими <b id="c-ok">0</b></span><span>не подходит <b id="c-no">0</b></span><span>промах отбора <b id="c-wrong">0</b></span><span>осталось выбрать <b id="c-left">—</b></span><button class="mbtn" id="export">скопировать отметки</button></div>
+<section><h2>Идеи по убыванию подтверждений</h2>
+<div class="row" data-id="1Y1694EO2z4" data-title="ВОССТАНОВИ ЭНЕРГИЮ за 7 ШАГОВ без стресса и усталости. Даже если нет времени. ">
+<div class="row-top">
+<div class="rank num">1</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=1Y1694EO2z4" target="_blank" rel="noopener">ВОССТАНОВИ ЭНЕРГИЮ за 7 ШАГОВ без стресса и усталости. Даже если нет времени. </a></p>
+<p class="rmeta">Доктор Любимова |  Усталость после 30 · поиск роликов · тема: смежное · ru</p>
+<div class="sig">
+<span class="s s-on">С1 из первых 4 · 1</span>
+<span class="s s-off">С2 канал ≤3 000 · 7900</span>
+<span class="s s-on">С3 формат наш · 21 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 27618 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · энерги — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">76 131</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">93.58</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">7 900</span></div>
+<div class="st"><span class="k">длина</span><span class="v">21 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">3/4</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т1</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="ZgJkfdHPG_g" data-title="Вы никогда не были в настоящем моменте? Давайте туда войдём. Пробуждение за 20 минут">
+<div class="row-top">
+<div class="rank num">2</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=ZgJkfdHPG_g" target="_blank" rel="noopener">Вы никогда не были в настоящем моменте? Давайте туда войдём. Пробуждение за 20 минут</a></p>
+<p class="rmeta">ProСВЕТ · поиск роликов · тема: по нише · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 15</span>
+<span class="s s-off">С2 канал ≤3 000 · 18000</span>
+<span class="s s-on">С3 формат наш · 21 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-on">С6 дверь свободна · R ×100.0, потолок 5017142</span>
+<span class="s s-on">С8 отдано времени · 24825 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · нет — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">70 649</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">7.85</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">18 000</span></div>
+<div class="st"><span class="k">длина</span><span class="v">21 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">3/5</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="aDtaZMoJYr4" data-title="7 типов людей, от которых стоит держаться подальше">
+<div class="row-top">
+<div class="rank num">3</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=aDtaZMoJYr4" target="_blank" rel="noopener">7 типов людей, от которых стоит держаться подальше</a></p>
+<p class="rmeta">Liza Brain · канал базы, свежий хит · тема: смежное · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 34</span>
+<span class="s s-off">С2 канал ≤3 000 · 44300</span>
+<span class="s s-on">С3 формат наш · 21 мин</span>
+<span class="s s-on">С5 свежесть ≤365 дн · 52 дн</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 50640 ч</span>
+<span class="s s-un">С4 лицо на обложке · 1 — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · нет — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">144 000</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">7.78</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">44 300</span></div>
+<div class="st"><span class="k">длина</span><span class="v">21 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">3/5</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="lH5iEs5IDH8" data-title="Как стать уверенной в себе с точки зрения нейропсихологии: пошаговый план">
+<div class="row-top">
+<div class="rank num">4</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=lH5iEs5IDH8" target="_blank" rel="noopener">Как стать уверенной в себе с точки зрения нейропсихологии: пошаговый план</a></p>
+<p class="rmeta">Liza Brain · канал базы, свежий хит · тема: смежное · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 33</span>
+<span class="s s-off">С2 канал ≤3 000 · 44300</span>
+<span class="s s-on">С3 формат наш · 22 мин</span>
+<span class="s s-on">С5 свежесть ≤365 дн · 80 дн</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 40290 ч</span>
+<span class="s s-un">С4 лицо на обложке · 3 — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · нет — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">108 000</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">5.84</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">44 300</span></div>
+<div class="st"><span class="k">длина</span><span class="v">22 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">3/5</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="VHARYuaeVo4" data-title="Понятный алгоритм исполнения желаний. Работает у меня БЕЗОТКАЗНО!">
+<div class="row-top">
+<div class="rank num">5</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=VHARYuaeVo4" target="_blank" rel="noopener">Понятный алгоритм исполнения желаний. Работает у меня БЕЗОТКАЗНО!</a></p>
+<p class="rmeta">Алёна Зацепило · открытый поиск по каналам · тема: по нише · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 154</span>
+<span class="s s-off">С2 канал ≤3 000 · 90200</span>
+<span class="s s-on">С3 формат наш · 23 мин</span>
+<span class="s s-on">С5 свежесть ≤365 дн · 67 дн</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 21150 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · желани, работа — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">54 078</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">3.2</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">90 200</span></div>
+<div class="st"><span class="k">длина</span><span class="v">23 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">3/5</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="_vpyaG4LCvc" data-title="КАК ПОНЯТЬ ЧЕГО Я ХОЧУ/ 4 ЭТАПА / психолог Людмила Айвазян">
+<div class="row-top">
+<div class="rank num">6</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=_vpyaG4LCvc" target="_blank" rel="noopener">КАК ПОНЯТЬ ЧЕГО Я ХОЧУ/ 4 ЭТАПА / психолог Людмила Айвазян</a></p>
+<p class="rmeta">Людмила Айвазян · поиск роликов · тема: по нише · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 74</span>
+<span class="s s-off">С2 канал ≤3 000 · 7520</span>
+<span class="s s-on">С3 формат наш · 15 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 20507 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · понять — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">78 541</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">113.5</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">7 520</span></div>
+<div class="st"><span class="k">длина</span><span class="v">15 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">2/4</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="NrxtzHy0hbI" data-title="Я ХОЧУ ЛЕЖАТЬ И НИЧЕГО НЕ ДЕЛАТЬ: ЖЕЛАНИЕ ВЕЧНОГО УЕДИНЕНИЯ И УСТАЛОСТЬ | ОТВЕЧАЮ НА ПЛАТНЫЙ ВОПРОС">
+<div class="row-top">
+<div class="rank num">7</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=NrxtzHy0hbI" target="_blank" rel="noopener">Я ХОЧУ ЛЕЖАТЬ И НИЧЕГО НЕ ДЕЛАТЬ: ЖЕЛАНИЕ ВЕЧНОГО УЕДИНЕНИЯ И УСТАЛОСТЬ | ОТВЕЧАЮ НА ПЛАТНЫЙ ВОПРОС</a></p>
+<p class="rmeta">Артём Кухарев | Психология &amp; Творчество · поиск роликов · тема: по нише · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 330</span>
+<span class="s s-off">С2 канал ≤3 000 · 17000</span>
+<span class="s s-on">С3 формат наш · 22 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 53335 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · ничего — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">139 948</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">103.67</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">17 000</span></div>
+<div class="st"><span class="k">длина</span><span class="v">22 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">2/4</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="YnleQaVhB5I" data-title="Как стать спокойным (и перестать тревожиться)">
+<div class="row-top">
+<div class="rank num">8</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=YnleQaVhB5I" target="_blank" rel="noopener">Как стать спокойным (и перестать тревожиться)</a></p>
+<p class="rmeta">Даниил Гильманов · поиск роликов · тема: смежное · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 129</span>
+<span class="s s-off">С2 канал ≤3 000 · 13500</span>
+<span class="s s-on">С3 формат наш · 26 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 29895 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · перест, тревож — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">67 988</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">72.33</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">13 500</span></div>
+<div class="st"><span class="k">длина</span><span class="v">26 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">2/4</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="e2qvYAkiP1A" data-title="8 шагов, чтобы повысить самоценность (и самооценку тоже!) | Совет психолога онлайн">
+<div class="row-top">
+<div class="rank num">9</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=e2qvYAkiP1A" target="_blank" rel="noopener">8 шагов, чтобы повысить самоценность (и самооценку тоже!) | Совет психолога онлайн</a></p>
+<p class="rmeta">Анна Парвати | Психотерапевт в Европе · поиск роликов · тема: по нише · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 59</span>
+<span class="s s-off">С2 канал ≤3 000 · 11500</span>
+<span class="s s-on">С3 формат наш · 19 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 19647 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · нет — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">61 721</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">68.5</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">11 500</span></div>
+<div class="st"><span class="k">длина</span><span class="v">19 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">2/4</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="kK9wOwSV5S0" data-title="Как по-настоящему полюбить себя">
+<div class="row-top">
+<div class="rank num">10</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=kK9wOwSV5S0" target="_blank" rel="noopener">Как по-настоящему полюбить себя</a></p>
+<p class="rmeta">Анна Рудакова · поиск роликов · тема: по нише · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 44</span>
+<span class="s s-off">С2 канал ≤3 000 · 42200</span>
+<span class="s s-on">С3 формат наш · 17 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 56592 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · нет — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">189 519</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">47.98</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">42 200</span></div>
+<div class="st"><span class="k">длина</span><span class="v">17 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">2/4</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="1sBAnSr8_OM" data-title="7 правил выживания для тех, кто вырос без опоры и поддержки">
+<div class="row-top">
+<div class="rank num">11</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=1sBAnSr8_OM" target="_blank" rel="noopener">7 правил выживания для тех, кто вырос без опоры и поддержки</a></p>
+<p class="rmeta">Надежда Семененко · поиск роликов · тема: смежное · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 131</span>
+<span class="s s-off">С2 канал ≤3 000 · 24100</span>
+<span class="s s-on">С3 формат наш · 22 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 57921 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · нет — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">155 959</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">42.73</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">24 100</span></div>
+<div class="st"><span class="k">длина</span><span class="v">22 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">2/4</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="gsxQ0PpOb30" data-title="Как вернуть мотивацию и желание жить | ТОП 5 убийц ДОФАМИНА">
+<div class="row-top">
+<div class="rank num">12</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=gsxQ0PpOb30" target="_blank" rel="noopener">Как вернуть мотивацию и желание жить | ТОП 5 убийц ДОФАМИНА</a></p>
+<p class="rmeta">Александр Свят · поиск роликов · тема: смежное · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 130</span>
+<span class="s s-off">С2 канал ≤3 000 · 31000</span>
+<span class="s s-on">С3 формат наш · 19 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 27894 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · вернут, желани — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">85 031</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">37.79</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">31 000</span></div>
+<div class="st"><span class="k">длина</span><span class="v">19 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">2/4</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="j5u2okHgnUM" data-title="Как выглядит выздоровление от созависимости?">
+<div class="row-top">
+<div class="rank num">13</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=j5u2okHgnUM" target="_blank" rel="noopener">Как выглядит выздоровление от созависимости?</a></p>
+<p class="rmeta">Клуб Натальи Жуковой «Автономия» · поиск роликов · тема: смежное · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 26</span>
+<span class="s s-off">С2 канал ≤3 000 · 26200</span>
+<span class="s s-on">С3 формат наш · 30 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 18767 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · созави — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">36 961</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">27.38</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">26 200</span></div>
+<div class="st"><span class="k">длина</span><span class="v">30 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">2/4</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="dUJiYqWIRV8" data-title="как стать уверенной в себе и независимой от мнения людей">
+<div class="row-top">
+<div class="rank num">14</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=dUJiYqWIRV8" target="_blank" rel="noopener">как стать уверенной в себе и независимой от мнения людей</a></p>
+<p class="rmeta">Liza Brain · поиск роликов · тема: по нише · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 14</span>
+<span class="s s-off">С2 канал ≤3 000 · 44300</span>
+<span class="s s-on">С3 формат наш · 18 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 125415 ч</span>
+<span class="s s-un">С4 лицо на обложке · 1 — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · нет — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">398 849</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">21.56</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">44 300</span></div>
+<div class="st"><span class="k">длина</span><span class="v">18 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">2/4</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="Cwoa4TOZXdk" data-title="Это видео перевернет твою жизнь навсегда! Как найти свое призвание и стать свободным?">
+<div class="row-top">
+<div class="rank num">15</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=Cwoa4TOZXdk" target="_blank" rel="noopener">Это видео перевернет твою жизнь навсегда! Как найти свое призвание и стать свободным?</a></p>
+<p class="rmeta">Константин Пулькин | Созидатель · поиск роликов · тема: по нише · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 11</span>
+<span class="s s-off">С2 канал ≤3 000 · 39200</span>
+<span class="s s-on">С3 формат наш · 16 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 26263 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · призва — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">96 974</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">16.72</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">39 200</span></div>
+<div class="st"><span class="k">длина</span><span class="v">16 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">2/4</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="U_vdYPZ5xMU" data-title="Почему мы боимся начинать? Страх перемен и прокрастинация.">
+<div class="row-top">
+<div class="rank num">16</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=U_vdYPZ5xMU" target="_blank" rel="noopener">Почему мы боимся начинать? Страх перемен и прокрастинация.</a></p>
+<p class="rmeta">Игорь Ожерельев · поиск роликов · тема: смежное · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 8</span>
+<span class="s s-off">С2 канал ≤3 000 · 35800</span>
+<span class="s s-on">С3 формат наш · 15 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 21264 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · переме — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">81 612</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">7.45</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">35 800</span></div>
+<div class="st"><span class="k">длина</span><span class="v">15 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">2/4</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+<div class="row" data-id="_ys0qBYXs9Q" data-title="Как понять, чего я хочу? Гайд по поиску целей">
+<div class="row-top">
+<div class="rank num">17</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=_ys0qBYXs9Q" target="_blank" rel="noopener">Как понять, чего я хочу? Гайд по поиску целей</a></p>
+<p class="rmeta">Алмара Кулиева | Психотерапия прокрастинации · поиск роликов · тема: по нише · ru</p>
+<div class="sig">
+<span class="s s-off">С1 из первых 4 · 25</span>
+<span class="s s-off">С2 канал ≤3 000 · 20600</span>
+<span class="s s-on">С3 формат наш · 35 мин</span>
+<span class="s s-un">С5 свежесть ≤365 дн — не измерено</span>
+<span class="s s-un">С6 дверь свободна — не измерено</span>
+<span class="s s-on">С8 отдано времени · 31747 ч</span>
+<span class="s s-un">С4 лицо на обложке · не измерено — в счёт не идёт</span>
+<span class="s s-un">С7 общие основы с формулировкой · понять — в счёт не идёт</span>
+</div></div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотры</span><span class="v">54 425</span></div>
+<div class="st"><span class="k">×медиана</span><span class="v">6.93</span></div>
+<div class="st"><span class="k">подписчики</span><span class="v">20 600</span></div>
+<div class="st"><span class="k">длина</span><span class="v">35 мин</span></div>
+<div class="st"><span class="k">сработало</span><span class="v">2/4</span></div>
+<div class="st"><span class="k">ярус</span><span class="v">Т2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ подходит</button><button class="mbtn" data-mark="no">✕ не подходит</button><button class="mbtn" data-mark="wrong">⊘ промах отбора</button><textarea class="cmt" rows="1" placeholder="комментарий"></textarea></div>
+</div>
+</section>
+<section><h2>Где на этой доске оказались бы темы контент-плана</h2>
+<p>План собран другим способом — формулой спроса по поисковой выдаче. Доска ранжирует по воспроизводимости с нуля. Это два независимых взгляда на один вопрос, и их расхождение — данные, а не ошибка одного из них.</p>
+<div class="call warn"><h4>Как читать это сопоставление</h4><p>Совпадение считается лексически, по общим основам заголовка и замеренной двери. Это прокси, и он назван прокси: точного соответствия между темой, которую мы снимем, и роликом, который уже кто-то снял, не существует. «Нет соответствия» означает, что в корпусе нет похожего залетевшего ролика — то есть тема стоит на замере спроса и не имеет доказательства воспроизводимости.</p></div>
+<div class="scroll"><table><thead><tr><th>№</th><th>Тема плана</th><th>Контур</th><th class='n'>Место на доске</th><th>С чем сопоставлено</th></tr></thead><tbody>
+<tr><td class="n">1</td><td>Как за 20 минут понять, почему мечта превратилась в фантазию: техника</td><td>ростовой</td><td class="n"><span style="color:var(--warn)">нет соответствия</span></td><td>—</td></tr>
+<tr><td class="n">2</td><td>Как найти своё дело, если состоялись в чужом: метод двух списков</td><td>ростовой</td><td class="n"><span style="color:var(--warn)">нет соответствия</span></td><td>—</td></tr>
+<tr><td class="n">3</td><td>Как поднять свой внутренний чек за неделю: шаг, с которого начинают</td><td>ростовой</td><td class="n"><span style="color:var(--warn)">нет соответствия</span></td><td>—</td></tr>
+<tr><td class="n">4</td><td>Как я нашла своё дело, уже состоявшись в чужом: четыре шага подряд</td><td>захватный</td><td class="n"><span style="color:var(--warn)">нет соответствия</span></td><td>—</td></tr>
+<tr><td class="n">5</td><td>Как за неделю вернуть мечту из фантазии в реальный план: четыре шага</td><td>ростовой</td><td class="n"><span style="color:var(--warn)">нет соответствия</span></td><td>—</td></tr>
+<tr><td class="n">6</td><td>Как за 30 дней перестать выбирать между делом души и деньгами: протокол</td><td>ростовой</td><td class="n"><span style="color:var(--warn)">нет соответствия</span></td><td>—</td></tr>
+<tr><td class="n">7</td><td>Как перестать играть по чужим правилам: протокол на двадцать минут</td><td>ростовой</td><td class="n"><span style="color:var(--warn)">нет соответствия</span></td><td>—</td></tr>
+<tr><td class="n">8</td><td>Как перестать держаться за то, что уже не держит: шаг за неделю</td><td>захватный</td><td class="n"><b>9</b></td><td>8 шагов, чтобы повысить самоценность (и самооценку тоже!) | Совет психолога онлайн</td></tr>
+<tr><td class="n">9</td><td>Как за 30 дней вернуть цель, которая перестала тянуть: протокол</td><td>захватный</td><td class="n"><span style="color:var(--warn)">нет соответствия</span></td><td>—</td></tr>
+<tr><td class="n">10</td><td>Как выйти из режима «я всё сама</td><td>захватный</td><td class="n"><span style="color:var(--warn)">нет соответствия</span></td><td>—</td></tr>
+</tbody></table></div></section>
+<div class="foot"><span>Improducer</span><span>собрано 2026-09-03</span><span>отметки хранятся в этом браузере</span></div>
+</div><script>window.BOARD_TARGET=10;
+(function(){
+  var KEY='board-marks-v1';
+  function load(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}}
+  function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
+  var state=load();
+  function counts(){
+    var c={ok:0,no:0,wrong:0};
+    Object.keys(state).forEach(function(k){var m=state[k]&&state[k].mark;if(m&&c[m]!==undefined)c[m]++});
+    return c;
+  }
+  function paint(){
+    var c=counts();
+    document.getElementById('c-ok').textContent=c.ok;
+    document.getElementById('c-no').textContent=c.no;
+    document.getElementById('c-wrong').textContent=c.wrong;
+    document.getElementById('c-left').textContent=
+      Math.max(0,(window.BOARD_TARGET||10)-c.ok);
+  }
+  document.querySelectorAll('.row').forEach(function(row){
+    var id=row.dataset.id, st=state[id]||{};
+    row.querySelectorAll('.mbtn').forEach(function(b){
+      var m=b.dataset.mark;
+      if(st.mark===m){b.classList.add('on-'+m);row.classList.add('m-'+m)}
+      b.addEventListener('click',function(){
+        var cur=(state[id]||{}).mark;
+        var next=(cur===m)?null:m;
+        state[id]=Object.assign({},state[id],{mark:next});
+        row.querySelectorAll('.mbtn').forEach(function(x){
+          x.classList.remove('on-ok','on-no','on-wrong')});
+        row.classList.remove('m-ok','m-no','m-wrong');
+        if(next){b.classList.add('on-'+next);row.classList.add('m-'+next)}
+        save(state);paint();
+      });
+    });
+    var ta=row.querySelector('.cmt');
+    if(ta){
+      if(st.note)ta.value=st.note;
+      ta.addEventListener('input',function(){
+        state[id]=Object.assign({},state[id],{note:ta.value});save(state);
+      });
+    }
+  });
+  paint();
+  var exp=document.getElementById('export');
+  if(exp)exp.addEventListener('click',function(){
+    var out=[];
+    document.querySelectorAll('.row').forEach(function(r){
+      var s=state[r.dataset.id];
+      if(s&&(s.mark||s.note))out.push({id:r.dataset.id,title:r.dataset.title,
+        mark:s.mark||null,note:s.note||''});
+    });
+    navigator.clipboard.writeText(JSON.stringify(out,null,2)).then(function(){
+      exp.textContent='скопировано';setTimeout(function(){exp.textContent='скопировать отметки'},1600);
+    });
+  });
+})();
+</script></body></html>
