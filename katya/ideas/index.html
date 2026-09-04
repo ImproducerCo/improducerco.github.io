@@ -1,338 +1,476 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><meta name="color-scheme" content="light">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Доска идей · Архитектура жизни</title>
+<title>Доска идей · Екатерина Арея</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Golos+Text:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
-:root{
-  --ground:#F3F5F2; --surface:#FFFFFF; --sunken:#E9ECE7; --tint:#EDF1EE;
-  --ink:#181C1A; --ink-2:#525A55; --ink-3:#87908A;
-  --line:#DDE3DC; --line-2:#C6CEC5;
-  --blue:#25506B; --blue-bg:#E3ECF2;
-  --moss:#3F6247; --moss-bg:#E4EDE5;
-  --rust:#8A4A2E; --rust-bg:#F4E6DF;
-  --serif:'Spectral',Georgia,'Times New Roman',serif;
-  --sans:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --mono:'IBM Plex Mono','SF Mono',Menlo,monospace;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --ground:#121614; --surface:#1A201C; --sunken:#161B18; --tint:#1E2622;
-  --ink:#E8EDE9; --ink-2:#A7B1AA; --ink-3:#78827B;
-  --line:#28312B; --line-2:#374139;
-  --blue:#7FB4D4; --blue-bg:#162A36;
-  --moss:#87B492; --moss-bg:#152418;
-  --rust:#D89273; --rust-bg:#2C1A12;
-}}
-:root[data-theme="dark"]{
-  --ground:#121614; --surface:#1A201C; --sunken:#161B18; --tint:#1E2622;
-  --ink:#E8EDE9; --ink-2:#A7B1AA; --ink-3:#78827B;
-  --line:#28312B; --line-2:#374139;
-  --blue:#7FB4D4; --blue-bg:#162A36;
-  --moss:#87B492; --moss-bg:#152418;
-  --rust:#D89273; --rust-bg:#2C1A12;
-}
+:root{--sans:'IBM Plex Sans',system-ui,sans-serif;--cond:'IBM Plex Sans Condensed',var(--sans);
+--mono:'IBM Plex Mono',Menlo,monospace;--ground:#F4F6F9;--surface:#FFF;--ink:#141C26;
+--ink-2:#4A5967;--ink-3:#778797;--line:#D9E1EA;--line-soft:#EAF0F5;--accent:#1B6C86;
+--accent-soft:#E2EFF3;--ok:#1F7A43;--ok-bg:#DFF0E6;--warn:#9A6510;--warn-bg:#F7EEDC;
+--no:#A33A2A;--no-bg:#F8E5E1;--bad:#7A3E8F;--bad-bg:#F0E6F5;
+--shadow:0 1px 2px rgba(20,28,38,.05),0 10px 28px -14px rgba(20,28,38,.22)}
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{background:var(--ground);color:var(--ink);font-family:var(--sans);
-  font-size:15px;line-height:1.6;margin:0;-webkit-font-smoothing:antialiased}
-.wrap{max-width:920px;margin:0 auto;padding:52px 22px 96px}
-h1,h2{font-family:var(--serif);margin:0;font-weight:600;text-wrap:balance}
-h1{font-size:clamp(30px,5vw,46px);line-height:1.08;letter-spacing:-.012em}
-h2{font-size:clamp(20px,2.7vw,26px);line-height:1.22}
-a{color:var(--blue)}
-.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--ink-3);margin:0 0 18px}
-header{padding-bottom:30px;margin-bottom:38px;border-bottom:1px solid var(--line-2)}
-.dek{font-family:var(--serif);font-size:19px;font-style:italic;color:var(--ink-2);
-  max-width:56ch;margin:18px 0 0;line-height:1.5}
-.tier{margin-top:46px}
-.tier-h{display:flex;align-items:baseline;gap:13px;flex-wrap:wrap;
-  padding-bottom:9px;border-bottom:1px solid var(--line-2)}
-.tier-h h2{font-size:21px}
-.tier-h .n{font-family:var(--mono);font-size:12px;color:var(--ink-3);
-  font-variant-numeric:tabular-nums}
-.tier-note{font-size:13.5px;color:var(--ink-3);margin:9px 0 6px;max-width:60ch}
-.v{display:grid;grid-template-columns:34px 1fr;gap:0 14px;
-  padding:17px 0;border-bottom:1px solid var(--line);align-items:start}
-.v .idx{font-family:var(--mono);font-size:13px;color:var(--ink-3);
-  font-variant-numeric:tabular-nums;padding-top:4px}
-.v a.t{font-family:var(--serif);font-size:19px;font-weight:500;line-height:1.3;
-  color:var(--ink);text-decoration:none;display:block;letter-spacing:-.003em}
-.v a.t:hover{color:var(--blue);text-decoration:underline;text-underline-offset:3px}
-.facts{display:flex;flex-wrap:wrap;gap:5px 14px;margin-top:8px;
-  font-family:var(--mono);font-size:11.5px;color:var(--ink-2);
-  font-variant-numeric:tabular-nums;align-items:center}
-.facts .ch{color:var(--ink-3);font-family:var(--sans);font-size:12.5px}
-.facts b{font-weight:500;color:var(--blue)}
-.facts .fresh{background:var(--moss-bg);color:var(--moss);
-  padding:2px 7px;border-radius:2px}
-.ideas{margin-top:14px;display:grid;gap:1px;background:var(--line);
-  border:1px solid var(--line);border-radius:4px;overflow:hidden}
-.idea{background:var(--surface);padding:17px 20px;display:grid;gap:7px}
-.idea .t{font-family:var(--serif);font-size:18px;font-weight:600;line-height:1.28}
-.idea .p{font-size:13.5px;color:var(--ink-2)}
-.idea .row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
-.chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;
-  padding:3px 8px;border-radius:2px;white-space:nowrap}
-.chip.ok{background:var(--moss-bg);color:var(--moss)}
-.chip.mid{background:var(--blue-bg);color:var(--blue)}
-.chip.low{background:var(--rust-bg);color:var(--rust)}
-.lede{color:var(--ink-2);max-width:64ch;margin:14px 0 0}
-footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);
-  font-family:var(--mono);font-size:11px;color:var(--ink-3);line-height:1.9}
-@media (max-width:560px){
-  .v{grid-template-columns:26px 1fr;gap:0 10px}
-  .v a.t{font-size:17px}
-}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px 80px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+header{padding:52px 0 30px;border-bottom:2px solid var(--ink)}
+.crumb{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+color:var(--ink-3);margin:0 0 16px}
+.crumb a{color:var(--ink-3);text-decoration:none;border-bottom:1px solid var(--line)}
+h1{font-family:var(--cond);font-size:clamp(30px,5vw,48px);line-height:1.03;font-weight:700;
+letter-spacing:-.015em;margin:0 0 16px;max-width:20ch}
+.lede{font-size:17px;color:var(--ink-2);max-width:66ch;margin:0}
+.lede strong{color:var(--ink);font-weight:600}
+.facts{display:flex;flex-wrap:wrap;margin:28px 0 0;border:1px solid var(--line);
+background:var(--surface);border-radius:3px;overflow:hidden;box-shadow:var(--shadow)}
+.fact{flex:1 1 140px;padding:13px 15px;border-right:1px solid var(--line-soft)}
+.fact:last-child{border-right:0}
+.fact .k{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+color:var(--ink-3);display:block;margin-bottom:4px}
+.fact .v{font-family:var(--cond);font-size:21px;font-weight:700;line-height:1.1}
+section{margin:48px 0 0}
+h2{font-family:var(--cond);font-size:12px;letter-spacing:.15em;text-transform:uppercase;
+font-weight:700;color:var(--ink-3);margin:0 0 18px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+p{margin:0 0 12px;max-width:68ch}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:3px;
+box-shadow:var(--shadow);margin-bottom:11px;overflow:hidden;transition:opacity .15s}
+.row.m-no,.row.m-wrong{opacity:.45}
+.row-top{display:flex;gap:14px;padding:14px 16px 11px;align-items:flex-start}
+.rank{font-family:var(--cond);font-size:24px;font-weight:700;color:var(--line);
+min-width:34px;line-height:1;font-variant-numeric:tabular-nums;padding-top:2px}
+.row.m-ok .rank{color:var(--ok)}
+.rhead{flex:1;min-width:0}
+.rtitle{font-family:var(--cond);font-size:17px;font-weight:700;line-height:1.25;margin:0 0 6px}
+.rtitle a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+.rtitle a:hover{color:var(--accent)}
+.rmeta{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin:0}
+.sig{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 0}
+.s{font-family:var(--mono);font-size:10px;letter-spacing:.04em;padding:3px 7px;border-radius:2px;
+font-weight:600;white-space:nowrap}
+.s-on{background:var(--ok-bg);color:var(--ok)}
+.s-off{background:var(--line-soft);color:var(--ink-3)}
+.s-un{background:var(--warn-bg);color:var(--warn)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));
+border-top:1px solid var(--line-soft);background:var(--ground)}
+.st{padding:8px 13px;border-right:1px solid var(--line-soft)}
+.st:last-child{border-right:0}
+.st .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;
+color:var(--ink-3);display:block}
+.st .v{font-family:var(--mono);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.marks{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:11px 16px;
+border-top:1px solid var(--line-soft)}
+.mbtn{font-family:var(--sans);font-size:13px;font-weight:600;padding:5px 13px;border-radius:3px;
+border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer}
+.mbtn:hover{border-color:var(--ink-3)}
+.mbtn.on-ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.mbtn.on-no{background:var(--no-bg);border-color:var(--no);color:var(--no)}
+.mbtn.on-wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.cmt{flex:1;min-width:200px;font-family:var(--sans);font-size:13px;padding:6px 10px;
+border:1px solid var(--line);border-radius:3px;background:var(--ground);color:var(--ink);resize:vertical}
+.cmt:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+.scroll{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:3px;
+background:var(--surface);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line-soft);vertical-align:top}
+th{font-family:var(--cond);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+color:var(--ink-3);font-weight:700;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.call{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
+border-radius:0 3px 3px 0;padding:16px 20px;margin:18px 0}
+.call.warn{border-left-color:var(--warn)}
+.call h4{font-family:var(--cond);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+margin:0 0 8px;color:var(--accent);font-weight:700}
+.call.warn h4{color:var(--warn)}
+.bar{position:sticky;top:0;z-index:9;background:var(--ground);border-bottom:1px solid var(--line);
+padding:10px 0;margin-bottom:16px;font-family:var(--mono);font-size:12px;color:var(--ink-3);
+display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.bar b{color:var(--ink);font-weight:600}
+.foot{margin:56px 0 0;padding-top:18px;border-top:2px solid var(--ink);font-family:var(--mono);
+font-size:11px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 22px}
+@media(max-width:640px){.wrap{padding:0 14px 56px}.row-top{padding:12px 12px 9px;gap:10px}
+.rank{font-size:18px;min-width:24px}.rtitle{font-size:15.5px}}
 </style>
-
 </head>
 <body>
 <div class="wrap">
 <header>
-<p class="eyebrow">Екатерина Арея · Архитектура жизни</p>
+<p class="crumb">Екатерина Арея · Архитектура жизни</p>
 <h1>Доска идей: что уже сработало у похожих авторов</h1>
-<p class="dek">30 роликов, каждый из которых собрал заметно больше,
-чем обычно собирает его канал. Все — говорящая голова на русском, у авторов
-близкого размера. Заголовки настоящие, ссылки открывают видео.</p>
+<p class="lede">Тридцать роликов, каждый из которых собрал заметно больше, чем
+обычно собирает его канал. Все — <strong>говорящая голова на русском</strong>, у
+авторов близкого размера. Заголовки настоящие, ссылки открывают видео.</p>
+<div class="facts">
+<div class="fact"><span class="k">роликов</span><span class="v">30</span></div>
+<div class="fact"><span class="k">каналов</span><span class="v">18</span></div>
+<div class="fact"><span class="k">свежее месяца</span><span class="v">5</span></div>
+<div class="fact"><span class="k">до 20 000 подписчиков</span><span class="v">все</span></div>
+</div>
 </header>
 
 <section>
-<div class="tier"><div class="tier-h"><h2>Каналы до 1 000 подписчиков</h2>
-<span class="n">2</span></div><p class="tier-note">Здесь тема вытащила ролик сама: аудитории у канала почти нет.</p>
-<div class="v"><div class="idx">1</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=trygQ5_EFcI" target="_blank" rel="noopener">РАВНОДУШИЕ  Самурайский Метод Перестать Зависеть От Чужого Мнения</a>
-<div class="facts"><span class="ch">Путь Воина</span>
-<span>758 подписчиков</span>
-<span>23 734 просмотров</span>
-<span><b>×65 к обычному для канала</b></span>
-<span>11 мин</span><span>86 дн. назад</span></div></div></div><div class="v"><div class="idx">2</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=aqbTlYZhNiI" target="_blank" rel="noopener">10 ШАГОВ, чтобы перестать откладывать свою жизнь на потом</a>
-<div class="facts"><span class="ch">Сердце мудрости</span>
-<span>604 подписчиков</span>
-<span>21 778 просмотров</span>
-<span><b>×5 к обычному для канала</b></span>
-<span>15 мин</span><span>585 дн. назад</span></div></div></div></div><div class="tier"><div class="tier-h"><h2>От 1 000 до 5 000</h2>
-<span class="n">10</span></div><p class="tier-note">Канал ещё маленький — результат даёт тема, а не накопленный зритель.</p>
-<div class="v"><div class="idx">3</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=U5CGRJsLPeQ" target="_blank" rel="noopener">Как превратить несерьезное увлечение в дело по Душе за 15 минут</a>
-<div class="facts"><span class="ch">Ана Атман</span>
-<span>3 930 подписчиков</span>
-<span>23 000 просмотров</span>
-<span><b>×40 к обычному для канала</b></span>
-<span>19 мин</span><span>746 дн. назад</span></div></div></div><div class="v"><div class="idx">4</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=P1oPzszUNVo" target="_blank" rel="noopener">ПЕРЕСТАНЬТЕ ЛЕЧИТЬСЯ! Душа кричит через ваше тело — а вы её не слышите</a>
-<div class="facts"><span class="ch">ЖИВОЕ ПРИСУТСТВИЕ</span>
-<span>4 520 подписчиков</span>
-<span>24 000 просмотров</span>
-<span><b>×32 к обычному для канала</b></span>
-<span>13 мин</span><span>297 дн. назад</span></div></div></div><div class="v"><div class="idx">5</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=YB8_X__Nb50" target="_blank" rel="noopener">ОБРАТНАЯ СТОРОНА ПРОСВЕТЛЕНИЯ||ты потеряешь все!</a>
-<div class="facts"><span class="ch">ЖИВОЕ ПРИСУТСТВИЕ</span>
-<span>4 520 подписчиков</span>
-<span>10 000 просмотров</span>
-<span><b>×13 к обычному для канала</b></span>
-<span>6 мин</span><span>205 дн. назад</span></div></div></div><div class="v"><div class="idx">6</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=IX6Jpy8913Y" target="_blank" rel="noopener">Взлом матрицы. Ты можешь не РАБотать.</a>
-<div class="facts"><span class="ch">Пробуждение сознания</span>
-<span>4 260 подписчиков</span>
-<span>24 000 просмотров</span>
-<span><b>×13 к обычному для канала</b></span>
-<span>43 мин</span><span>97 дн. назад</span></div></div></div><div class="v"><div class="idx">7</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=YpuGJwifF54" target="_blank" rel="noopener">МЫ УМИРАЕМ КАЖДЫЕ 24 ЧАСА: что на самом деле происходит С ДУШОЙ ВО ВРЕМЯ СНА</a>
-<div class="facts"><span class="ch">Пробуждение с Сулейманом</span>
-<span>3 990 подписчиков</span>
-<span>32 000 просмотров</span>
-<span><b>×12 к обычному для канала</b></span>
-<span>18 мин</span><span>69 дн. назад</span></div></div></div><div class="v"><div class="idx">8</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=gyWOym05OBg" target="_blank" rel="noopener">🫩Подавление воли. Как проявляется безволие.</a>
-<div class="facts"><span class="ch">Психолог Людмила Алаторцева </span>
-<span>4 140 подписчиков</span>
-<span>15 000 просмотров</span>
-<span><b>×9 к обычному для канала</b></span>
-<span>34 мин</span><span class="fresh">5 дн. назад</span></div></div></div><div class="v"><div class="idx">9</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=K9LzM2DGaC0" target="_blank" rel="noopener">Я ОТКРЫЛ ПРЯМОЙ ПУТЬ В ОСОЗНАННОСТЬ: Как навсегда отключить бесконечный шум в голове</a>
-<div class="facts"><span class="ch">Пробуждение с Сулейманом</span>
-<span>3 990 подписчиков</span>
-<span>19 000 просмотров</span>
-<span><b>×7 к обычному для канала</b></span>
-<span>15 мин</span><span>79 дн. назад</span></div></div></div><div class="v"><div class="idx">10</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=mHh02ixFcP0" target="_blank" rel="noopener">👼 Инфантильность. Почему взрослые люди остаются детьми.</a>
-<div class="facts"><span class="ch">Психолог Людмила Алаторцева </span>
-<span>4 140 подписчиков</span>
-<span>10 000 просмотров</span>
-<span><b>×6 к обычному для канала</b></span>
-<span>42 мин</span><span>272 дн. назад</span></div></div></div><div class="v"><div class="idx">11</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=ufzSQguQBPg" target="_blank" rel="noopener">ИГНОРИРУЙ РЕАЛЬНОСТЬ. Взлом МАТРИЦЫ </a>
-<div class="facts"><span class="ch">Пробуждение сознания</span>
-<span>4 260 подписчиков</span>
-<span>11 000 просмотров</span>
-<span><b>×6 к обычному для канала</b></span>
-<span>22 мин</span><span>37 дн. назад</span></div></div></div><div class="v"><div class="idx">12</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=v-b4JUum66E" target="_blank" rel="noopener">Почему Бог создал тебя СВЕРХЧУВСТВИТЕЛЬНЫМ? Инструменты, КОТОРЫЕ РАБОТАЮТ.</a>
-<div class="facts"><span class="ch">THE SOFOS</span>
-<span>4 730 подписчиков</span>
-<span>16 000 просмотров</span>
-<span><b>×5 к обычному для канала</b></span>
-<span>52 мин</span><span>163 дн. назад</span></div></div></div></div><div class="tier"><div class="tier-h"><h2>От 5 000 до 15 000</h2>
-<span class="n">13</span></div><p class="tier-note">Средние каналы: видно, что тема держится и на подросшей аудитории.</p>
-<div class="v"><div class="idx">13</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=XiR_3atCSSA" target="_blank" rel="noopener">ЖЕНСТВЕННОСТЬ, в которой ты начинаешь притягивать ВСЕ  без усилий. Секрет женской силы</a>
-<div class="facts"><span class="ch">Точка перемен</span>
-<span>9 220 подписчиков</span>
-<span>217 000 просмотров</span>
-<span><b>×155 к обычному для канала</b></span>
-<span>37 мин</span><span>152 дн. назад</span></div></div></div><div class="v"><div class="idx">14</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=FbAn7K4ZfL8" target="_blank" rel="noopener">💸 Как я манифестировала деньги из ниоткуда: скептикам посвящается.</a>
-<div class="facts"><span class="ch">Anastassia Bianchi </span>
-<span>12 400 подписчиков</span>
-<span>132 000 просмотров</span>
-<span><b>×88 к обычному для канала</b></span>
-<span>13 мин</span><span>461 дн. назад</span></div></div></div><div class="v"><div class="idx">15</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=-rrTj8h12pY" target="_blank" rel="noopener">ТРАНСЕРФИНГ. Как МГНОВЕННО ПЕРЕСКОЧИТЬ на ЛУЧШУЮ ВЕТКУ РЕАЛЬНОСТИ</a>
-<div class="facts"><span class="ch">Светлана Мирэ</span>
-<span>6 440 подписчиков</span>
-<span>78 000 просмотров</span>
-<span><b>×58 к обычному для канала</b></span>
-<span>8 мин</span><span>338 дн. назад</span></div></div></div><div class="v"><div class="idx">16</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=MZST5fWGbSY" target="_blank" rel="noopener">Как я ничего не делая манифестирую всё , что захочу.</a>
-<div class="facts"><span class="ch">Anastassia Bianchi </span>
-<span>12 400 подписчиков</span>
-<span>61 000 просмотров</span>
-<span><b>×41 к обычному для канала</b></span>
-<span>17 мин</span><span>437 дн. назад</span></div></div></div><div class="v"><div class="idx">17</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=BZW4FMQ1KwM" target="_blank" rel="noopener">Как перестать стесняться и влюблять в себя людей: реальные способы расслабиться и быть собой</a>
-<div class="facts"><span class="ch">ARISHA</span>
-<span>13 100 подписчиков</span>
-<span>333 000 просмотров</span>
-<span><b>×40 к обычному для канала</b></span>
-<span>18 мин</span><span>315 дн. назад</span></div></div></div><div class="v"><div class="idx">18</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=jSZIZv1w3eU" target="_blank" rel="noopener">ЖЕНСКАЯ СИЛА И ЖЕНСТВЕННОСТЬ: как выйти из режима «я всё сама» и вернуться к себе</a>
-<div class="facts"><span class="ch">Точка перемен</span>
-<span>9 220 подписчиков</span>
-<span>41 000 просмотров</span>
-<span><b>×29 к обычному для канала</b></span>
-<span>30 мин</span><span class="fresh">27 дн. назад</span></div></div></div><div class="v"><div class="idx">19</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=FB_h25IaMM8" target="_blank" rel="noopener">Сложность первых шагов</a>
-<div class="facts"><span class="ch">Tanya Zinchenko</span>
-<span>6 230 подписчиков</span>
-<span>108 000 просмотров</span>
-<span><b>×21 к обычному для канала</b></span>
-<span>18 мин</span><span>205 дн. назад</span></div></div></div><div class="v"><div class="idx">20</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=L3fft51lfzw" target="_blank" rel="noopener">5 ПРАВИЛ ДЕНЕГ Чтобы ДЕНЬГИ Приходили из НИОТКУДА</a>
-<div class="facts"><span class="ch">Светлана Мирэ</span>
-<span>6 440 подписчиков</span>
-<span>13 000 просмотров</span>
-<span><b>×10 к обычному для канала</b></span>
-<span>12 мин</span><span>32 дн. назад</span></div></div></div><div class="v"><div class="idx">21</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=S8C0nYLtExY" target="_blank" rel="noopener">Как я быстро воплощаю желаемое (этого не найти ни в книгах, ни в видео)</a>
-<div class="facts"><span class="ch">Frances Auralia Delacroix</span>
-<span>9 930 подписчиков</span>
-<span>33 000 просмотров</span>
-<span><b>×8 к обычному для канала</b></span>
-<span>16 мин</span><span>46 дн. назад</span></div></div></div><div class="v"><div class="idx">22</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=dNIlFPvTnhQ" target="_blank" rel="noopener">7 привычек, которые я украла у ах*еть каких успешных женщин:</a>
-<div class="facts"><span class="ch">ARISHA</span>
-<span>13 100 подписчиков</span>
-<span>39 000 просмотров</span>
-<span><b>×5 к обычному для канала</b></span>
-<span>24 мин</span><span class="fresh">14 дн. назад</span></div></div></div><div class="v"><div class="idx">23</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=qSSye5w6BGE" target="_blank" rel="noopener">Техника ПЕРЕПРОСМОТР. Верни энергию в свою жизнь</a>
-<div class="facts"><span class="ch">АСЛАН. ПУТЬ ДОМОЙ</span>
-<span>11 200 подписчиков</span>
-<span>14 000 просмотров</span>
-<span><b>×5 к обычному для канала</b></span>
-<span>16 мин</span><span>603 дн. назад</span></div></div></div><div class="v"><div class="idx">24</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=cAaZVAql4Vg" target="_blank" rel="noopener">Что такое Осознанность. Тайна сознания человека</a>
-<div class="facts"><span class="ch">АСЛАН. ПУТЬ ДОМОЙ</span>
-<span>11 200 подписчиков</span>
-<span>14 000 просмотров</span>
-<span><b>×5 к обычному для канала</b></span>
-<span>13 мин</span><span>962 дн. назад</span></div></div></div><div class="v"><div class="idx">25</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=APdT_AVfi1A" target="_blank" rel="noopener">Перестать жить чужую жизнь</a>
-<div class="facts"><span class="ch">Tanya Zinchenko</span>
-<span>6 230 подписчиков</span>
-<span>20 000 просмотров</span>
-<span><b>×4 к обычному для канала</b></span>
-<span>19 мин</span><span class="fresh">8 дн. назад</span></div></div></div></div><div class="tier"><div class="tier-h"><h2>От 15 000 до 20 000</h2>
-<span class="n">5</span></div><p class="tier-note">Верхняя полоса отбора: выше уже другая весовая категория.</p>
-<div class="v"><div class="idx">26</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=nOY_DwOk2fw" target="_blank" rel="noopener">Маха Шиваратри  - мистическая ночь возможностей. Праздник Шивы.</a>
-<div class="facts"><span class="ch">АЛЕКСЕЙ МЕРЕДОВ</span>
-<span>16 200 подписчиков</span>
-<span>39 000 просмотров</span>
-<span><b>×28 к обычному для канала</b></span>
-<span>13 мин</span><span>918 дн. назад</span></div></div></div><div class="v"><div class="idx">27</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=u9ma58XBS1E" target="_blank" rel="noopener">Маха Шиваратри 2025  - мистическое время возможностей. Ночь Шивы.</a>
-<div class="facts"><span class="ch">АЛЕКСЕЙ МЕРЕДОВ</span>
-<span>16 200 подписчиков</span>
-<span>33 000 просмотров</span>
-<span><b>×24 к обычному для канала</b></span>
-<span>12 мин</span><span>568 дн. назад</span></div></div></div><div class="v"><div class="idx">28</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=1r2Nhwsitn4" target="_blank" rel="noopener">Вас снова не выбрали? Как исправить этот сценарий</a>
-<div class="facts"><span class="ch">Анастасия Малинкина</span>
-<span>17 200 подписчиков</span>
-<span>32 000 просмотров</span>
-<span><b>×12 к обычному для канала</b></span>
-<span>19 мин</span><span>492 дн. назад</span></div></div></div><div class="v"><div class="idx">29</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=O3jRGOviJSs" target="_blank" rel="noopener">Как исцелить травму отвержения, если всё время чувствуешь СО МНОЙ ЧТО-ТО НЕ ТАК и Я НЕДОСТАТОЧНА</a>
-<div class="facts"><span class="ch">Анастасия Малинкина</span>
-<span>17 200 подписчиков</span>
-<span>17 000 просмотров</span>
-<span><b>×7 к обычному для канала</b></span>
-<span>25 мин</span><span>196 дн. назад</span></div></div></div><div class="v"><div class="idx">30</div><div>
-<a class="t" href="https://www.youtube.com/watch?v=jhfBwC_RvRw" target="_blank" rel="noopener">Как я наманифестировала $10.000 через своё состояние</a>
-<div class="facts"><span class="ch">Tanya Jupiter • тайны подсознания  </span>
-<span>19 500 подписчиков</span>
-<span>19 000 просмотров</span>
-<span><b>×3 к обычному для канала</b></span>
-<span>18 мин</span><span class="fresh">22 дн. назад</span></div></div></div></div>
+<h2>Каналы до 1 000 подписчиков · 2</h2><p style="color:var(--ink-3);font-size:13.5px;margin:-8px 0 16px">Аудитории у канала почти нет — ролик вытащила сама тема.</p><div class="row">
+<div class="row-top"><div class="rank">1</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=trygQ5_EFcI" target="_blank" rel="noopener">РАВНОДУШИЕ  Самурайский Метод Перестать Зависеть От Чужого Мнения</a></p>
+<p class="rmeta">Путь Воина · 758 подписчиков</p>
+<div class="sig"><span class="s s-off">86 дн. назад</span><span class="s s-off">11 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">23 734</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">—</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×65</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">2</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=aqbTlYZhNiI" target="_blank" rel="noopener">10 ШАГОВ, чтобы перестать откладывать свою жизнь на потом</a></p>
+<p class="rmeta">Сердце мудрости · 604 подписчиков</p>
+<div class="sig"><span class="s s-off">585 дн. назад</span><span class="s s-off">15 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">21 778</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">—</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×5</span></div>
+</div></div><h2>Каналы от 1 000 до 5 000 · 10</h2><p style="color:var(--ink-3);font-size:13.5px;margin:-8px 0 16px">Канал ещё маленький: результат даёт тема, а не накопленный зритель.</p><div class="row">
+<div class="row-top"><div class="rank">3</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=U5CGRJsLPeQ" target="_blank" rel="noopener">Как превратить несерьезное увлечение в дело по Душе за 15 минут</a></p>
+<p class="rmeta">Ана Атман · 3 930 подписчиков</p>
+<div class="sig"><span class="s s-off">746 дн. назад</span><span class="s s-off">19 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">23 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">578</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×40</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">4</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=P1oPzszUNVo" target="_blank" rel="noopener">ПЕРЕСТАНЬТЕ ЛЕЧИТЬСЯ! Душа кричит через ваше тело — а вы её не слышите</a></p>
+<p class="rmeta">ЖИВОЕ ПРИСУТСТВИЕ · 4 520 подписчиков</p>
+<div class="sig"><span class="s s-off">297 дн. назад</span><span class="s s-off">13 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">24 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">742</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×32</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">5</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=YB8_X__Nb50" target="_blank" rel="noopener">ОБРАТНАЯ СТОРОНА ПРОСВЕТЛЕНИЯ||ты потеряешь все!</a></p>
+<p class="rmeta">ЖИВОЕ ПРИСУТСТВИЕ · 4 520 подписчиков</p>
+<div class="sig"><span class="s s-off">205 дн. назад</span><span class="s s-off">6 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">10 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">742</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×13</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">6</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=IX6Jpy8913Y" target="_blank" rel="noopener">Взлом матрицы. Ты можешь не РАБотать.</a></p>
+<p class="rmeta">Пробуждение сознания · 4 260 подписчиков</p>
+<div class="sig"><span class="s s-off">97 дн. назад</span><span class="s s-off">43 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">24 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">1 850</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×13</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">7</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=YpuGJwifF54" target="_blank" rel="noopener">МЫ УМИРАЕМ КАЖДЫЕ 24 ЧАСА: что на самом деле происходит С ДУШОЙ ВО ВРЕМЯ СНА</a></p>
+<p class="rmeta">Пробуждение с Сулейманом · 3 990 подписчиков</p>
+<div class="sig"><span class="s s-off">69 дн. назад</span><span class="s s-off">18 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">32 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">2 700</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×12</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">8</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=gyWOym05OBg" target="_blank" rel="noopener">🫩Подавление воли. Как проявляется безволие.</a></p>
+<p class="rmeta">Психолог Людмила Алаторцева  · 4 140 подписчиков</p>
+<div class="sig"><span class="s s-on">5 дн. назад</span><span class="s s-off">34 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">15 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">1 600</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×9</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">9</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=K9LzM2DGaC0" target="_blank" rel="noopener">Я ОТКРЫЛ ПРЯМОЙ ПУТЬ В ОСОЗНАННОСТЬ: Как навсегда отключить бесконечный шум в голове</a></p>
+<p class="rmeta">Пробуждение с Сулейманом · 3 990 подписчиков</p>
+<div class="sig"><span class="s s-off">79 дн. назад</span><span class="s s-off">15 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">19 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">2 700</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×7</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">10</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=mHh02ixFcP0" target="_blank" rel="noopener">👼 Инфантильность. Почему взрослые люди остаются детьми.</a></p>
+<p class="rmeta">Психолог Людмила Алаторцева  · 4 140 подписчиков</p>
+<div class="sig"><span class="s s-off">272 дн. назад</span><span class="s s-off">42 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">10 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">1 600</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×6</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">11</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=ufzSQguQBPg" target="_blank" rel="noopener">ИГНОРИРУЙ РЕАЛЬНОСТЬ. Взлом МАТРИЦЫ </a></p>
+<p class="rmeta">Пробуждение сознания · 4 260 подписчиков</p>
+<div class="sig"><span class="s s-off">37 дн. назад</span><span class="s s-off">22 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">11 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">1 850</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×6</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">12</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=v-b4JUum66E" target="_blank" rel="noopener">Почему Бог создал тебя СВЕРХЧУВСТВИТЕЛЬНЫМ? Инструменты, КОТОРЫЕ РАБОТАЮТ.</a></p>
+<p class="rmeta">THE SOFOS · 4 730 подписчиков</p>
+<div class="sig"><span class="s s-off">163 дн. назад</span><span class="s s-off">52 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">16 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">3 100</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×5</span></div>
+</div></div><h2>Каналы от 5 000 до 15 000 · 13</h2><p style="color:var(--ink-3);font-size:13.5px;margin:-8px 0 16px">Тема держится и на подросшей аудитории.</p><div class="row">
+<div class="row-top"><div class="rank">13</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=XiR_3atCSSA" target="_blank" rel="noopener">ЖЕНСТВЕННОСТЬ, в которой ты начинаешь притягивать ВСЕ  без усилий. Секрет женской силы</a></p>
+<p class="rmeta">Точка перемен · 9 220 подписчиков</p>
+<div class="sig"><span class="s s-off">152 дн. назад</span><span class="s s-off">37 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">217 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">1 400</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×155</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">14</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=FbAn7K4ZfL8" target="_blank" rel="noopener">💸 Как я манифестировала деньги из ниоткуда: скептикам посвящается.</a></p>
+<p class="rmeta">Anastassia Bianchi  · 12 400 подписчиков</p>
+<div class="sig"><span class="s s-off">461 дн. назад</span><span class="s s-off">13 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">132 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">1 500</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×88</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">15</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=-rrTj8h12pY" target="_blank" rel="noopener">ТРАНСЕРФИНГ. Как МГНОВЕННО ПЕРЕСКОЧИТЬ на ЛУЧШУЮ ВЕТКУ РЕАЛЬНОСТИ</a></p>
+<p class="rmeta">Светлана Мирэ · 6 440 подписчиков</p>
+<div class="sig"><span class="s s-off">338 дн. назад</span><span class="s s-off">8 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">78 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">1 350</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×58</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">16</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=MZST5fWGbSY" target="_blank" rel="noopener">Как я ничего не делая манифестирую всё , что захочу.</a></p>
+<p class="rmeta">Anastassia Bianchi  · 12 400 подписчиков</p>
+<div class="sig"><span class="s s-off">437 дн. назад</span><span class="s s-off">17 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">61 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">1 500</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×41</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">17</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=BZW4FMQ1KwM" target="_blank" rel="noopener">Как перестать стесняться и влюблять в себя людей: реальные способы расслабиться и быть собой</a></p>
+<p class="rmeta">ARISHA · 13 100 подписчиков</p>
+<div class="sig"><span class="s s-off">315 дн. назад</span><span class="s s-off">18 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">333 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">8 400</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×40</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">18</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=jSZIZv1w3eU" target="_blank" rel="noopener">ЖЕНСКАЯ СИЛА И ЖЕНСТВЕННОСТЬ: как выйти из режима «я всё сама» и вернуться к себе</a></p>
+<p class="rmeta">Точка перемен · 9 220 подписчиков</p>
+<div class="sig"><span class="s s-on">27 дн. назад</span><span class="s s-off">30 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">41 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">1 400</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×29</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">19</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=FB_h25IaMM8" target="_blank" rel="noopener">Сложность первых шагов</a></p>
+<p class="rmeta">Tanya Zinchenko · 6 230 подписчиков</p>
+<div class="sig"><span class="s s-off">205 дн. назад</span><span class="s s-off">18 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">108 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">5 100</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×21</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">20</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=L3fft51lfzw" target="_blank" rel="noopener">5 ПРАВИЛ ДЕНЕГ Чтобы ДЕНЬГИ Приходили из НИОТКУДА</a></p>
+<p class="rmeta">Светлана Мирэ · 6 440 подписчиков</p>
+<div class="sig"><span class="s s-off">32 дн. назад</span><span class="s s-off">12 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">13 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">1 350</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×10</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">21</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=S8C0nYLtExY" target="_blank" rel="noopener">Как я быстро воплощаю желаемое (этого не найти ни в книгах, ни в видео)</a></p>
+<p class="rmeta">Frances Auralia Delacroix · 9 930 подписчиков</p>
+<div class="sig"><span class="s s-off">46 дн. назад</span><span class="s s-off">16 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">33 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">3 950</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×8</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">22</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=dNIlFPvTnhQ" target="_blank" rel="noopener">7 привычек, которые я украла у ах*еть каких успешных женщин:</a></p>
+<p class="rmeta">ARISHA · 13 100 подписчиков</p>
+<div class="sig"><span class="s s-on">14 дн. назад</span><span class="s s-off">24 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">39 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">8 400</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×5</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">23</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=qSSye5w6BGE" target="_blank" rel="noopener">Техника ПЕРЕПРОСМОТР. Верни энергию в свою жизнь</a></p>
+<p class="rmeta">АСЛАН. ПУТЬ ДОМОЙ · 11 200 подписчиков</p>
+<div class="sig"><span class="s s-off">603 дн. назад</span><span class="s s-off">16 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">14 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">3 100</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×5</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">24</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=cAaZVAql4Vg" target="_blank" rel="noopener">Что такое Осознанность. Тайна сознания человека</a></p>
+<p class="rmeta">АСЛАН. ПУТЬ ДОМОЙ · 11 200 подписчиков</p>
+<div class="sig"><span class="s s-off">962 дн. назад</span><span class="s s-off">13 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">14 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">3 100</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×5</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">25</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=APdT_AVfi1A" target="_blank" rel="noopener">Перестать жить чужую жизнь</a></p>
+<p class="rmeta">Tanya Zinchenko · 6 230 подписчиков</p>
+<div class="sig"><span class="s s-on">8 дн. назад</span><span class="s s-off">19 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">20 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">5 100</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×4</span></div>
+</div></div><h2>Каналы от 15 000 до 20 000 · 5</h2><p style="color:var(--ink-3);font-size:13.5px;margin:-8px 0 16px">Верхняя полоса отбора: выше уже другая весовая категория.</p><div class="row">
+<div class="row-top"><div class="rank">26</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=nOY_DwOk2fw" target="_blank" rel="noopener">Маха Шиваратри  - мистическая ночь возможностей. Праздник Шивы.</a></p>
+<p class="rmeta">АЛЕКСЕЙ МЕРЕДОВ · 16 200 подписчиков</p>
+<div class="sig"><span class="s s-off">918 дн. назад</span><span class="s s-off">13 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">39 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">1 400</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×28</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">27</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=u9ma58XBS1E" target="_blank" rel="noopener">Маха Шиваратри 2025  - мистическое время возможностей. Ночь Шивы.</a></p>
+<p class="rmeta">АЛЕКСЕЙ МЕРЕДОВ · 16 200 подписчиков</p>
+<div class="sig"><span class="s s-off">568 дн. назад</span><span class="s s-off">12 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">33 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">1 400</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×24</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">28</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=1r2Nhwsitn4" target="_blank" rel="noopener">Вас снова не выбрали? Как исправить этот сценарий</a></p>
+<p class="rmeta">Анастасия Малинкина · 17 200 подписчиков</p>
+<div class="sig"><span class="s s-off">492 дн. назад</span><span class="s s-off">19 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">32 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">2 600</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×12</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">29</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=O3jRGOviJSs" target="_blank" rel="noopener">Как исцелить травму отвержения, если всё время чувствуешь СО МНОЙ ЧТО-ТО НЕ ТАК и Я НЕДОСТАТОЧНА</a></p>
+<p class="rmeta">Анастасия Малинкина · 17 200 подписчиков</p>
+<div class="sig"><span class="s s-off">196 дн. назад</span><span class="s s-off">25 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">17 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">2 600</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×7</span></div>
+</div></div><div class="row">
+<div class="row-top"><div class="rank">30</div><div class="rhead">
+<p class="rtitle"><a href="https://www.youtube.com/watch?v=jhfBwC_RvRw" target="_blank" rel="noopener">Как я наманифестировала $10.000 через своё состояние</a></p>
+<p class="rmeta">Tanya Jupiter • тайны подсознания   · 19 500 подписчиков</p>
+<div class="sig"><span class="s s-on">22 дн. назад</span><span class="s s-off">18 мин</span></div>
+</div></div>
+<div class="stats">
+<div class="st"><span class="k">просмотров</span><span class="v">19 000</span></div>
+<div class="st"><span class="k">обычно у канала</span><span class="v">5 950</span></div>
+<div class="st"><span class="k">во сколько раз больше</span><span class="v">×3</span></div>
+</div></div>
 </section>
 
-<section style="margin-top:56px">
-<div class="tier-h"><h2>Темы, отобранные для канала</h2><span class="n">10</span></div>
-<p class="lede">Десять тем первого плана, проверенных по этой доске и по прошлым
-роликам Екатерины.</p>
-<div class="ideas"><div class="idea">
-<div class="t">Как найти своё главное за 20 минут | Три вопроса, после которых ясно, кто вы</div>
-<div class="p">сошлись в «подтверждена с правкой», но разошлись в том, ЧТО именно доказано, и здесь прав скептик: ×12,5 — это ролик про ПРОЯВЛЕННОСТЬ (быть видимой), а не про поиск себя, и приписывать его теме «найти своё главное» нельзя — рамка</div>
-<div class="row"><span class="chip mid">нужна правка формулировки</span></div></div><div class="idea">
-<div class="t">Как войти в состояние, из которого решения приходят сами — и что его ломает</div>
-<div class="p">сошлись без оговорок — вердикт бесспорен.</div>
-<div class="row"><span class="chip ok">подтверждена</span></div></div><div class="idea">
-<div class="t">Как поднять свой внутренний чек — и доход подтянется следом</div>
-<div class="p">и скептик разошлись в оценке, и оба упустили решающую строку: её собственный ×63,8 — это ДЕНЕЖНЫЙ ролик в допустимом формате.</div>
-<div class="row"><span class="chip mid">нужна правка формулировки</span></div></div><div class="idea">
-<div class="t">У меня было всё по списку и ничего своего. Как я пересобрала жизнь из центра</div>
-<div class="p">с мощным донорским спросом и НУЛЁМ её собственных провалов.</div>
-<div class="row"><span class="chip mid">нужна правка формулировки</span></div></div><div class="idea">
-<div class="t">Как перестать играть по чужим правилам | Устройство игры за 20 минут</div>
-<div class="p">поставил «подтверждена с правкой», скептик — «спорная».</div>
-<div class="row"><span class="chip mid">спорная</span></div></div><div class="idea">
-<div class="t">Как принять решение, после которого жизнь двигается сама</div>
-<div class="p">где против стоят ОБА источника, и обе оценки сошлись слово в слово: семь её промахов на всех длинах и отсутствие самостоятельного донорского спроса.</div>
-<div class="row"><span class="chip low">доказательств не нашли</span></div></div><div class="idea">
-<div class="t">Как отличить главное от лишнего — четыре проверки за 20 минут</div>
-<div class="p">сошлись на «спорной», и я подтверждаю, но с уликой, которую они пропустили: скептиковский новый заголовок («Вы делаете много и не двигаетесь») у неё уже существует и дал ×0,6.</div>
-<div class="row"><span class="chip mid">спорная</span></div></div><div class="idea">
-<div class="t">«Мечты превращаются в фантазии» — как разобрать свой запрос за 20 минут</div>
-<div class="p">сошлись: единственная тема, где сильны ОБА источника одновременно — 18+ донорских попаданий до ×155 и три её собственных плюса (×5,6, ×3,9, ×2,7).</div>
-<div class="row"><span class="chip mid">нужна правка формулировки</span></div></div><div class="idea">
-<div class="t">Как работает квантовая сессия — и что из неё можно сделать самому</div>
-<div class="p">— «подтверждена с правкой», скептик — «спорная».</div>
-<div class="row"><span class="chip mid">нужна правка формулировки</span></div></div><div class="idea">
-<div class="t">Как найти свой дар там, где вы видите недостаток | Генные ключи за 20 минут</div>
-<div class="p">— «спорная», скептик — «доказательства нет».</div>
-<div class="row"><span class="chip mid">спорная</span></div></div></div>
+<section>
+<h2>Темы, отобранные для канала · 10</h2>
+<p style="color:var(--ink-2)">Десять тем первого плана, проверенных по этой доске
+и по прошлым роликам Екатерины.</p>
+<div class="row"><div class="row-top">
+<div class="rank">1</div><div class="rhead">
+<p class="rtitle">Как найти своё главное за 20 минут | Три вопроса, после которых ясно, кто вы</p><p class="rmeta" style="margin-top:6px;color:var(--ink-2)">Предлагаемая формулировка: Как начать проявляться, когда не понимаешь, в чём твоё дело</p>
+<div class="sig"><span class="s s-un">нужна правка формулировки</span></div>
+</div></div></div><div class="row"><div class="row-top">
+<div class="rank">2</div><div class="rhead">
+<p class="rtitle">Как войти в состояние, из которого решения приходят сами — и что его ломает</p><p class="rmeta" style="margin-top:6px;color:var(--ink-2)">Предлагаемая формулировка: Почему вы годами ходите по кругу — и что ломает состояние, из которого решения приходят сами</p>
+<div class="sig"><span class="s s-on">подтверждена</span></div>
+</div></div></div><div class="row"><div class="row-top">
+<div class="rank">3</div><div class="rhead">
+<p class="rtitle">Как поднять свой внутренний чек — и доход подтянется следом</p><p class="rmeta" style="margin-top:6px;color:var(--ink-2)">Предлагаемая формулировка: Почему духовные люди остаются без денег</p>
+<div class="sig"><span class="s s-un">нужна правка формулировки</span></div>
+</div></div></div><div class="row"><div class="row-top">
+<div class="rank">4</div><div class="rhead">
+<p class="rtitle">У меня было всё по списку и ничего своего. Как я пересобрала жизнь из центра</p><p class="rmeta" style="margin-top:6px;color:var(--ink-2)">Предлагаемая формулировка: У меня было всё по списку — и я не хотела вставать по утрам. Как я собрала жизнь заново</p>
+<div class="sig"><span class="s s-un">нужна правка формулировки</span></div>
+</div></div></div><div class="row"><div class="row-top">
+<div class="rank">5</div><div class="rhead">
+<p class="rtitle">Как перестать играть по чужим правилам | Устройство игры за 20 минут</p><p class="rmeta" style="margin-top:6px;color:var(--ink-2)">Предлагаемая формулировка: Как перестать зависеть от чужого мнения и начать жить по своим правилам</p>
+<div class="sig"><span class="s s-un">спорная</span></div>
+</div></div></div><div class="row"><div class="row-top">
+<div class="rank">6</div><div class="rhead">
+<p class="rtitle">Как принять решение, после которого жизнь двигается сама</p><p class="rmeta" style="margin-top:6px;color:var(--ink-2)">Предлагаемая формулировка: вливается в тему №2 отдельным блоком: «…и почему решения перестают быть мучительными»</p>
+<div class="sig"><span class="s s-off">доказательств не нашли</span></div>
+</div></div></div><div class="row"><div class="row-top">
+<div class="rank">7</div><div class="rhead">
+<p class="rtitle">Как отличить главное от лишнего — четыре проверки за 20 минут</p><p class="rmeta" style="margin-top:6px;color:var(--ink-2)">Предлагаемая формулировка: Почему вы годами заняты — и не двигаетесь</p>
+<div class="sig"><span class="s s-un">спорная</span></div>
+</div></div></div><div class="row"><div class="row-top">
+<div class="rank">8</div><div class="rhead">
+<p class="rtitle">«Мечты превращаются в фантазии» — как разобрать свой запрос за 20 минут</p><p class="rmeta" style="margin-top:6px;color:var(--ink-2)">Предлагаемая формулировка: Почему желания не сбываются — и что переводит мечту в реальность</p>
+<div class="sig"><span class="s s-un">нужна правка формулировки</span></div>
+</div></div></div><div class="row"><div class="row-top">
+<div class="rank">9</div><div class="rhead">
+<p class="rtitle">Как работает квантовая сессия — и что из неё можно сделать самому</p><p class="rmeta" style="margin-top:6px;color:var(--ink-2)">Предлагаемая формулировка: Почему жизнь не меняется годами — и как совершить квантовый скачок самому</p>
+<div class="sig"><span class="s s-un">нужна правка формулировки</span></div>
+</div></div></div><div class="row"><div class="row-top">
+<div class="rank">10</div><div class="rhead">
+<p class="rtitle">Как найти свой дар там, где вы видите недостаток | Генные ключи за 20 минут</p><p class="rmeta" style="margin-top:6px;color:var(--ink-2)">Предлагаемая формулировка: «Со мной что-то не так» — как то, что вы считаете изъяном, начинает работать на вас</p>
+<div class="sig"><span class="s s-un">спорная</span></div>
+</div></div></div>
 </section>
 
-<footer>
-Отбор: русский язык · формат говорящей головы · каналы до 20 000 подписчиков ·
-кратность считается к обычному для канала числу просмотров
-</footer>
+<div class="foot">
+<span>Отбор: русский язык</span><span>формат говорящей головы</span>
+<span>каналы до 20 000 подписчиков</span>
+<span>кратность — к обычному для канала числу просмотров</span>
+</div>
 </div>
 </body>
 </html>
