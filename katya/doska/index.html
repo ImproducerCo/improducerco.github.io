@@ -121,7 +121,6 @@ font-size:11px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 22px}
 <span>берём <b id="c-ok">0</b></span>
 <span>не берём <b id="c-no">0</b></span>
 <span>не должно быть здесь <b id="c-wrong">0</b></span>
-<button id="cp" class="mbtn" style="margin-left:auto">скопировать адрес с отметками</button>
 </div>
 <p class="saving" id="sv" style="margin:-8px 0 18px">отметки попадают в адрес страницы</p>
 <section><h2>Темы к съёмке · 21</h2><div class="row" data-id="t1" data-title="Как найти своё главное за 20 минут | Три вопроса, после которых ясно, кто вы">
@@ -313,7 +312,7 @@ font-size:11px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 22px}
     document.getElementById('c-no').textContent=c.no;
     document.getElementById('c-wrong').textContent=c.wrong;
     var n=c.ok+c.no+c.wrong;
-    el.textContent = n ? ('отметок '+n+' — они в адресе страницы, пришлите его') : 'отметки попадают в адрес страницы';
+    el.textContent = n ? ('отметок '+n+' — сохранены') : 'отметки сохраняются';
   }
   function apply(id){
     var row=document.querySelector('[data-id="'+id+'"]'); if(!row)return;
@@ -350,12 +349,6 @@ font-size:11px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 22px}
   if(h){st=dec(h)}
   else{try{st=JSON.parse(localStorage.getItem('doska')||'{}')}catch(e){st={}}}
   Object.keys(st).forEach(apply); paint();
-  var b=document.getElementById('cp');
-  if(b)b.addEventListener('click',function(){
-    var t=location.origin+location.pathname+'#'+enc();
-    navigator.clipboard.writeText(t).then(function(){
-      b.textContent='адрес скопирован'; setTimeout(function(){b.textContent='скопировать адрес с отметками'},1800);
-    },function(){});
   });
 })();
 </script>
