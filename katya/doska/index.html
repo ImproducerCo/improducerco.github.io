@@ -121,6 +121,7 @@ font-size:11px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 22px}
 <span>берём <b id="c-ok">0</b></span>
 <span>не берём <b id="c-no">0</b></span>
 <span>не должно быть здесь <b id="c-wrong">0</b></span>
+<span id="c-left" style="color:var(--ink-3)"></span>
 </div>
 <p class="saving" id="sv" style="margin:-8px 0 10px">отметки сохраняются здесь, у вас</p>
 <div id="send" hidden style="margin:0 0 20px;padding:14px 16px;border:1px solid var(--line);
@@ -338,6 +339,8 @@ font-size:11px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 22px}
     document.getElementById('c-no').textContent=c.no;
     document.getElementById('c-wrong').textContent=c.wrong;
     var n=c.ok+c.no+c.wrong;
+    var left=document.querySelectorAll('.row').length-n, lf=document.getElementById('c-left');
+    if(lf) lf.textContent = left>0 ? ('осталось отметить '+left) : 'отмечено всё';
     el.textContent = n ? ('отметок '+n+' — сохранены') : 'отметки сохраняются';
   }
   function apply(id){
