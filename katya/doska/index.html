@@ -122,7 +122,17 @@ font-size:11px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 22px}
 <span>не берём <b id="c-no">0</b></span>
 <span>не должно быть здесь <b id="c-wrong">0</b></span>
 </div>
-<p class="saving" id="sv" style="margin:-8px 0 18px">отметки попадают в адрес страницы</p>
+<p class="saving" id="sv" style="margin:-8px 0 10px">отметки сохраняются здесь, у вас</p>
+<div id="send" hidden style="margin:0 0 20px;padding:14px 16px;border:1px solid var(--line);
+  border-left:3px solid var(--accent);border-radius:0 3px 3px 0;background:var(--surface)">
+  <div style="font-weight:600;margin-bottom:4px">Закончили? Поделитесь отметками</div>
+  <div id="sendwhy" style="color:var(--ink-2);font-size:13.5px;margin-bottom:10px">
+    Отметки сохранены только в этом браузере. Нажмите — ссылка скопируется,
+    отправьте её продюсеру.</div>
+  <button id="sendbtn" class="mbtn" style="background:var(--accent);border-color:var(--accent);
+    color:#fff;font-size:14px;padding:9px 18px">Поделиться</button>
+  <span id="sendst" style="margin-left:10px;color:var(--ink-3);font-size:13px"></span>
+</div>
 <section><h2>Темы к съёмке · 21</h2><div class="row" data-id="t1" data-title="Как найти своё главное за 20 минут | Три вопроса, после которых ясно, кто вы">
 <div class="row-top"><div class="rank">1</div><div class="rhead">
 <p class="rtitle"><a href="https://www.youtube.com/watch?v=IsNN3rJYFnc" target="_blank" rel="noopener">Как найти своё главное за 20 минут | Три вопроса, после которых ясно, кто вы</a></p><p class="rmeta">откуда взята: Как начать проявляться в мир? | Проявленность - ключ к целостной жизни — Екатерина Арея, ×12</p>
@@ -349,6 +359,63 @@ font-size:11px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 22px}
   if(h){st=dec(h)}
   else{try{st=JSON.parse(localStorage.getItem('doska')||'{}')}catch(e){st={}}}
   Object.keys(st).forEach(apply); paint();
+
+  /* Адрес дописывается СРАЗУ при открытии, а не только при изменении отметки.
+     Прежняя версия ждала правки, и человек, открывший страницу со своими
+     отметками, видел чистый адрес — работа выглядела потерянной. */
+  try{ if(enc()) history.replaceState(null,'','#'+enc()); }catch(e){}
+
+  /* Отправка. От человека требуется одно нажатие и ноль понимания: раньше
+     здесь не было ничего, и клиент, отметив всё, просто закрывал вкладку —
+     отметки оставались у неё в браузере и не доходили никогда. */
+  var SEND_URL='';           /* адрес приёмника; пустой — работает пересылка ссылкой */
+  var panel=document.getElementById('send'), btn=document.getElementById('sendbtn'),
+      sst=document.getElementById('sendst'), swhy=document.getElementById('sendwhy');
+  function full(){ return location.origin+location.pathname+'#'+enc(); }
+  function count(){ return Object.keys(st).filter(function(k){
+    return st[k]&&(st[k].mark||st[k].note); }).length; }
+
+  function post(){
+    if(!SEND_URL) return Promise.reject();
+    return fetch(SEND_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({доска:'katya',отметки:st,адрес:full(),
+        когда:new Date().toISOString()})}).then(function(r){
+        if(!r.ok) throw new Error(r.status); return true; });
+  }
+  function showPanel(){
+    var n=count();
+    panel.hidden = n===0;
+    if(n) swhy.textContent='Отмечено '+n+'. Отметки сохранены только в этом браузере. '+
+      'Нажмите — ссылка скопируется, отправьте её продюсеру.';
+  }
+  var _p=paint; paint=function(){ _p(); showPanel(); };
+  showPanel();
+
+  function copy(t){
+    /* Буфер даётся только внутри нажатия, поэтому копируем ПЕРВЫМ делом и
+       синхронно. Запасной путь — старое execCommand: без него обещание
+       «ссылка скопируется» ломается там, где нет разрешения на буфер. */
+    try{ if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t); return true; } }catch(e){}
+    try{
+      var a=document.createElement('textarea');
+      a.value=t; a.setAttribute('readonly','');
+      a.style.position='fixed'; a.style.top='-1000px';
+      document.body.appendChild(a); a.select();
+      var ok=document.execCommand('copy'); document.body.removeChild(a); return ok;
+    }catch(e){ return false; }
+  }
+  if(btn) btn.addEventListener('click', function(){
+    var url=full();
+    var copied=copy(url);
+    sst.textContent = copied ? 'ссылка скопирована — отправьте её продюсеру'
+                             : 'ссылка в адресной строке — отправьте её продюсеру';
+    if(navigator.share) navigator.share({title:'Мои отметки по доске тем',url:url})
+      .then(function(){ sst.textContent='отправлено, спасибо'; })
+      .catch(function(){});
+    post().then(function(){ sst.textContent='получено продюсером, спасибо'; })
+          .catch(function(){});
+  });
 })();
 </script>
 
