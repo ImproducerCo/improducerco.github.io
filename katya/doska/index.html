@@ -305,13 +305,29 @@ font-size:11px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 22px}
       var v=st[k]; if(!v||(!v.mark&&!v.note))return;
       a.push(k+'~'+(v.mark||'')+'~'+encodeURIComponent(v.note||''));
     });
-    return a.join('|');
+    /* Разделитель записей — запятая. Прежде стояла «|», и браузер писал её в
+       адресную строку как %7C; страница делила строку по «|», не находила ни
+       одного и читала все отметки как ОДНУ. Клиент прислал ссылку с тринадцатью
+       отметками, а доска показала одну. Запятая для этого годится: она не
+       появляется в выводе encodeURIComponent и браузером в адресе не кодируется. */
+    return a.join(',');
   }
   function dec(h){
     var o={};
-    (h||'').split('|').forEach(function(p){
-      if(!p)return; var x=p.split('~');
-      if(x[0])o[x[0]]={mark:x[1]||null,note:decodeURIComponent(x[2]||'')};
+    h=String(h||'');
+    /* Принимаем и старые ссылки: «|» как есть и «|», закодированную браузером */
+    var parts = h.indexOf(',')>=0 ? h.split(',')
+              : h.replace(/%7C/gi,'|').split('|');
+    parts.forEach(function(p){
+      if(!p)return;
+      /* Делим ровно по двум первым «~»: encodeURIComponent «~» не кодирует,
+         поэтому тильда может встретиться внутри заметки */
+      var i=p.indexOf('~'); if(i<0)return;
+      var j=p.indexOf('~',i+1); if(j<0)j=p.length;
+      var id=p.slice(0,i), mark=p.slice(i+1,j), note=p.slice(j+1);
+      if(!id)return;
+      try{ note=decodeURIComponent(note); }catch(e){}
+      o[id]={mark:mark||null,note:note};
     });
     return o;
   }
