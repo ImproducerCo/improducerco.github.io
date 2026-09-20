@@ -123,7 +123,7 @@ border:1px solid var(--line);border-radius:3px;background:var(--surface);color:v
 <div class="fact"><span class="k">Шагов</span><span class="v num">16</span></div>
 <div class="fact"><span class="k">Ворот</span><span class="v num">9</span></div>
 <div class="fact"><span class="k">Порогов назначено</span><span class="v num">5</span></div>
-<div class="fact"><span class="k">На выходе каналов</span><span class="v num">70</span></div>
+<div class="fact"><span class="k">На выходе каналов</span><span class="v num">38</span></div>
 </div></header>
 <div class="bar"><span>размечено <b id="c-done">0</b> из 28</span><span>✓ <b id="c-ok">0</b></span><span>✕ <b id="c-no">0</b></span><span>⊘ <b id="c-wrong">0</b></span><button class="mbtn" id="export">скопировать опись</button></div>
 <section><h2>Звено 1. Что ищем</h2>
@@ -267,7 +267,7 @@ border:1px solid var(--line);border-radius:3px;background:var(--surface);color:v
 <div class="io">
 <div class="io-c"><span class="k">на входе</span><span class="v">таблица + ранжирование + живость + ваши отметки + реестр отказов</span></div>
 <div class="io-c"><span class="k">правило</span><span class="v">на страницу выходит канал, отобранный машиной ИЛИ одобренный вами, минус реестр отказов</span></div>
-<div class="io-c"><span class="k">на выходе</span><span class="v">review_channels.html — 70 карточек</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">review_channels.html — 38 карточек</span></div>
 </div>
 <div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
 <div class="row" data-id="step-10" data-title="Доставка">
@@ -329,7 +329,7 @@ border:1px solid var(--line);border-radius:3px;background:var(--surface);color:v
 <div class="io">
 <div class="io-c"><span class="k">на входе</span><span class="v">выгрузка или сохранённая страница</span></div>
 <div class="io-c"><span class="k">правило</span><span class="v">побеждает самая поздняя отметка; снятие переносится тоже</span></div>
-<div class="io-c"><span class="k">на выходе</span><span class="v">marks.json 205 + marks_ru50.json 50</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">marks.json 225 + marks_ru50.json 50</span></div>
 </div>
 <div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
 <div class="row" data-id="step-14" data-title="Реестр отказов">
@@ -344,7 +344,7 @@ border:1px solid var(--line);border-radius:3px;background:var(--surface);color:v
 <div class="io">
 <div class="io-c"><span class="k">на входе</span><span class="v">оба файла отметок</span></div>
 <div class="io-c"><span class="k">правило</span><span class="v">действующий вердикт «отказ» — навсегда вне счёта и вне страниц</span></div>
-<div class="io-c"><span class="k">на выходе</span><span class="v">rejected_by_owner.json 166 каналов</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">rejected_by_owner.json 198 каналов</span></div>
 </div>
 <div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
 </section>
@@ -541,7 +541,7 @@ border:1px solid var(--line);border-radius:3px;background:var(--surface);color:v
 <div class="rank num">Ч-1</div><div class="rhead">
 <p class="rtitle">Отметка владельца</p>
 <p class="rmeta">_client/niche/data/marks.json + marks_ru50.json</p>
-<div class="sig"><span class="s s-un">решает человек</span><span class="s s-un">отметок 205 + 50; в реестре отказов 166; на странице 70</span></div>
+<div class="sig"><span class="s s-un">решает человек</span><span class="s s-un">отметок 225 + 50; в реестре отказов 198; на странице 38</span></div>
 </div></div>
 <div class="io">
 <div class="io-c"><span class="k">читает</span><span class="v">ваши нажатия на странице</span></div>
@@ -553,8 +553,8 @@ border:1px solid var(--line);border-radius:3px;background:var(--surface);color:v
 </section>
 <section><h2>Что функция выдаёт на конце и как это выглядит</h2>
 <div class="call"><h4>Сейчас выход один — страница</h4>
-<p><code>review_channels.html</code>, <b>70</b> карточек, открывается по локальному адресу <code>https://improducer.co/katya/otbor/</code> и живёт до перезагрузки машины. Карточка несёт: название и ссылку, подписчиков, медиану, свежесть, длинные и шортсы, долю метода и первого лица, отношение к нише, ярус, чем канал предложен, залетевшие ролики с заголовками, вашу прежнюю отметку и список незамеренного. Разметка — ✓ / ✕ / ⊘ и комментарий.</p>
-<p>Из них проходят нынешние ворота <b>17</b>, у <b>35</b> нет замеров вовсе.</p>
+<p><code>review_channels.html</code>, <b>38</b> карточек, открывается по локальному адресу <code>https://improducer.co/katya/otbor/</code> и живёт до перезагрузки машины. Карточка несёт: название и ссылку, подписчиков, медиану, свежесть, длинные и шортсы, долю метода и первого лица, отношение к нише, ярус, чем канал предложен, залетевшие ролики с заголовками, вашу прежнюю отметку и список незамеренного. Разметка — ✓ / ✕ / ⊘ и комментарий.</p>
+<p>Из них проходят нынешние ворота <b>16</b>, у <b>15</b> нет замеров вовсе.</p>
 <p><b>Чего функция НЕ выдаёт:</b> файла «действующая таблица отобранных доноров» не существует — следующее звено конвейера берёт данные прежнего поколения. Отметки из браузера сами в систему не попадают.</p></div>
 </section>
 <section><h2>Что вы записали</h2><div id="mine"></div></section>
