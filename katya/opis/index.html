@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Опись функции · отбор каналов-доноров</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{--sans:'IBM Plex Sans',system-ui,sans-serif;--cond:'IBM Plex Sans Condensed',var(--sans);
+--mono:'IBM Plex Mono',Menlo,monospace;--ground:#F4F6F9;--surface:#FFF;--ink:#141C26;
+--ink-2:#4A5967;--ink-3:#778797;--line:#D9E1EA;--line-soft:#EAF0F5;--accent:#1B6C86;
+--accent-soft:#E2EFF3;--ok:#1F7A43;--ok-bg:#DFF0E6;--warn:#9A6510;--warn-bg:#F7EEDC;
+--no:#A33A2A;--no-bg:#F8E5E1;--bad:#7A3E8F;--bad-bg:#F0E6F5;
+--shadow:0 1px 2px rgba(20,28,38,.05),0 10px 28px -14px rgba(20,28,38,.22)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px 80px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+a{color:var(--accent)}
+header{padding:52px 0 30px;border-bottom:2px solid var(--ink)}
+.crumb{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+color:var(--ink-3);margin:0 0 16px}
+.crumb a{color:var(--ink-3);text-decoration:none;border-bottom:1px solid var(--line)}
+h1{font-family:var(--cond);font-size:clamp(30px,5vw,48px);line-height:1.03;font-weight:700;
+letter-spacing:-.015em;margin:0 0 16px;max-width:20ch}
+.lede{font-size:17px;color:var(--ink-2);max-width:66ch;margin:0}
+.lede strong{color:var(--ink);font-weight:600}
+.facts{display:flex;flex-wrap:wrap;margin:28px 0 0;border:1px solid var(--line);
+background:var(--surface);border-radius:3px;overflow:hidden;box-shadow:var(--shadow)}
+.fact{flex:1 1 140px;padding:13px 15px;border-right:1px solid var(--line-soft)}
+.fact:last-child{border-right:0}
+.fact .k{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+color:var(--ink-3);display:block;margin-bottom:4px}
+.fact .v{font-family:var(--cond);font-size:21px;font-weight:700;line-height:1.1}
+section{margin:48px 0 0}
+h2{font-family:var(--cond);font-size:12px;letter-spacing:.15em;text-transform:uppercase;
+font-weight:700;color:var(--ink-3);margin:0 0 18px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+p{margin:0 0 12px;max-width:68ch}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:3px;
+box-shadow:var(--shadow);margin-bottom:11px;overflow:hidden;transition:opacity .15s}
+.row.m-no,.row.m-wrong{opacity:.45}
+.row-top{display:flex;gap:14px;padding:14px 16px 11px;align-items:flex-start}
+.rank{font-family:var(--cond);font-size:24px;font-weight:700;color:var(--line);
+min-width:34px;line-height:1;font-variant-numeric:tabular-nums;padding-top:2px}
+.row.m-ok .rank{color:var(--ok)}
+.rhead{flex:1;min-width:0}
+.rtitle{font-family:var(--cond);font-size:17px;font-weight:700;line-height:1.25;margin:0 0 6px}
+.rtitle a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+.rtitle a:hover{color:var(--accent)}
+.rmeta{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin:0}
+.sig{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 0}
+.s{font-family:var(--mono);font-size:10px;letter-spacing:.04em;padding:3px 7px;border-radius:2px;
+font-weight:600;white-space:nowrap}
+.s-on{background:var(--ok-bg);color:var(--ok)}
+.s-off{background:var(--line-soft);color:var(--ink-3)}
+.s-un{background:var(--warn-bg);color:var(--warn)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));
+border-top:1px solid var(--line-soft);background:var(--ground)}
+.st{padding:8px 13px;border-right:1px solid var(--line-soft)}
+.st:last-child{border-right:0}
+.st .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;
+color:var(--ink-3);display:block}
+.st .v{font-family:var(--mono);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.marks{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:11px 16px;
+border-top:1px solid var(--line-soft)}
+.mbtn{font-family:var(--sans);font-size:13px;font-weight:600;padding:5px 13px;border-radius:3px;
+border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer}
+.mbtn:hover{border-color:var(--ink-3)}
+.mbtn.on-ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.mbtn.on-no{background:var(--no-bg);border-color:var(--no);color:var(--no)}
+.mbtn.on-wrong{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.cmt{flex:1;min-width:200px;font-family:var(--sans);font-size:13px;padding:6px 10px;
+border:1px solid var(--line);border-radius:3px;background:var(--ground);color:var(--ink);resize:vertical}
+.cmt:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+.scroll{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:3px;
+background:var(--surface);box-shadow:var(--shadow)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line-soft);vertical-align:top}
+th{font-family:var(--cond);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
+color:var(--ink-3);font-weight:700;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.call{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
+border-radius:0 3px 3px 0;padding:16px 20px;margin:18px 0}
+.call.warn{border-left-color:var(--warn)}
+.call h4{font-family:var(--cond);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+margin:0 0 8px;color:var(--accent);font-weight:700}
+.call.warn h4{color:var(--warn)}
+.bar{position:sticky;top:0;z-index:9;background:var(--ground);border-bottom:1px solid var(--line);
+padding:10px 0;margin-bottom:16px;font-family:var(--mono);font-size:12px;color:var(--ink-3);
+display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.bar b{color:var(--ink);font-weight:600}
+.foot{margin:56px 0 0;padding-top:18px;border-top:2px solid var(--ink);font-family:var(--mono);
+font-size:11px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 22px}
+@media(max-width:640px){.wrap{padding:0 14px 56px}.row-top{padding:12px 12px 9px;gap:10px}
+.rank{font-size:18px;min-width:24px}.rtitle{font-size:15.5px}}
+
+.io{display:grid;grid-template-columns:1fr 1.4fr 1.2fr;border-top:1px solid var(--line-soft);
+background:var(--ground)}
+.io-c{padding:10px 14px;border-right:1px solid var(--line-soft)}
+.io-c:last-child{border-right:0}
+.io-c .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;
+color:var(--ink-3);display:block;margin-bottom:4px}
+.io-c .v{font-size:13px;color:var(--ink-2);display:block}
+@media(max-width:760px){.io{grid-template-columns:1fr}
+.io-c{border-right:0;border-bottom:1px solid var(--line-soft)}}
+.sig .s{white-space:normal}
+.gapline{padding:9px 16px;border-top:1px solid var(--line-soft);background:var(--warn-bg);
+font-size:12.5px;color:var(--warn)}
+code{font-family:var(--mono);font-size:12.5px;background:var(--ground);padding:1px 4px;border-radius:2px}
+.dump{width:100%;min-height:90px;font-family:var(--mono);font-size:11px;padding:8px;
+border:1px solid var(--line);border-radius:3px;background:var(--surface);color:var(--ink-2)}
+</style></head><body><div class='wrap'>
+<header>
+<p class="crumb"><a href="/katya/otbor/">Каналы</a> · Опись функции · 20.09.2026</p>
+<h1>Отбор каналов-доноров: полная опись функции</h1>
+<p class="lede">Слева направо: <strong>звенья цепочки</strong>, затем <strong>все ворота</strong> в том порядке, в каком они применяются, затем <strong>что выходит на конце</strong>. У каждых ворот — правило числом, откуда это число взято и сколько каналов оно снимает сейчас. Числа сняты с диска, пороги вычитаны из кода при сборке этой страницы. Отмечайте: ✓ так и оставить · ✕ переделать · ⊘ этого быть не должно, и пишите в поле, как должно работать.</p>
+<div class="facts">
+<div class="fact"><span class="k">Звеньев</span><span class="v num">7</span></div>
+<div class="fact"><span class="k">Шагов</span><span class="v num">16</span></div>
+<div class="fact"><span class="k">Ворот</span><span class="v num">9</span></div>
+<div class="fact"><span class="k">Порогов назначено</span><span class="v num">5</span></div>
+<div class="fact"><span class="k">На выходе каналов</span><span class="v num">70</span></div>
+</div></header>
+<div class="bar"><span>размечено <b id="c-done">0</b> из 28</span><span>✓ <b id="c-ok">0</b></span><span>✕ <b id="c-no">0</b></span><span>⊘ <b id="c-wrong">0</b></span><button class="mbtn" id="export">скопировать опись</button></div>
+<section><h2>Звено 1. Что ищем</h2>
+<div class="row" data-id="step-1" data-title="Определение ниши">
+<div class="row-top">
+<div class="rank num">1</div><div class="rhead">
+<p class="rtitle">Определение ниши</p>
+<p class="rmeta">_client/niche/niche_definition.md</p>
+<div class="sig">
+<span class="s s-on">работает</span>
+<span class="s s-off">решает: машина предложила, человек не утверждал</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">ДНК автора</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">граница ниши словами, порога-числа нет</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">niche_definition.md</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="step-2" data-title="Формулировки поиска">
+<div class="row-top">
+<div class="rank num">2</div><div class="rhead">
+<p class="rtitle">Формулировки поиска</p>
+<p class="rmeta">_base/scripts/collect/build_queries.py</p>
+<div class="sig">
+<span class="s s-on">работает</span>
+<span class="s s-off">решает: машина</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">определение ниши + лексика ДНК</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">формулировка остаётся, если приносит новые каналы</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">queries_pool_next.json: рабочих 13, на испытании 390</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+</section>
+<section><h2>Звено 2. Кого нашли</h2>
+<div class="row" data-id="step-3" data-title="Разведка каналов">
+<div class="row-top">
+<div class="rank num">3</div><div class="rhead">
+<p class="rtitle">Разведка каналов</p>
+<p class="rmeta">_base/scripts/collect/discover_channels.py, discover_browser.py (yt-dlp, ключ не нужен)</p>
+<div class="sig">
+<span class="s s-on">работает</span>
+<span class="s s-off">решает: машина</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">формулировки поиска</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">виденный канал повторно не осматривается (--skip-known)</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">ЧЕТЫРЕ ПОКОЛЕНИЯ: channels.json 389 · channels_merged 596 · channels_new 1096 · channels_v4 1553</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="step-4" data-title="Дозабор каталога донора">
+<div class="row-top">
+<div class="rank num">4</div><div class="rhead">
+<p class="rtitle">Дозабор каталога донора</p>
+<p class="rmeta">_base/scripts/collect/enrich_donors.py</p>
+<div class="sig">
+<span class="s s-on">работает</span>
+<span class="s s-off">решает: машина</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">список каналов</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">аномалия — ролик ×3 к медиане канала и ≥15 000 просмотров</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">donor_outliers_flat.json 258 роликов</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+</section>
+<section><h2>Звено 3. Кто подходит</h2>
+<div class="row" data-id="step-5" data-title="Вердикт темы и формата">
+<div class="row-top">
+<div class="rank num">5</div><div class="rhead">
+<p class="rtitle">Вердикт темы и формата</p>
+<p class="rmeta">_base/scripts/collect/relevance_model.py, format_profile.py</p>
+<div class="sig">
+<span class="s s-on">работает</span>
+<span class="s s-off">решает: машина</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">заголовки и каталог канала</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">см. ворота В-0, В-1, В-2 ниже</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">donors_table_v3.json — 133 строк</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="step-6" data-title="Свод в таблицу доноров">
+<div class="row-top">
+<div class="rank num">6</div><div class="rhead">
+<p class="rtitle">Свод в таблицу доноров</p>
+<p class="rmeta">СКРИПТА НЕТ — свод делала сессия руками</p>
+<div class="sig">
+<span class="s s-off">не собрано</span>
+<span class="s s-off">решает: машина, но без скрипта</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">вердикты по всем поколениям</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">в отбор идёт «по нише» ИЛИ («смежное» И эталонный формат)</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">donors_table_v3.json: резерв: донор темы 46, отбор 44, яруса нет 36, отобран 5, резерв: донор формата 2</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+</section>
+<section><h2>Звено 4. Кто жив</h2>
+<div class="row" data-id="step-7" data-title="Замер живости">
+<div class="row-top">
+<div class="rank num">7</div><div class="rhead">
+<p class="rtitle">Замер живости</p>
+<p class="rmeta">_base/scripts/collect/find_fresh.py</p>
+<div class="sig">
+<span class="s s-on">работает</span>
+<span class="s s-off">решает: машина</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">ленты каналов</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">окно 30 дней; длинные, медиана окна, лучший ролик</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">liveness.json 133 каналов</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="step-8" data-title="Ворота состава и ступени">
+<div class="row-top">
+<div class="rank num">8</div><div class="rhead">
+<p class="rtitle">Ворота состава и ступени</p>
+<p class="rmeta">_base/scripts/board/rank_donors.py</p>
+<div class="sig">
+<span class="s s-on">работает</span>
+<span class="s s-off">решает: машина</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">таблица + живость + размер автора</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">шесть ворот подряд, первое сработавшее снимает (В-1…В-6)</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">donors_ranked.json 133 строк, в составе 35</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+</section>
+<section><h2>Звено 5. Что видите вы</h2>
+<div class="row" data-id="step-9" data-title="Сборка страницы">
+<div class="row-top">
+<div class="rank num">9</div><div class="rhead">
+<p class="rtitle">Сборка страницы</p>
+<p class="rmeta">_pult/build_review.py</p>
+<div class="sig">
+<span class="s s-on">работает</span>
+<span class="s s-off">решает: машина</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">таблица + ранжирование + живость + ваши отметки + реестр отказов</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">на страницу выходит канал, отобранный машиной ИЛИ одобренный вами, минус реестр отказов</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">review_channels.html — 70 карточек</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="step-10" data-title="Доставка">
+<div class="row-top">
+<div class="rank num">10</div><div class="rhead">
+<p class="rtitle">Доставка</p>
+<p class="rmeta">python3 -m http.server 8787 --bind 127.0.0.1</p>
+<div class="sig">
+<span class="s s-on">работает</span>
+<span class="s s-un">решает: ЧЕЛОВЕК поднимает сервер</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">готовая страница</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">сервер поднимается руками и живёт до перезагрузки машины</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">https://improducer.co/katya/otbor/</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+</section>
+<section><h2>Звено 6. Как решение возвращается</h2>
+<div class="row" data-id="step-11" data-title="Разметка в браузере">
+<div class="row-top">
+<div class="rank num">11</div><div class="rhead">
+<p class="rtitle">Разметка в браузере</p>
+<p class="rmeta">поведение страницы, localStorage</p>
+<div class="sig">
+<span class="s s-on">работает</span>
+<span class="s s-un">решает: ЧЕЛОВЕК отмечает</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">ваши нажатия</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">отметка привязана к channel_id и переживает пересборку</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">запись в браузере, ключ review-marks-v1</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="step-12" data-title="Вынос отметок">
+<div class="row-top">
+<div class="rank num">12</div><div class="rhead">
+<p class="rtitle">Вынос отметок</p>
+<p class="rmeta">кнопка «скопировать отметки» → пересылка агенту</p>
+<div class="sig">
+<span class="s s-off">не собрано</span>
+<span class="s s-un">решает: ЧЕЛОВЕК нажимает и присылает — РАЗРЫВ</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">хранилище браузера</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">иначе отметки в систему не попадают вовсе</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">кусок JSON в переписке</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="step-13" data-title="Приём отметок">
+<div class="row-top">
+<div class="rank num">13</div><div class="rhead">
+<p class="rtitle">Приём отметок</p>
+<p class="rmeta">_base/scripts/board/ingest_marks.py</p>
+<div class="sig">
+<span class="s s-on">работает</span>
+<span class="s s-off">решает: машина</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">выгрузка или сохранённая страница</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">побеждает самая поздняя отметка; снятие переносится тоже</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">marks.json 205 + marks_ru50.json 50</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="step-14" data-title="Реестр отказов">
+<div class="row-top">
+<div class="rank num">14</div><div class="rhead">
+<p class="rtitle">Реестр отказов</p>
+<p class="rmeta">_pult/ingest_review.py --build-rejected</p>
+<div class="sig">
+<span class="s s-on">работает</span>
+<span class="s s-off">решает: машина</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">оба файла отметок</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">действующий вердикт «отказ» — навсегда вне счёта и вне страниц</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">rejected_by_owner.json 166 каналов</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+</section>
+<section><h2>Звено 7. Что дальше</h2>
+<div class="row" data-id="step-15" data-title="Действующая таблица отобранных">
+<div class="row-top">
+<div class="rank num">15</div><div class="rhead">
+<p class="rtitle">Действующая таблица отобранных</p>
+<p class="rmeta">СКРИПТА НЕТ</p>
+<div class="sig">
+<span class="s s-off">не собрано</span>
+<span class="s s-off">решает: —</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">ваши отметки + таблица доноров</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">—</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">ФАЙЛА НЕТ: свод отобранных доноров новой версией не собран</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="step-16" data-title="Доска идей">
+<div class="row-top">
+<div class="rank num">16</div><div class="rhead">
+<p class="rtitle">Доска идей</p>
+<p class="rmeta">_base/scripts/board/build_board.py</p>
+<div class="sig">
+<span class="s s-on">работает</span>
+<span class="s s-off">решает: машина</span>
+</div></div></div>
+<div class="io">
+<div class="io-c"><span class="k">на входе</span><span class="v">ролики отобранных доноров</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">строка доски — найденный ролик, а не придуманная тема</span></div>
+<div class="io-c"><span class="k">на выходе</span><span class="v">board.json: на доске 1 из 729 рассмотренных</span></div>
+</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этого быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+</section>
+<section><h2>Ворота — в порядке применения</h2>
+<div class="call warn"><h4>Как читать</h4><p>Ворота применяются подряд, <b>первое сработавшее снимает канал — до следующих дело не доходит</b>. Поэтому «вне ниши» и «чужой формат» всегда перевешивают любые замеры живости: канал с отличным свежим взлётом не попадёт в состав, если раньше сработал вердикт темы.</p></div>
+<div class="row" data-id="gate-В-0" data-title="В-0 Потолок вердикта при малом замере (правило П0)">
+<div class="row-top">
+<div class="rank num">В-0</div><div class="rhead">
+<p class="rtitle">Потолок вердикта при малом замере (правило П0)</p>
+<p class="rmeta">_base/scripts/collect/eval_channels.py</p>
+<div class="sig"><span class="s s-un">ограничитель</span><span class="s s-un">каналов с вердиктом «смежное»: 77</span></div>
+</div></div>
+<div class="io">
+<div class="io-c"><span class="k">читает</span><span class="v">число замеренных заголовков канала</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">меньше 4 замеренных заголовков — вердикт темы не может быть выше «смежное», а формат не строже «допустимого»</span></div>
+<div class="io-c"><span class="k">откуда число</span><span class="v">решение проекта: меньше данных не даёт более сильный вердикт</span></div>
+</div>
+<div class="gapline">слабое место: ворота НЕ снимают канал, а ограничивают силу вердикта — это верно</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этих ворот быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="gate-В-1" data-title="В-1 Тема: вне ниши">
+<div class="row-top">
+<div class="rank num">В-1</div><div class="rhead">
+<p class="rtitle">Тема: вне ниши</p>
+<p class="rmeta">_base/scripts/board/rank_donors.py — первое условие состава</p>
+<div class="sig"><span class="s s-off">снимает</span><span class="s s-un">снимает 9 каналов; смежное 77, по нише 47, вне ниши 9</span></div>
+</div></div>
+<div class="io">
+<div class="io-c"><span class="k">читает</span><span class="v">поле relevance таблицы доноров</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">relevance == «вне ниши» → канал вне состава, дальше ворота не проверяются</span></div>
+<div class="io-c"><span class="k">откуда число</span><span class="v">граница ниши задана словами в _client/niche/niche_definition.md, порога-числа нет</span></div>
+</div>
+<div class="gapline">слабое место: ЕСЛИ ВЕРДИКТ ТЕМЫ НЕ СТАВИЛСЯ, поле пустое и ворота канал пропускают</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этих ворот быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="gate-В-2" data-title="В-2 Формат: чужой">
+<div class="row-top">
+<div class="rank num">В-2</div><div class="rhead">
+<p class="rtitle">Формат: чужой</p>
+<p class="rmeta">_base/scripts/board/rank_donors.py — второе условие состава</p>
+<div class="sig"><span class="s s-off">снимает</span><span class="s s-un">снимает 21 каналов; допустимый 70, эталонный 40, чужой 22, не судился 1</span></div>
+</div></div>
+<div class="io">
+<div class="io-c"><span class="k">читает</span><span class="v">поле format таблицы доноров</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">format == «чужой» → канал вне состава независимо от темы</span></div>
+<div class="io-c"><span class="k">откуда число</span><span class="v">профиль формата: шортс ≤ 180 сек, доля шортсов выше 0.25 снимает, длинное 8, 60 мин; эталон снят с ОДНОГО канала ОДНОГО клиента</span></div>
+</div>
+<div class="gapline">слабое место: порог доли шортсов 0,25 замерен на нише этого клиента: точность 0,75 при полноте 0,25, то есть снимает 9 эталонов из 12, включая сам эталон</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этих ворот быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="gate-В-3" data-title="В-3 Живость не измерена">
+<div class="row-top">
+<div class="rank num">В-3</div><div class="rhead">
+<p class="rtitle">Живость не измерена</p>
+<p class="rmeta">_base/scripts/board/rank_donors.py — liveness_state()</p>
+<div class="sig"><span class="s s-off">снимает</span><span class="s s-un">снимает 1 каналов</span></div>
+</div></div>
+<div class="io">
+<div class="io-c"><span class="k">читает</span><span class="v">_client/niche/data/liveness.json</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">канала нет в файле ИЛИ лента недоступна ИЛИ медиана не подана → «живость не измерена»: канал вне состава, но причина называет отсутствующий замер, а не отсутствующий взлёт</span></div>
+<div class="io-c"><span class="k">откуда число</span><span class="v">правило проекта: меньше данных — не более сильный вердикт</span></div>
+</div>
+<div class="gapline">слабое место: канал всё равно оказывается вне состава — разница только в названии причины</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этих ворот быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="gate-В-4" data-title="В-4 Лента прочитана, 0 длинных за 30 дней">
+<div class="row-top">
+<div class="rank num">В-4</div><div class="rhead">
+<p class="rtitle">Лента прочитана, 0 длинных за 30 дней</p>
+<p class="rmeta">_base/scripts/board/rank_donors.py</p>
+<div class="sig"><span class="s s-off">снимает</span><span class="s s-un">снимает 12 каналов</span></div>
+</div></div>
+<div class="io">
+<div class="io-c"><span class="k">читает</span><span class="v">сводка.длинных_за_окно из liveness.json</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">длинных роликов за окно 30 дней == 0 → вне состава</span></div>
+<div class="io-c"><span class="k">откуда число</span><span class="v">окно 30 дней задано сборщиком живости, обоснования числом нет</span></div>
+</div>
+<div class="gapline">слабое место: окно 30 дней назначено, а не выведено</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этих ворот быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="gate-В-5" data-title="В-5 Ж1 — свежий взлёт к своей медиане">
+<div class="row-top">
+<div class="rank num">В-5</div><div class="rhead">
+<p class="rtitle">Ж1 — свежий взлёт к своей медиане</p>
+<p class="rmeta">_base/scripts/board/rank_donors.py — MIN_FRESH_RATIO</p>
+<div class="sig"><span class="s s-off">снимает</span><span class="s s-un">снимает 54 каналов — это САМЫЕ МАССОВЫЕ ворота функции</span></div>
+</div></div>
+<div class="io">
+<div class="io-c"><span class="k">читает</span><span class="v">сводка.кратность_к_медиане_канала</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">кратность лучшего ролика за 30 дней к собственной медиане канала &lt; 3.0 → вне состава</span></div>
+<div class="io-c"><span class="k">откуда число</span><span class="v">решение D-124; число назначено разбором живости доноров, отдельным замером не подтверждено</span></div>
+</div>
+<div class="gapline">слабое место: порог ×3 назначен: замера, который бы его подтвердил, на диске нет</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этих ворот быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="gate-В-6" data-title="В-6 Хит меньше победы">
+<div class="row-top">
+<div class="rank num">В-6</div><div class="rhead">
+<p class="rtitle">Хит меньше победы</p>
+<p class="rmeta">_base/scripts/board/rank_donors.py — MIN_WIN_K</p>
+<div class="sig"><span class="s s-off">снимает</span><span class="s s-un">снимает 1 каналов</span></div>
+</div></div>
+<div class="io">
+<div class="io-c"><span class="k">читает</span><span class="v">сводка.лучший_за_окно</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">лучший ролик канала за 30 дней &lt; победы автора (4 540 просмотров) → вне состава</span></div>
+<div class="io-c"><span class="k">откуда число</span><span class="v">победа = собственная медиана 227 × 20 (D-121); режим «живой канал», автор 452 подписчиков</span></div>
+</div>
+<div class="gapline">слабое место: множитель 20 назначен решением, замером не выведен</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этих ворот быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="gate-П-1" data-title="П-1 Ступени по размеру автора (порядок, не состав)">
+<div class="row-top">
+<div class="rank num">П-1</div><div class="rhead">
+<p class="rtitle">Ступени по размеру автора (порядок, не состав)</p>
+<p class="rmeta">_base/scripts/board/rank_donors.py — STEP_MULTIPLIERS</p>
+<div class="sig"><span class="s s-on">порядок</span><span class="s s-un">ступени задают ПОРЯДОК показа, канал не снимают</span></div>
+</div></div>
+<div class="io">
+<div class="io-c"><span class="k">читает</span><span class="v">author_size.json: подписчики автора</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">границы = 452 × (2.5, 12, 25, 60, 120) → до 1 130 · до 5 424 · до 11 300 · до 27 120 · до 54 240 · больше 54 240</span></div>
+<div class="io-c"><span class="k">откуда число</span><span class="v">кратности назначены, замером не подтверждены; у канала с нуля вместо них абсолютные (1_000, 5_000, 10_000, 25_000, 50_000)</span></div>
+</div>
+<div class="gapline">слабое место: границы назначены: замерить их можно будет, когда наберётся история «донор → снятый ролик»</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этих ворот быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="gate-В-7" data-title="В-7 Фильтр ферм и пересказчиков">
+<div class="row-top">
+<div class="rank num">В-7</div><div class="rhead">
+<p class="rtitle">Фильтр ферм и пересказчиков</p>
+<p class="rmeta">_base/scripts/collect/farm_filter.py</p>
+<div class="sig"><span class="s s-off">снимает</span><span class="s s-un">применяется на разведке, до таблицы доноров: в таблице следов не оставляет</span></div>
+</div></div>
+<div class="io">
+<div class="io-c"><span class="k">читает</span><span class="v">заголовки роликов канала</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">снимает канал, если заголовки — нарезки, сериальные номера, или это пересказ чужого автора по закрытому списку имён</span></div>
+<div class="io-c"><span class="k">откуда число</span><span class="v">список чужих авторов (Carl Jung, Wayne Dyer, Neville Goddard, Joe Dispenza и др.) зашит в код базы, а не в файл ниши клиента</span></div>
+</div>
+<div class="gapline">слабое место: СПИСОК ИМЁН ЛЕЖИТ В БАЗЕ, а он про нишу ЭТОГО клиента — у следующего клиента он будет снимать не то</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этих ворот быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="gate-В-8" data-title="В-8 Ворота запретных меток ниши">
+<div class="row-top">
+<div class="rank num">В-8</div><div class="rhead">
+<p class="rtitle">Ворота запретных меток ниши</p>
+<p class="rmeta">_base/scripts/board/tag_gate.py + _client/niche/tag_gate.json</p>
+<div class="sig"><span class="s s-off">снимает</span><span class="s s-un">работает на доске идей, каналы не снимает</span></div>
+</div></div>
+<div class="io">
+<div class="io-c"><span class="k">читает</span><span class="v">метки ролика</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">совпадение с узором запретных меток снимает СТРОКУ ДОСКИ; узор: чакр|мантр|\bведы\b|ведическ|кришн|\bшив[аы]\b|шиваратри|шанкар|аюрвед|санскрит|торсунов|сатья\b|нарушевич|энергетическ\…</span></div>
+<div class="io-c"><span class="k">откуда число</span><span class="v">калибровка ниши этого клиента, лежит у клиента — так и правильно</span></div>
+</div>
+<div class="gapline">слабое место: без файла ворота отвечают «не измерено» и строку не снимают</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этих ворот быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="gate-В-9" data-title="В-9 Ворота формата ролика (для доски)">
+<div class="row-top">
+<div class="rank num">В-9</div><div class="rhead">
+<p class="rtitle">Ворота формата ролика (для доски)</p>
+<p class="rmeta">_base/scripts/board/format_gate.py</p>
+<div class="sig"><span class="s s-off">снимает</span><span class="s s-un">работает на доске идей, каналы не снимает</span></div>
+</div></div>
+<div class="io">
+<div class="io-c"><span class="k">читает</span><span class="v">заголовок и длительность ролика</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">длиннее 3600 сек — эфир; короче 300 сек — клип; плюс узоры чужого формата и подписи гостя</span></div>
+<div class="io-c"><span class="k">откуда число</span><span class="v">пороги назначены в коде базы</span></div>
+</div>
+<div class="gapline">слабое место: узор VOICE_LED настроен на нишу первого клиента и лежит в базе</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этих ворот быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+<div class="row" data-id="gate-Ч-1" data-title="Ч-1 Отметка владельца">
+<div class="row-top">
+<div class="rank num">Ч-1</div><div class="rhead">
+<p class="rtitle">Отметка владельца</p>
+<p class="rmeta">_client/niche/data/marks.json + marks_ru50.json</p>
+<div class="sig"><span class="s s-un">решает человек</span><span class="s s-un">отметок 205 + 50; в реестре отказов 166; на странице 70</span></div>
+</div></div>
+<div class="io">
+<div class="io-c"><span class="k">читает</span><span class="v">ваши нажатия на странице</span></div>
+<div class="io-c"><span class="k">правило</span><span class="v">действующий вердикт — САМАЯ ПОЗДНЯЯ ваша отметка; отказ навсегда уводит канал в реестр, одобрение выводит его на страницу независимо от того, что решила машина</span></div>
+<div class="io-c"><span class="k">откуда число</span><span class="v">правило проекта: отметка человека побеждает машину (D-051)</span></div>
+</div>
+<div class="gapline">слабое место: отметка идёт в систему через кнопку и пересылку вручную: 4 вердикта уже терялись на этом шаге</div>
+<div class="marks"><button class="mbtn" data-mark="ok">✓ так и оставить</button><button class="mbtn" data-mark="no">✕ переделать</button><button class="mbtn" data-mark="wrong">⊘ этих ворот быть не должно</button><textarea class="cmt" rows="1" placeholder="как должно работать"></textarea></div></div>
+</section>
+<section><h2>Что функция выдаёт на конце и как это выглядит</h2>
+<div class="call"><h4>Сейчас выход один — страница</h4>
+<p><code>review_channels.html</code>, <b>70</b> карточек, открывается по локальному адресу <code>https://improducer.co/katya/otbor/</code> и живёт до перезагрузки машины. Карточка несёт: название и ссылку, подписчиков, медиану, свежесть, длинные и шортсы, долю метода и первого лица, отношение к нише, ярус, чем канал предложен, залетевшие ролики с заголовками, вашу прежнюю отметку и список незамеренного. Разметка — ✓ / ✕ / ⊘ и комментарий.</p>
+<p>Из них проходят нынешние ворота <b>17</b>, у <b>35</b> нет замеров вовсе.</p>
+<p><b>Чего функция НЕ выдаёт:</b> файла «действующая таблица отобранных доноров» не существует — следующее звено конвейера берёт данные прежнего поколения. Отметки из браузера сами в систему не попадают.</p></div>
+</section>
+<section><h2>Что вы записали</h2><div id="mine"></div></section>
+<div class="foot"><span>Improducer · пульт отбора</span><span>собрано 20.09.2026</span><span>числа с диска, пороги из кода</span></div>
+</div><script>
+(function(){
+  var KEY='opis-marks-v1';
+  function load(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}}
+  function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
+  var state=load(), rows=[].slice.call(document.querySelectorAll('.row'));
+  function dump(){var o=[];rows.forEach(function(r){var s=state[r.dataset.id];
+    if(s&&(s.mark||s.note))o.push({id:r.dataset.id,title:r.dataset.title,
+      mark:s.mark||null,note:s.note||''})});return JSON.stringify(o,null,2)}
+  function paintRow(row){var st=state[row.dataset.id]||{};
+    row.querySelectorAll('.mbtn[data-mark]').forEach(function(b){
+      b.classList.remove('on-ok','on-no','on-wrong');
+      if(st.mark===b.dataset.mark)b.classList.add('on-'+st.mark)});
+    row.classList.remove('m-ok','m-no','m-wrong');
+    if(st.mark)row.classList.add('m-'+st.mark);
+    var ta=row.querySelector('.cmt');
+    if(ta&&document.activeElement!==ta)ta.value=st.note||''}
+  function paint(){var c={ok:0,no:0,wrong:0,done:0};
+    rows.forEach(function(r){var s=state[r.dataset.id];if(s&&s.mark){c[s.mark]++;c.done++}});
+    ['ok','no','wrong','done'].forEach(function(k){
+      var e=document.getElementById('c-'+k);if(e)e.textContent=c[k]});
+    var box=document.getElementById('mine');if(!box)return;
+    var ids=Object.keys(state).filter(function(k){return state[k]&&(state[k].mark||state[k].note)});
+    if(!ids.length){box.innerHTML='<p style="color:var(--ink-3)">Пока ничего не отмечено.</p>';return}
+    var lab={ok:'✓ оставить',no:'✕ переделать',wrong:'⊘ убрать'};
+    box.innerHTML='<div class="scroll"><table><thead><tr><th>Шаг или ворота</th><th>Отметка</th>'+
+      '<th>Как должно работать</th></tr></thead><tbody>'+ids.map(function(k){var s=state[k];
+      return '<tr><td>'+(s.title||k)+'</td><td>'+(lab[s.mark]||'—')+'</td><td>'+
+        (s.note||'')+'</td></tr>'}).join('')+'</tbody></table></div>'+
+      '<textarea class="dump" readonly>'+dump().replace(/</g,'&lt;')+'</textarea>'}
+  rows.forEach(function(row){var id=row.dataset.id;
+    row.querySelectorAll('.mbtn[data-mark]').forEach(function(b){
+      b.addEventListener('click',function(){var cur=(state[id]||{}).mark;
+        state[id]=Object.assign({},state[id],{mark:(cur===b.dataset.mark)?null:b.dataset.mark,
+          title:row.dataset.title||''});
+        if(!state[id].mark&&!state[id].note)delete state[id];
+        save(state);paintRow(row);paint()})});
+    var ta=row.querySelector('.cmt');
+    if(ta)ta.addEventListener('input',function(){
+      state[id]=Object.assign({},state[id],{note:ta.value,title:row.dataset.title||''});
+      if(!state[id].mark&&!state[id].note)delete state[id];save(state);paint()});
+    paintRow(row)});
+  var exp=document.getElementById('export');
+  if(exp)exp.addEventListener('click',function(){var t=dump(),ok=false;
+    try{if(navigator.clipboard){navigator.clipboard.writeText(t);ok=true}}catch(e){}
+    if(!ok){try{var x=document.createElement('textarea');x.value=t;document.body.appendChild(x);
+      x.select();ok=document.execCommand('copy');document.body.removeChild(x)}catch(e){}}
+    exp.textContent=ok?'скопировано':'копия внизу страницы';
+    setTimeout(function(){exp.textContent='скопировать опись'},2000)});
+  paint();
+})();
+</script></body></html>
