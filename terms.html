@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Условия использования — improducer</title>
+<meta name="theme-color" content="#F9FAFC">
+<link rel="icon" href="https://connect.improducer.co/assets/favicon.svg" type="image/svg+xml">
 <!--
   Страница для публикации на improducer.co. Её адрес указывается в экране согласия
   Google Cloud рядом с политикой конфиденциальности. Требование YouTube API Services
@@ -11,48 +13,54 @@
   конфиденциальности Google — они в разделе 7 и убирать их нельзя.
 -->
 <style>
+/* Значения — дизайн-система improducer (_design/tokens.json). Только светлая тема.
+   Страница публикуется одиночным файлом на improducer.co и не может грузить
+   шрифты рядом, поэтому шрифт — системный запасной из стека --sans. */
 :root{
-  color-scheme:light dark;
-  --bg:#f6f5f3; --card:#fff; --ink:#15181c; --muted:#5e6570; --line:#e4e2de;
-  --accent:#123a5e;
-  --shadow:0 1px 2px rgba(20,24,28,.05), 0 8px 24px rgba(20,24,28,.05);
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#101214; --card:#191c1f; --ink:#e8eaec; --muted:#a2a9b2; --line:#2a2e33;
-    --accent:#dbe7f3; --shadow:none;
-  }
+  color-scheme:light;
+  --bg:#F9FAFC; --card:#FFFFFF; --sunken:#F1F4F8; --ink:#1B2230; --body:#3C4757; --muted:#5A6575;
+  --faint:#97A1AF; --line:#E4E8EF; --line-soft:#F0F3F7; --focus:#0B63C5; --red:#FF0000;
+  --sans:"Golos Text",ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
 body{
   margin:0; background:var(--bg); color:var(--ink);
-  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font:16px/1.65 var(--sans); -webkit-font-smoothing:antialiased;
   -webkit-text-size-adjust:100%;
 }
-.wrap{max-width:42rem; margin:0 auto; padding:28px 18px 48px}
-.brand{display:flex; align-items:baseline; gap:.5rem; margin:0 0 18px; font-size:.95rem}
-.brand b{font-weight:650}
-.brand span{color:var(--muted); font-size:.82rem}
-.card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:24px 20px; box-shadow:var(--shadow)}
-h1{font-size:clamp(1.35rem,5.2vw,1.8rem); line-height:1.25; letter-spacing:-.01em; margin:0 0 6px}
-h2{font-size:1.05rem; line-height:1.35; margin:26px 0 8px}
-p{margin:0 0 12px}
-ul{margin:0 0 12px; padding-left:1.2rem}
+.wrap{max-width:44rem; margin:0 auto; padding:clamp(24px,6vw,48px) 18px 56px}
+.brand{display:flex; flex-wrap:wrap; align-items:center; gap:4px 9px; margin:0 0 20px}
+.brand svg{flex:0 0 auto; display:block}
+.brand b{font-size:19px; font-weight:800; letter-spacing:-.02em}
+.brand span{color:var(--faint); font-size:.85rem; margin-left:4px}
+.card{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:clamp(22px,5vw,36px) clamp(18px,5vw,40px)}
+/* Красная черта — слева от заголовка, на его первой строке. */
+h1,h2{position:relative}
+h1::before,h2::before{content:""; position:absolute; left:0; background:var(--red)}
+h1{font-size:clamp(1.6rem,5.2vw,2.1rem); line-height:1.15; font-weight:800; letter-spacing:-.02em; margin:0 0 10px; padding-left:22px}
+h1::before{width:7px; height:24px; border-radius:3.5px; top:calc((1.15em - 24px) / 2)}
+h2{font-size:1.2rem; line-height:1.3; font-weight:700; margin:32px 0 10px; padding-left:16px}
+h2::before{width:5px; height:14px; border-radius:2.5px; top:calc((1.3em - 14px) / 2)}
+h3{font-size:1rem; line-height:1.4; margin:18px 0 6px}
+p{margin:0 0 12px; color:var(--body); max-width:68ch}
+ul{margin:0 0 12px; padding-left:1.2rem; color:var(--body)}
 li{margin:0 0 7px}
 .muted{color:var(--muted)}
 .small{font-size:.88rem}
-.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.85em; overflow-wrap:anywhere}
-a{color:var(--ink)}
-a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
-hr{border:0; border-top:1px solid var(--line); margin:22px 0}
-.box{border:1px solid var(--line); border-radius:11px; padding:14px 16px; margin:0 0 14px; background:var(--bg)}
-footer{margin:18px 2px 0; font-size:.82rem; color:var(--muted)}
+.mono{font-family:var(--mono); font-size:.85em; overflow-wrap:anywhere}
+a{color:var(--ink); text-decoration-color:#C3CCD8; text-underline-offset:3px}
+a:hover{text-decoration-color:var(--ink)}
+a:focus-visible{outline:2px solid var(--focus); outline-offset:2px}
+hr{border:0; border-top:1px solid var(--line); margin:24px 0}
+.box{border:1px solid var(--line); border-radius:14px; padding:14px 18px; margin:0 0 14px; background:var(--bg)}
+footer{margin:20px 2px 0; font-size:.82rem; color:var(--muted); text-align:center}
 footer a{color:var(--muted)}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="brand"><b>improducer</b><span>improducer.co</span></div>
+  <div class="brand"><svg width="28" height="28" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><rect x="13.5" y="44" width="9" height="12" rx="4.5" fill="#C9D1DC"/><rect x="29.5" y="32" width="9" height="36" rx="4.5" fill="#C9D1DC"/><rect x="45.5" y="18" width="9" height="64" rx="4.5" fill="#FF0000"/><rect x="61.5" y="32" width="9" height="36" rx="4.5" fill="#1B2230"/><rect x="77.5" y="44" width="9" height="12" rx="4.5" fill="#1B2230"/></svg><b>improducer</b><span>improducer.co</span></div>
   <main class="card">
 
     <h1>Условия использования</h1>

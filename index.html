@@ -1,15 +1,114 @@
-<!doctype html><html lang="ru" data-theme="light"><head><meta charset="utf-8"><meta name="color-scheme" content="light">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>Improducer</title>
-<style>body{font:15px/1.6 system-ui,-apple-system,sans-serif;background:#F4F6F9;color:#141C26;
-margin:0;display:grid;place-items:center;min-height:100vh}main{max-width:34rem;padding:2rem}
-a{color:#1B6C86}h1{font-size:1.6rem;margin:0 0 .6rem}
-}</style>
-</head><body><main><h1>Improducer</h1>
-<p>Производство авторских YouTube-каналов.</p>
-<p><a href="/katya/">Концепция канала — Екатерина Арея</a></p>
-<p><a href="/katya/otbor/">Отбор каналов-доноров — разметка</a></p>
-<p><a href="/katya/opis/">Опись функции отбора — как она работает</a></p>
-<p><a href="/katya/plan/">Контент-план — десять роликов</a></p>
-<p><a href="/katya/doska/">Доска идей — отобранное для канала</a></p>
-<p><a href="/katya/ideas/">Доска идей — 30 роликов для отбора</a></p>
-<p><a href="/katya/board/">Доска идей — прежняя версия</a></p></main></body></html>
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>improducer — продюсирование YouTube-каналов</title>
+<meta name="description" content="improducer — продюсирование авторских YouTube-каналов: концепция, отбор тем, контент-план и отчёты по статистике канала.">
+<meta name="theme-color" content="#F9FAFC">
+<link rel="icon" href="https://connect.improducer.co/assets/favicon.svg" type="image/svg+xml">
+<!--
+  Главная improducer.co. Исходник — Y basic/_pult/connect/pages/index.html,
+  публикуется в репозиторий improducerco.github.io вместе с privacy.html и
+  terms.html. Её открывает проверяющий Google при верификации приложения: здесь
+  обязаны быть описание продукта, назначение доступа к данным Google и ссылка на
+  политику конфиденциальности. Материалы клиентов здесь не перечисляются.
+-->
+<style>
+/* Значения — дизайн-система improducer (_design/tokens.json). Только светлая тема.
+   Страница публикуется одиночным файлом на improducer.co и не может грузить
+   шрифты рядом, поэтому шрифт — системный запасной из стека --sans. */
+:root{
+  color-scheme:light;
+  --bg:#F9FAFC; --card:#FFFFFF; --sunken:#F1F4F8; --ink:#1B2230; --body:#3C4757; --muted:#5A6575;
+  --faint:#97A1AF; --line:#E4E8EF; --line-soft:#F0F3F7; --focus:#0B63C5; --red:#FF0000;
+  --sans:"Golos Text",ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:16px/1.65 var(--sans); -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:44rem; margin:0 auto; padding:clamp(24px,6vw,48px) 18px 56px}
+.brand{display:flex; flex-wrap:wrap; align-items:center; gap:4px 9px; margin:0 0 20px}
+.brand svg{flex:0 0 auto; display:block}
+.brand b{font-size:19px; font-weight:800; letter-spacing:-.02em}
+.brand span{color:var(--faint); font-size:.85rem; margin-left:4px}
+.card{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:clamp(22px,5vw,36px) clamp(18px,5vw,40px)}
+/* Красная черта — слева от заголовка, на его первой строке. */
+h1,h2{position:relative}
+section[lang=en] h3{margin-top:22px}
+h1::before,h2::before{content:""; position:absolute; left:0; background:var(--red)}
+h1{font-size:clamp(1.6rem,5.2vw,2.1rem); line-height:1.15; font-weight:800; letter-spacing:-.02em; margin:0 0 10px; padding-left:22px}
+h1::before{width:7px; height:24px; border-radius:3.5px; top:calc((1.15em - 24px) / 2)}
+h2{font-size:1.2rem; line-height:1.3; font-weight:700; margin:32px 0 10px; padding-left:16px}
+h2::before{width:5px; height:14px; border-radius:2.5px; top:calc((1.3em - 14px) / 2)}
+h3{font-size:1rem; line-height:1.4; margin:18px 0 6px}
+p{margin:0 0 12px; color:var(--body); max-width:68ch}
+ul{margin:0 0 12px; padding-left:1.2rem; color:var(--body)}
+li{margin:0 0 7px}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+.mono{font-family:var(--mono); font-size:.85em; overflow-wrap:anywhere}
+a{color:var(--ink); text-decoration-color:#C3CCD8; text-underline-offset:3px}
+a:hover{text-decoration-color:var(--ink)}
+a:focus-visible{outline:2px solid var(--focus); outline-offset:2px}
+hr{border:0; border-top:1px solid var(--line); margin:24px 0}
+.box{border:1px solid var(--line); border-radius:14px; padding:14px 18px; margin:0 0 14px; background:var(--bg)}
+footer{margin:20px 2px 0; font-size:.82rem; color:var(--muted); text-align:center}
+footer a{color:var(--muted)}
+.go{display:inline-block; margin:6px 0 4px; padding:11px 18px; border-radius:12px; background:#FEF0EF; border:1px solid #F7DAD8; color:var(--ink); font-weight:700; text-decoration:none}
+.go:hover{border-color:#EFC4C1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><svg width="28" height="28" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><rect x="13.5" y="44" width="9" height="12" rx="4.5" fill="#C9D1DC"/><rect x="29.5" y="32" width="9" height="36" rx="4.5" fill="#C9D1DC"/><rect x="45.5" y="18" width="9" height="64" rx="4.5" fill="#FF0000"/><rect x="61.5" y="32" width="9" height="36" rx="4.5" fill="#1B2230"/><rect x="77.5" y="44" width="9" height="12" rx="4.5" fill="#1B2230"/></svg><b>improducer</b><span>improducer.co</span></div>
+  <main class="card">
+    <h1>Продюсирование авторских YouTube-каналов</h1>
+    <p>improducer ведёт канал автора от замысла до выпусков: концепция канала, отбор
+    тем по живым данным YouTube, контент-план, упаковка роликов и отчёты по тому,
+    что сработало.</p>
+
+    <h2>Подключение канала</h2>
+    <p>Чтобы готовить отчёты и решения по контенту, нам нужна статистика канала.
+    Автор подключает канал сам на <span class="mono">connect.improducer.co</span>,
+    входя своим аккаунтом Google. Доступ — <b>только на чтение</b> статистики
+    YouTube Analytics и сведений о видео: мы не можем публиковать, удалять или
+    менять что-либо на канале. Доступ хранится зашифрованным и отзывается в любой
+    момент.</p>
+    <p><a class="go" href="https://connect.improducer.co/">Подключить канал</a></p>
+    <p class="small muted">Как мы обращаемся с данными — в
+    <a href="/privacy.html">политике конфиденциальности</a>; правила сервиса — в
+    <a href="/terms.html">условиях использования</a>.</p>
+
+    <hr>
+    <section id="en" lang="en">
+    <h2>YouTube channel production</h2>
+    <p>improducer produces YouTube channels for independent authors: channel concept,
+    topic research based on live YouTube data, content plans, video packaging, and
+    reports on what worked.</p>
+    <p>Authors connect their own channel at
+    <span class="mono">connect.improducer.co</span> by signing in with Google. We request
+    <b>read-only</b> access to YouTube Analytics and channel video data
+    (<span class="mono">yt-analytics.readonly</span>,
+    <span class="mono">youtube.readonly</span>) solely to prepare reports and content
+    decisions for that author. We never upload, edit or delete anything, never sell or
+    share the data, and access can be revoked at any time. See the
+    <a href="/privacy.html#en">Privacy Policy</a> and <a href="/terms.html">Terms of
+    Service</a>.</p>
+    </section>
+
+    <hr>
+    <p class="small muted">Связь: <a href="mailto:founder@improducer.co">founder@improducer.co</a></p>
+  </main>
+  <footer>
+    <a href="/privacy.html">Политика конфиденциальности</a> ·
+    <a href="/terms.html">Условия использования</a> ·
+    <a href="mailto:founder@improducer.co">founder@improducer.co</a>
+  </footer>
+</div>
+</body>
+</html>
