@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Политика конфиденциальности — improducer</title>
+<meta name="theme-color" content="#F9FAFC">
+<link rel="icon" href="https://connect.improducer.co/assets/favicon.svg" type="image/svg+xml">
 <!--
   Страница для публикации на improducer.co. Её адрес указывается в экране
   согласия Google Cloud: при проверке чувствительных областей доступа ревьюер
@@ -13,54 +15,61 @@
   внутри, внешних запросов нет.
 -->
 <style>
+/* Значения — дизайн-система improducer (_design/tokens.json). Только светлая тема.
+   Страница публикуется одиночным файлом на improducer.co и не может грузить
+   шрифты рядом, поэтому шрифт — системный запасной из стека --sans. */
 :root{
-  color-scheme:light dark;
-  --bg:#f6f5f3; --card:#fff; --ink:#15181c; --muted:#5e6570; --line:#e4e2de;
-  --accent:#123a5e;
-  --shadow:0 1px 2px rgba(20,24,28,.05), 0 8px 24px rgba(20,24,28,.05);
-}
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#101214; --card:#191c1f; --ink:#e8eaec; --muted:#a2a9b2; --line:#2a2e33;
-    --accent:#dbe7f3; --shadow:none;
-  }
+  color-scheme:light;
+  --bg:#F9FAFC; --card:#FFFFFF; --sunken:#F1F4F8; --ink:#1B2230; --body:#3C4757; --muted:#5A6575;
+  --faint:#97A1AF; --line:#E4E8EF; --line-soft:#F0F3F7; --focus:#0B63C5; --red:#FF0000;
+  --sans:"Golos Text",ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
 body{
   margin:0; background:var(--bg); color:var(--ink);
-  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font:16px/1.65 var(--sans); -webkit-font-smoothing:antialiased;
   -webkit-text-size-adjust:100%;
 }
-.wrap{max-width:42rem; margin:0 auto; padding:28px 18px 48px}
-.brand{display:flex; align-items:baseline; gap:.5rem; margin:0 0 18px; font-size:.95rem}
-.brand b{font-weight:650}
-.brand span{color:var(--muted); font-size:.82rem}
-.card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:24px 20px; box-shadow:var(--shadow)}
-h1{font-size:clamp(1.35rem,5.2vw,1.8rem); line-height:1.25; letter-spacing:-.01em; margin:0 0 6px}
-h2{font-size:1.05rem; line-height:1.35; margin:26px 0 8px}
-h3{font-size:.95rem; margin:18px 0 6px}
-p{margin:0 0 12px}
-ul{margin:0 0 12px; padding-left:1.2rem}
+.wrap{max-width:44rem; margin:0 auto; padding:clamp(24px,6vw,48px) 18px 56px}
+.brand{display:flex; flex-wrap:wrap; align-items:center; gap:4px 9px; margin:0 0 20px}
+.brand svg{flex:0 0 auto; display:block}
+.brand b{font-size:19px; font-weight:800; letter-spacing:-.02em}
+.brand span{color:var(--faint); font-size:.85rem; margin-left:4px}
+.card{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:clamp(22px,5vw,36px) clamp(18px,5vw,40px)}
+/* Красная черта — слева от заголовка, на его первой строке. */
+h1,h2{position:relative}
+section[lang=en] h3{margin-top:22px}
+h1::before,h2::before{content:""; position:absolute; left:0; background:var(--red)}
+h1{font-size:clamp(1.6rem,5.2vw,2.1rem); line-height:1.15; font-weight:800; letter-spacing:-.02em; margin:0 0 10px; padding-left:22px}
+h1::before{width:7px; height:24px; border-radius:3.5px; top:calc((1.15em - 24px) / 2)}
+h2{font-size:1.2rem; line-height:1.3; font-weight:700; margin:32px 0 10px; padding-left:16px}
+h2::before{width:5px; height:14px; border-radius:2.5px; top:calc((1.3em - 14px) / 2)}
+h3{font-size:1rem; line-height:1.4; margin:18px 0 6px}
+p{margin:0 0 12px; color:var(--body); max-width:68ch}
+ul{margin:0 0 12px; padding-left:1.2rem; color:var(--body)}
 li{margin:0 0 7px}
 .muted{color:var(--muted)}
 .small{font-size:.88rem}
-.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.85em; overflow-wrap:anywhere}
-a{color:var(--ink)}
-a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
-hr{border:0; border-top:1px solid var(--line); margin:22px 0}
-.box{border:1px solid var(--line); border-radius:11px; padding:14px 16px; margin:0 0 14px; background:var(--bg)}
-footer{margin:18px 2px 0; font-size:.82rem; color:var(--muted)}
+.mono{font-family:var(--mono); font-size:.85em; overflow-wrap:anywhere}
+a{color:var(--ink); text-decoration-color:#C3CCD8; text-underline-offset:3px}
+a:hover{text-decoration-color:var(--ink)}
+a:focus-visible{outline:2px solid var(--focus); outline-offset:2px}
+hr{border:0; border-top:1px solid var(--line); margin:24px 0}
+.box{border:1px solid var(--line); border-radius:14px; padding:14px 18px; margin:0 0 14px; background:var(--bg)}
+footer{margin:20px 2px 0; font-size:.82rem; color:var(--muted); text-align:center}
 footer a{color:var(--muted)}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="brand"><b>improducer</b><span>improducer.co</span></div>
+  <div class="brand"><svg width="28" height="28" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><rect x="13.5" y="44" width="9" height="12" rx="4.5" fill="#C9D1DC"/><rect x="29.5" y="32" width="9" height="36" rx="4.5" fill="#C9D1DC"/><rect x="45.5" y="18" width="9" height="64" rx="4.5" fill="#FF0000"/><rect x="61.5" y="32" width="9" height="36" rx="4.5" fill="#1B2230"/><rect x="77.5" y="44" width="9" height="12" rx="4.5" fill="#1B2230"/></svg><b>improducer</b><span>improducer.co</span></div>
   <main class="card">
 
     <h1>Политика конфиденциальности</h1>
     <p class="muted small">Действует с 18 сентября 2026 года. Относится к сервису
-    подключения канала по адресу <span class="mono">connect.improducer.co</span>.</p>
+    подключения канала по адресу <span class="mono">connect.improducer.co</span>.
+    <a href="#en" lang="en">English version</a></p>
 
     <h2>Коротко</h2>
     <div class="box">
@@ -195,6 +204,104 @@ footer a{color:var(--muted)}
     <h2>11. Изменения политики</h2>
     <p>Если политика изменится, новая редакция появится на этой странице с новой датой.
     О существенных изменениях мы сообщим письмом на адрес подключённого аккаунта.</p>
+
+    <hr>
+    <section id="en" lang="en">
+    <h2>Privacy Policy (English)</h2>
+    <p class="muted small">Effective September 18, 2026. Applies to the channel
+    connection service at <span class="mono">connect.improducer.co</span>. The Russian
+    text above and this English text say the same.</p>
+    <div class="box">
+      <p class="small" style="margin:0">We ask Google for <b>read-only</b> access to your
+      YouTube channel statistics. We cannot upload or delete videos, post comments, change
+      channel settings, or read your email or Google Drive. Your access is stored
+      encrypted, and the server itself cannot decrypt it. We never sell or share this
+      data. You can revoke access at any time (see “How to revoke access”).</p>
+    </div>
+    <h3>Who processes the data</h3>
+    <p>improducer is a YouTube channel production service. The service owner is the data
+    controller and answers all questions about this policy:
+    <a href="mailto:founder@improducer.co">founder@improducer.co</a>.</p>
+    <h3>What data we request and why</h3>
+    <ul>
+      <li><span class="mono">yt-analytics.readonly</span> — YouTube Analytics for your
+      channel: views, watch time, audience retention, traffic sources, viewer geography and
+      devices, subscriber changes, per-video metrics. The data is aggregated; we receive
+      nothing about individual viewers. <b>Why:</b> it is the only source that shows what
+      works on the channel, so we can prepare reports and content decisions for you.</li>
+      <li><span class="mono">youtube.readonly</span> — channel name and ID, the list of
+      videos with titles, descriptions, thumbnails, publish dates and public metrics.
+      <b>Why:</b> to match Analytics numbers to specific videos and to confirm that the
+      connected channel is yours.</li>
+      <li><span class="mono">openid</span> and <span class="mono">email</span> — your
+      Google account ID and email address. <b>Why:</b> to tell connections apart, show you
+      your own connection page and know whose access to revoke on request.</li>
+    </ul>
+    <p>We do not request permission to upload, edit or delete videos, to manage comments,
+    playlists or channel settings, to access Gmail, Drive, Calendar, Contacts or Photos, or
+    to read revenue data. We never see your password.</p>
+    <h3>How we use the data</h3>
+    <p>Only to provide the production service to you: channel metrics, reports, content
+    recommendations and release planning. We do not use it for advertising, do not train
+    third-party models on it, do not build profiles and do not combine it with other
+    people’s data.</p>
+    <p>improducer’s use and transfer to any other app of information received from Google
+    APIs will adhere to the
+    <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API
+    Services User Data Policy</a>, including the Limited Use requirements. The service uses
+    YouTube API Services; see the <a href="https://policies.google.com/privacy">Google
+    Privacy Policy</a> and the <a href="https://www.youtube.com/t/terms">YouTube Terms of
+    Service</a>.</p>
+    <h3>How the data is stored and protected</h3>
+    <ul>
+      <li>The moment you connect, the server encrypts the access key (refresh token) with
+      the service owner’s public key (X25519 + AES-256-GCM) and stores only the encrypted
+      envelope.</li>
+      <li>There is no private key on the server, so it cannot decrypt what it stores.
+      Decryption happens only on the owner’s work computer; after pickup the envelope is
+      deleted from the server.</li>
+      <li>Only non-secret details for your connection page stay readable on the server:
+      channel name and ID, email, connection date and status.</li>
+      <li>The event log contains no access keys, no passwords and no full IP addresses.
+      All connections use HTTPS.</li>
+    </ul>
+    <h3>Who we share the data with</h3>
+    <p><b>No one.</b> We do not sell, rent or transfer your data to third parties. There
+    are no ads, trackers, pixels or third-party scripts on the connection pages. The only
+    technical parties are Google (the data source) and the hosting provider, which sees
+    only encrypted data. Disclosure is possible only on a lawful request from an
+    authorized body, and only of what we are able to read.</p>
+    <h3>Cookies</h3>
+    <p>One technical cookie that remembers you while your connection page is open. No
+    advertising or analytics cookies.</p>
+    <h3>How long data is kept</h3>
+    <ul>
+      <li>Encrypted access envelope — up to 30 days on the server, then deleted
+      automatically; usually picked up and deleted the same day.</li>
+      <li>Connection card (channel, email, date, status) — while the connection is active;
+      deleted when access is revoked.</li>
+      <li>Event log without secrets — up to 180 days.</li>
+      <li>Reports and calculations — for the duration of our work together; deleted on
+      your written request.</li>
+    </ul>
+    <h3>How to revoke access</h3>
+    <ul>
+      <li>On your connection page <span class="mono">connect.improducer.co/app</span>, press
+      “Отключить доступ” (Disconnect).</li>
+      <li>Or in Google: open
+      <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>,
+      find <b>improducer</b> and remove access.</li>
+    </ul>
+    <p>After revocation we receive no more data about the channel. To also delete stored
+    reports, email <a href="mailto:founder@improducer.co">founder@improducer.co</a> — we
+    will delete them and confirm by email.</p>
+    <h3>Your rights, children, changes</h3>
+    <p>You may ask what data we hold about you, have it corrected or deleted, and withdraw
+    consent — email <a href="mailto:founder@improducer.co">founder@improducer.co</a>; we
+    reply within 30 days. The service is for channel owners over 18; we do not knowingly
+    collect children’s data. A changed policy appears on this page with a new date; we
+    announce material changes by email to the connected account.</p>
+    </section>
 
     <hr>
     <p class="small muted">Вопросы по этой политике:
