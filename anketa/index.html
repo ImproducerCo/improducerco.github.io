@@ -24,17 +24,20 @@
   --ok:#17683A; --ok-bg:#E9F4EE; --warn:#7F5300; --warn-bg:#FBF2DF; --focus:#0B63C5;
   --sans:"Golos Text",ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  --pad:clamp(16px,4vw,56px);
+  /* Размеры — как у всех страниц дизайн-системы (_design/pages.css): колонка 1180,
+     поля 24 и 16 на телефоне, те же кегли заголовков и шаг разделов. */
+  --pad:24px;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-padding-top:84px}
-body{margin:0;background:var(--surface);color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased;
+body{margin:0;background:var(--canvas);color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased;
   overflow-wrap:break-word}
 :focus-visible{outline:2px solid var(--focus);outline-offset:3px}
-.shell{max-width:1600px;margin:0 auto;padding:0 var(--pad)}
+.shell{max-width:1180px;margin:0 auto;padding:0 var(--pad)}
+@media(max-width:640px){:root{--pad:16px}}
 
 /* Верхняя полоса: знак, короткий ход, «только главное», отправка. Под ней — линия хода. */
-.top{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.96);backdrop-filter:blur(8px)}
+.top{position:sticky;top:0;z-index:10;background:rgba(249,250,252,.95);backdrop-filter:blur(8px)}
 .top-in{display:flex;align-items:center;gap:12px 22px;min-height:64px}
 .top-in .brand{display:flex;align-items:center;gap:10px;margin-right:auto}
 .top-in .brand b{font-size:20px;font-weight:800;letter-spacing:-.02em}
@@ -48,20 +51,21 @@ body{margin:0;background:var(--surface);color:var(--ink);font:16px/1.6 var(--san
   .top-in .brand b{font-size:18px}}
 
 /* Заголовок экрана и ход — широкой полосой, без карточек. */
-.hero{padding:clamp(40px,6vw,88px) 0 0}
+.hero{padding:40px 0 0}
 h1,h2{position:relative;margin:0}
 h1::before,h2::before{content:"";position:absolute;left:0;background:var(--red)}
-h1{font-size:clamp(34px,5vw,56px);line-height:1.05;font-weight:800;letter-spacing:-.025em;padding-left:clamp(22px,2.4vw,30px)}
-h1::before{width:8px;height:clamp(24px,3.4vw,38px);border-radius:4px;top:calc((1.05em - clamp(24px,3.4vw,38px)) / 2)}
-h2{font-size:clamp(22px,2vw,28px);line-height:1.2;font-weight:700;letter-spacing:-.015em;padding-left:18px}
+h1{font-size:clamp(30px,4.6vw,40px);line-height:1.1;font-weight:800;letter-spacing:-.02em;padding-left:24px}
+h1::before{width:8px;height:28px;border-radius:4px;top:calc((1.1em - 28px) / 2)}
+h2{font-size:24px;line-height:1.2;font-weight:700;letter-spacing:-.01em;padding-left:18px}
+@media(max-width:640px){h2{font-size:21px}}
 h2::before{width:6px;height:17px;border-radius:3px;top:calc((1.2em - 17px) / 2)}
-.lede{font-size:clamp(17px,1.5vw,20px);line-height:1.55;color:var(--body);margin:18px 0 0;max-width:56rem}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:clamp(32px,4vw,56px) 0 0;
+.lede{font-size:17px;line-height:1.6;color:var(--body);margin:16px 0 0;max-width:68ch}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:30px 0 0;
   border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .stat{padding:22px 24px 24px 0}
 .stat+.stat{padding-left:24px;border-left:1px solid var(--line)}
 .stat .k{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.stat .v{font-family:var(--mono);font-size:clamp(28px,3vw,40px);font-weight:600;line-height:1.1;margin-top:8px;color:var(--ink)}
+.stat .v{font-family:var(--mono);font-size:24px;font-weight:600;line-height:1.1;margin-top:8px;color:var(--ink)}
 .stat .v small{font-size:.45em;color:var(--faint);font-weight:500;margin-left:6px}
 .stat .track{margin-top:14px}
 .track{height:4px;border-radius:2px;background:var(--line-soft);overflow:hidden}
@@ -71,7 +75,7 @@ h2::before{width:6px;height:17px;border-radius:3px;top:calc((1.2em - 17px) / 2)}
   .stat:nth-child(3){padding-left:0;border-left:0}.stat:nth-child(n+3){border-top:1px solid var(--line)}}
 
 /* Разделы: заголовок и счётчик, дальше строки «вопрос — ответ» на всю ширину. */
-section{padding:clamp(48px,6vw,88px) 0 0}
+section{padding:52px 0 0}
 .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding-bottom:18px;border-bottom:1px solid var(--ink)}
 .sec-head .cnt{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap}
 .sec-head .cnt.full{color:var(--ok)}
@@ -174,7 +178,7 @@ section{padding:clamp(48px,6vw,88px) 0 0}
 .photos-skip .shots,.photos-skip .photo-acts .drop{opacity:.4;pointer-events:none}
 
 /* Финал: одна большая кнопка. */
-.finish{padding:clamp(56px,7vw,104px) 0 clamp(56px,7vw,96px)}
+.finish{padding:52px 0 80px}
 .finish p{color:var(--soft);font-size:16px;margin:16px 0 28px;max-width:44rem}
 .msg{margin-top:18px;font-size:15px;border-radius:12px;padding:14px 16px;display:none;max-width:44rem}
 .msg.show{display:block}
