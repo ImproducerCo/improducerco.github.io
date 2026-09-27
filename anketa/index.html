@@ -247,7 +247,7 @@ footer{padding:24px 0 40px;border-top:1px solid var(--line);font-size:13px;color
   </section>
 </main>
 <div class="shell"><footer><span>improducer · анкета 1.0</span><span class="saved">черновик пуст</span></footer></div>
-<script id="meta" type="application/json">{"version": "1.0", "total": 66, "main": 16, "platforms": ["youtube", "telegram", "telegram_chats", "instagram", "vk", "rutube", "dzen", "tiktok", "web", "products", "podcasts", "courses", "docs", "reviews"], "shots": 12, "min_side": 2000, "api": "https://connect.improducer.co/api/anketa/"}</script>
+<script id="meta" type="application/json">{"version": "1.0", "total": 66, "main": 16, "platforms": ["youtube", "telegram", "telegram_chats", "instagram", "vk", "rutube", "dzen", "tiktok", "web", "products", "podcasts", "courses", "docs", "reviews"], "shots": 12, "min_side": 2000, "api": "https://connect.improducer.co/anketa/"}</script>
 <script>
 (function(){
   "use strict";
@@ -429,7 +429,7 @@ footer{padding:24px 0 40px;border-top:1px solid var(--line);font-size:13px;color
 
   // ── фото для обложек: превью, проверка размера, «всё разом», пропуск ──
   // Файлы в черновик браузера не кладутся (слишком тяжёлые): они уходят с отправкой.
-  var shots = {};
+  var shots = {}, sent = {};   // sent — что уже ушло: повторная отправка файлы не дублирует
   function setShot(cell, file){
     var n = cell.dataset.shot, pic = cell.querySelector(".pic"), st = cell.querySelector(".st");
     shots[n] = { file: file, w: 0, h: 0 };
@@ -471,13 +471,51 @@ footer{padding:24px 0 40px;border-top:1px solid var(--line);font-size:13px;color
     if (bad) { alertMsg("warn", "Проверьте ссылки, подсвеченные красным: " + bad + " шт. Ссылка начинается с https://"); return; }
     if (!CODE) { alertMsg("warn", "Отправка работает по личной ссылке. Черновик сохранён в этом браузере."); return; }
     var btns = document.querySelectorAll(".send-btn"); btns.forEach(function(b){ b.disabled = true; });
+    // Файлы — по одному: фото с телефона бывают по 5–10 МБ, одним запросом всё
+    // не уйдёт. Уже отправленное второй раз не шлётся.
+    function upload(kind, file, shot){
+      var h = { "Content-Type": file.type || "application/octet-stream", "X-Kind": kind,
+                "X-Name": encodeURIComponent(file.name || "file") };
+      if (shot) h["X-Shot"] = shot;
+      return fetch(META.api + CODE + "/file", { method: "POST", headers: h, body: file })
+        .then(function(r){ if (!r.ok) throw new Error(String(r.status)); });
+    }
+    var queue = [];
+    Object.keys(shots).forEach(function(n){
+      var f = shots[n].file, key = "photo:" + n + ":" + f.name + ":" + f.size;
+      if (!sent[key]) queue.push({ key: key, kind: "photo", file: f, shot: n,
+        cell: page.querySelector('.shot[data-shot="' + n + '"] .st') });
+    });
+    [].slice.call(files.files || []).forEach(function(f){
+      var key = "chat:" + f.name + ":" + f.size;
+      if (!sent[key]) queue.push({ key: key, kind: "chat", file: f });
+    });
+    var failedFiles = 0;
     fetch(META.api + CODE, { method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ version: META.version, q: d.q, links: d.links }) })
       .then(function(r){
-        if (r.ok) alertMsg("ok", "Отправлено. Можно дописывать дальше — следующая отправка дополнит эту.");
-        else alertMsg("warn", "Сервер не принял ответы (код " + r.status + "). Черновик сохранён — попробуйте позже.");
+        if (!r.ok) throw new Error("ответы: код " + r.status);
+        var chain = Promise.resolve(), done = 0;
+        queue.forEach(function(it){
+          chain = chain.then(function(){
+            alertMsg("ok", "Ответы отправлены. Отправляю файлы: " + (done + 1) + " из " + queue.length + "…");
+            return upload(it.kind, it.file, it.shot).then(function(){
+              sent[it.key] = true; done++;
+              if (it.cell) it.cell.textContent = "отправлено";
+            }).catch(function(){ failedFiles++; if (it.cell) it.cell.textContent = "не отправлено — повторите"; });
+          });
+        });
+        return chain;
       })
-      .catch(function(){ alertMsg("warn", "Нет связи с сервером. Черновик сохранён в этом браузере — отправьте позже."); })
+      .then(function(){
+        if (failedFiles) alertMsg("warn", "Ответы дошли, но " + failedFiles + " файл(а) не отправились. Нажмите «Отправить» ещё раз — уйдут только они.");
+        else alertMsg("ok", "Отправлено всё" + (queue.length ? ", с файлами: " + queue.length : "") +
+                      ". Можно дописывать дальше — следующая отправка дополнит эту.");
+      })
+      .catch(function(e){
+        alertMsg("warn", /ответы: код 404/.test(String(e)) ? "Ссылка недействительна — попросите новую." :
+          "Не отправлено (" + (e && e.message || "нет связи") + "). Черновик сохранён в этом браузере — попробуйте позже.");
+      })
       .then(function(){ btns.forEach(function(b){ b.disabled = false; }); });
   }
 
