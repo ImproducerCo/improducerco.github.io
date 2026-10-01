@@ -73,12 +73,16 @@ footer a{color:var(--muted)}
     что сработало.</p>
 
     <h2>Подключение канала</h2>
-    <p>Чтобы готовить отчёты и решения по контенту, нам нужна статистика канала.
-    Автор подключает канал сам на <span class="mono">connect.improducer.co</span>,
-    входя своим аккаунтом Google. Доступ — <b>только на чтение</b> статистики
-    YouTube Analytics и сведений о видео: мы не можем публиковать, удалять или
-    менять что-либо на канале. Доступ хранится зашифрованным и отзывается в любой
-    момент.</p>
+    <p>Автор подключает канал сам на <span class="mono">connect.improducer.co</span>,
+    входя своим аккаунтом Google, — одним согласием на всё, что нужно системе:</p>
+    <ul>
+      <li><b>статистика и данные канала</b> — чтобы готовить отчёты и решения по контенту;</li>
+      <li><b>правки на канале</b> — названия, описания и теги роликов, описание и ключевые
+      слова канала, плейлисты, шапка, загрузка готовых роликов. Каждую правку система
+      сначала показывает автору «было → станет» и вносит только после его «да», только
+      на его канале. Видео, комментарии и субтитры мы не удаляем.</li>
+    </ul>
+    <p>Доступ хранится зашифрованным и отзывается в любой момент.</p>
     <p><a class="go" href="https://connect.improducer.co/">Подключить канал</a></p>
     <p class="small muted">Как мы обращаемся с данными — в
     <a href="/privacy.html">политике конфиденциальности</a>; правила сервиса — в
@@ -91,12 +95,21 @@ footer a{color:var(--muted)}
     topic research based on live YouTube data, content plans, video packaging, and
     reports on what worked.</p>
     <p>Authors connect their own channel at
-    <span class="mono">connect.improducer.co</span> by signing in with Google. We request
-    <b>read-only</b> access to YouTube Analytics and channel video data
-    (<span class="mono">yt-analytics.readonly</span>,
-    <span class="mono">youtube.readonly</span>) solely to prepare reports and content
-    decisions for that author. We never upload, edit or delete anything, never sell or
-    share the data, and access can be revoked at any time. See the
+    <span class="mono">connect.improducer.co</span> by signing in with Google, on one
+    consent screen:</p>
+    <ul>
+      <li><b>YouTube Analytics and channel data</b>
+      (<span class="mono">yt-analytics.readonly</span>,
+      <span class="mono">youtube.readonly</span>) — to prepare reports and content
+      decisions for that author;</li>
+      <li><b>changes on the author's channel</b>
+      (<span class="mono">youtube.force-ssl</span>) — video titles, descriptions and tags,
+      the channel description and keywords, playlists, the channel banner, and uploading
+      the author's finished videos. Every change is shown to the author first as
+      “current → new” and applied only after the author's explicit “yes”, only on the
+      author's own channel. We never delete videos, comments or captions.</li>
+    </ul>
+    <p>We never sell or share the data, and access can be revoked at any time. See the
     <a href="/privacy.html#en">Privacy Policy</a> and <a href="/terms.html">Terms of
     Service</a>.</p>
     </section>

@@ -67,18 +67,19 @@ footer a{color:var(--muted)}
   <main class="card">
 
     <h1>Политика конфиденциальности</h1>
-    <p class="muted small">Действует с 18 сентября 2026 года. Относится к сервису
+    <p class="muted small">Действует с 1 октября 2026 года (прежняя редакция — с 18
+    сентября 2026 года). Относится к сервису
     подключения канала по адресу <span class="mono">connect.improducer.co</span>.
     <a href="#en" lang="en">English version</a></p>
 
     <h2>Коротко</h2>
     <div class="box">
-      <p class="small" style="margin:0">Мы просим у Google доступ <b>только на чтение</b>
-      статистики вашего YouTube-канала. Мы не можем загружать и удалять видео, писать
-      комментарии, менять настройки канала, читать вашу почту и Google Диск. Ваш доступ
-      хранится на сервере в зашифрованном виде — сервер физически не может его прочитать.
-      Мы никому не передаём и не продаём эти данные. Отозвать доступ можно в любой
-      момент — как именно, написано в разделе 8.</p>
+      <p class="small" style="margin:0">Мы просим у Google доступ к статистике и данным
+      вашего YouTube-канала и право вносить на нём правки. Правку система сначала
+      показывает вам «было → станет» и вносит только после вашего «да» и только на вашем
+      канале. Мы не удаляем видео, комментарии и субтитры, не читаем вашу почту и Google
+      Диск. Доступ хранится зашифрованным. Мы никому не передаём и не продаём эти данные.
+      Отозвать доступ можно в любой момент — как именно, написано в разделе 8.</p>
     </div>
 
     <h2>1. Кто обрабатывает данные</h2>
@@ -87,8 +88,8 @@ footer a{color:var(--muted)}
     <a href="mailto:founder@improducer.co">founder@improducer.co</a>.</p>
 
     <h2>2. Какие данные мы запрашиваем и зачем</h2>
-    <p>При подключении Google показывает вам экран согласия. Мы просим ровно четыре
-    области доступа и ни одной сверх того.</p>
+    <p>При подключении Google показывает вам экран согласия. Мы просим ровно пять
+    областей доступа и ни одной сверх того.</p>
 
     <h3><span class="mono">https://www.googleapis.com/auth/yt-analytics.readonly</span></h3>
     <p>Чтение статистики YouTube Analytics вашего канала: просмотры, время просмотра,
@@ -105,27 +106,38 @@ footer a{color:var(--muted)}
     названиям — этот доступ сопоставляет цифры с конкретными видео и подтверждает,
     что подключён именно ваш канал, а не чужой.</p>
 
+    <h3><span class="mono">https://www.googleapis.com/auth/youtube.force-ssl</span></h3>
+    <p>Право вносить правки на вашем канале: названия, описания и теги роликов, описание
+    и ключевые слова канала, плейлисты (создать плейлист, добавить в него ваши ролики),
+    шапка канала, загрузка готовых роликов. <b>Зачем:</b> система разбирает ваш канал и
+    предлагает конкретные правки; внести их за вас — её работа. <b>Как:</b> каждую правку
+    система сначала показывает вам — «было» (как сейчас на YouTube) и «станет» дословно —
+    и вносит только после вашего явного «да», только на вашем канале; после правки
+    перечитывает YouTube и показывает, что сохранилось. Ролик выходит только после
+    вашего нажатия «Выпустить». Google называет эту область «просматривать,
+    редактировать и удалять видео, оценки, комментарии и субтитры» — это самое узкое из
+    его разрешений, которое покрывает правки и плейлисты; удалять мы ничего не будем.</p>
+
     <h3><span class="mono">openid</span> и <span class="mono">email</span></h3>
     <p>Постоянный идентификатор вашего Google-аккаунта и адрес электронной почты.
     <b>Зачем:</b> чтобы отличать одно подключение от другого, показывать вам ваш
     личный кабинет и понимать, чей доступ отзывать по вашей просьбе. Мы не читаем
     почту и не рассылаем письма на этот адрес без вашей просьбы.</p>
 
-    <h3>Чего мы не запрашиваем</h3>
+    <h3>Чего мы не делаем и не запрашиваем</h3>
     <ul>
-      <li>Права на загрузку, изменение и удаление видео.</li>
-      <li>Права писать, удалять и скрывать комментарии.</li>
-      <li>Права менять описание, обложки, плейлисты и настройки канала.</li>
-      <li>Доступ к Gmail, Google Диску, Календарю, Контактам, Фото.</li>
+      <li>Не вносим правки без вашего «да» и не трогаем чужие каналы.</li>
+      <li>Не удаляем видео, комментарии и субтитры и не пишем комментарии от вашего имени.</li>
+      <li>Не запрашиваем доступ к Gmail, Google Диску, Календарю, Контактам, Фото.</li>
       <li>Данные о доходах и монетизации — область
         <span class="mono">yt-analytics-monetary.readonly</span> не запрашивается.</li>
       <li>Ваш пароль. Он вводится только на странице Google, мы его не видим.</li>
     </ul>
 
     <h2>3. Как мы используем данные</h2>
-    <p>Полученные данные используются ровно для одного — оказания вам услуги
-    продюсирования: расчёт показателей канала, отчёты, рекомендации по контенту и
-    планирование выпусков. Мы не используем их для рекламы, не обучаем на них
+    <p>Полученные данные и доступ используются ровно для одного — оказания вам услуги:
+    расчёт показателей канала, отчёты, рекомендации по контенту, планирование выпусков
+    и внесение подтверждённых вами правок. Мы не используем их для рекламы, не обучаем на них
     сторонние модели, не строим профили и не сопоставляем с данными других людей.</p>
     <p>Использование данных, полученных через API Google, подчиняется
     <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API
@@ -136,16 +148,17 @@ footer a{color:var(--muted)}
     <a href="https://www.youtube.com/t/terms">Условиях использования YouTube</a>.</p>
 
     <h2>4. Как данные хранятся и защищены</h2>
-    <p>Разрешение, которое вы выдаёте, — это ключ доступа (refresh-токен). Устройство
-    хранения сделано так, чтобы взлом сервера не выдавал доступ к каналам:</p>
+    <p>Разрешение, которое вы выдаёте, — это ключ доступа (refresh-токен). Он хранится
+    в двух копиях, обе зашифрованы:</p>
     <ul>
-      <li>В момент подключения сервер <b>сразу шифрует</b> ключ доступа открытым ключом
-      владельца сервиса (X25519 + AES-256-GCM) и складывает зашифрованным.</li>
-      <li>Закрытого ключа на сервере <b>нет</b>. Сервер не может расшифровать то, что
-      хранит, — ни по ошибке, ни по требованию, ни при взломе.</li>
-      <li>Расшифровка происходит только на рабочем компьютере владельца, куда
-      зашифрованный конверт забирается по защищённому каналу. После получения
-      конверт с сервера удаляется.</li>
+      <li><b>Для отчётов.</b> В момент подключения сервер шифрует ключ открытым ключом
+      владельца сервиса (X25519 + AES-256-GCM). Закрытого ключа на сервере нет — эту копию
+      сервер прочитать не может. Расшифровка — только на рабочем компьютере владельца;
+      после получения конверт с сервера удаляется.</li>
+      <li><b>Для правок</b> — только если вы выдали право на изменения. Копия шифруется
+      AES-256-GCM ключом из Google Secret Manager, доступным только служебному аккаунту
+      сервера. Сервер использует её только чтобы внести подтверждённые вами правки и
+      загрузить ролик по вашему «Выпустить». При отключении доступа она стирается сразу.</li>
       <li>В открытом виде на сервере остаются только несекретные сведения для вашего
       личного кабинета: название и идентификатор канала, адрес почты, дата подключения
       и состояние подключения.</li>
@@ -168,8 +181,10 @@ footer a{color:var(--muted)}
 
     <h2>7. Сколько данных хранится</h2>
     <ul>
-      <li>Зашифрованный конверт с ключом доступа — до 30 дней на сервере, затем
-      удаляется автоматически; как правило, он забирается и удаляется в тот же день.</li>
+      <li>Зашифрованный конверт с ключом доступа для отчётов — до 30 дней на сервере,
+      затем удаляется автоматически; как правило, он забирается и удаляется в тот же день.</li>
+      <li>Зашифрованная копия для правок — пока действует подключение; стирается сразу при
+      отключении. Журнал правок (что, когда, «было» и «стало») — на время сотрудничества.</li>
       <li>Карточка подключения (канал, почта, дата, состояние) — пока действует
       подключение; удаляется при отключении доступа.</li>
       <li>Служебный журнал событий без секретов — до 180 дней.</li>
@@ -186,7 +201,8 @@ footer a{color:var(--muted)}
       <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>,
       найти в списке <b>improducer</b> и нажать «Закрыть доступ».</li>
     </ul>
-    <p>После отзыва мы перестаём получать какие-либо данные о канале. Чтобы удалить
+    <p>После отзыва мы перестаём получать какие-либо данные о канале и вносить правки.
+    Чтобы удалить
     также сохранённые отчёты и расчёты, напишите на
     <a href="mailto:founder@improducer.co">founder@improducer.co</a> — удалим и подтвердим
     письмом.</p>
@@ -208,14 +224,16 @@ footer a{color:var(--muted)}
     <hr>
     <section id="en" lang="en">
     <h2>Privacy Policy (English)</h2>
-    <p class="muted small">Effective September 18, 2026. Applies to the channel
+    <p class="muted small">Effective October 1, 2026 (previous version: September 18,
+    2026). Applies to the channel
     connection service at <span class="mono">connect.improducer.co</span>. The Russian
     text above and this English text say the same.</p>
     <div class="box">
-      <p class="small" style="margin:0">We ask Google for <b>read-only</b> access to your
-      YouTube channel statistics. We cannot upload or delete videos, post comments, change
-      channel settings, or read your email or Google Drive. Your access is stored
-      encrypted, and the server itself cannot decrypt it. We never sell or share this
+      <p class="small" style="margin:0">We ask Google for access to your YouTube channel
+      statistics and data and for permission to make changes on your channel. Every change
+      is shown to you first as “current → new” and applied only after your explicit “yes”,
+      only on your own channel. We never delete videos, comments or captions and never read
+      your email or Google Drive. Access is stored encrypted. We never sell or share this
       data. You can revoke access at any time (see “How to revoke access”).</p>
     </div>
     <h3>Who processes the data</h3>
@@ -233,16 +251,28 @@ footer a{color:var(--muted)}
       videos with titles, descriptions, thumbnails, publish dates and public metrics.
       <b>Why:</b> to match Analytics numbers to specific videos and to confirm that the
       connected channel is yours.</li>
+      <li><span class="mono">youtube.force-ssl</span> — permission to make changes on your
+      channel: video titles, descriptions and tags, the channel description and keywords,
+      playlists (create one, add your videos to it), the channel banner, and uploading your
+      finished videos. <b>Why:</b> the service analyses your channel and proposes concrete
+      changes; applying them is its job. <b>How:</b> each change is shown to you first —
+      the current value read live from YouTube and the new value, word for word — and is
+      applied only after your explicit “yes”, only on your own channel; afterwards we read
+      YouTube back and show what was saved. A video is published only when you press
+      “Release”. Google describes this scope as “see, edit, and permanently delete your
+      YouTube videos, ratings, comments and captions”; it is the narrowest scope that
+      covers edits and playlists, and we never delete anything.</li>
       <li><span class="mono">openid</span> and <span class="mono">email</span> — your
       Google account ID and email address. <b>Why:</b> to tell connections apart, show you
       your own connection page and know whose access to revoke on request.</li>
     </ul>
-    <p>We do not request permission to upload, edit or delete videos, to manage comments,
-    playlists or channel settings, to access Gmail, Drive, Calendar, Contacts or Photos, or
-    to read revenue data. We never see your password.</p>
+    <p>We never change anything without your “yes”, never act on other channels, never
+    delete videos, comments or captions, and never post comments on your behalf. We do not
+    request access to Gmail, Drive, Calendar, Contacts or Photos, or to revenue data. We
+    never see your password.</p>
     <h3>How we use the data</h3>
-    <p>Only to provide the production service to you: channel metrics, reports, content
-    recommendations and release planning. We do not use it for advertising, do not train
+    <p>Only to provide the service to you: channel metrics, reports, content
+    recommendations, release planning and applying the changes you confirmed. We do not use it for advertising, do not train
     third-party models on it, do not build profiles and do not combine it with other
     people’s data.</p>
     <p>improducer’s use and transfer to any other app of information received from Google
@@ -254,12 +284,14 @@ footer a{color:var(--muted)}
     Service</a>.</p>
     <h3>How the data is stored and protected</h3>
     <ul>
-      <li>The moment you connect, the server encrypts the access key (refresh token) with
-      the service owner’s public key (X25519 + AES-256-GCM) and stores only the encrypted
-      envelope.</li>
-      <li>There is no private key on the server, so it cannot decrypt what it stores.
-      Decryption happens only on the owner’s work computer; after pickup the envelope is
-      deleted from the server.</li>
+      <li>For reports: the moment you connect, the server encrypts the access key (refresh
+      token) with the service owner’s public key (X25519 + AES-256-GCM). There is no
+      private key on the server, so it cannot decrypt this copy. Decryption happens only on
+      the owner’s work computer; after pickup the envelope is deleted from the server.</li>
+      <li>For changes, only if you granted that permission: a second copy is encrypted with
+      AES-256-GCM under a key held in Google Secret Manager that only the server’s service
+      account can read. It is used only to apply changes you confirmed and to upload a video
+      when you press “Release”, and it is deleted immediately when you disconnect.</li>
       <li>Only non-secret details for your connection page stay readable on the server:
       channel name and ID, email, connection date and status.</li>
       <li>The event log contains no access keys, no passwords and no full IP addresses.
@@ -276,8 +308,11 @@ footer a{color:var(--muted)}
     advertising or analytics cookies.</p>
     <h3>How long data is kept</h3>
     <ul>
-      <li>Encrypted access envelope — up to 30 days on the server, then deleted
+      <li>Encrypted access envelope for reports — up to 30 days on the server, then deleted
       automatically; usually picked up and deleted the same day.</li>
+      <li>Encrypted copy for changes — while the connection is active; deleted immediately
+      on disconnect. The change log (what, when, current and saved values) — for the
+      duration of our work together.</li>
       <li>Connection card (channel, email, date, status) — while the connection is active;
       deleted when access is revoked.</li>
       <li>Event log without secrets — up to 180 days.</li>
@@ -292,7 +327,8 @@ footer a{color:var(--muted)}
       <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>,
       find <b>improducer</b> and remove access.</li>
     </ul>
-    <p>After revocation we receive no more data about the channel. To also delete stored
+    <p>After revocation we receive no more data about the channel and make no more
+    changes. To also delete stored
     reports, email <a href="mailto:founder@improducer.co">founder@improducer.co</a> — we
     will delete them and confirm by email.</p>
     <h3>Your rights, children, changes</h3>
