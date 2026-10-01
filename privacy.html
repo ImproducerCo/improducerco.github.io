@@ -156,8 +156,8 @@ footer a{color:var(--muted)}
       сервер прочитать не может. Расшифровка — только на рабочем компьютере владельца;
       после получения конверт с сервера удаляется.</li>
       <li><b>Для правок</b> — только если вы выдали право на изменения. Копия шифруется
-      AES-256-GCM ключом из Google Secret Manager, доступным только служебному аккаунту
-      сервера. Сервер использует её только чтобы внести подтверждённые вами правки и
+      AES-256-GCM ключом, который хранится отдельно от базы и выдаётся системой только
+      службе правок на сервере. Сервер использует её только чтобы внести подтверждённые вами правки и
       загрузить ролик по вашему «Выпустить». При отключении доступа она стирается сразу.</li>
       <li>В открытом виде на сервере остаются только несекретные сведения для вашего
       личного кабинета: название и идентификатор канала, адрес почты, дата подключения
@@ -289,8 +289,8 @@ footer a{color:var(--muted)}
       private key on the server, so it cannot decrypt this copy. Decryption happens only on
       the owner’s work computer; after pickup the envelope is deleted from the server.</li>
       <li>For changes, only if you granted that permission: a second copy is encrypted with
-      AES-256-GCM under a key held in Google Secret Manager that only the server’s service
-      account can read. It is used only to apply changes you confirmed and to upload a video
+      AES-256-GCM under a key kept apart from the database and released by the operating
+      system only to the server’s change service. It is used only to apply changes you confirmed and to upload a video
       when you press “Release”, and it is deleted immediately when you disconnect.</li>
       <li>Only non-secret details for your connection page stay readable on the server:
       channel name and ID, email, connection date and status.</li>
