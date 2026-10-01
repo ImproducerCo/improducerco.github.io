@@ -262,7 +262,25 @@ footer{padding:24px 0 40px;border-top:1px solid var(--line);font-size:13px;color
 
   function store(){ try { return window.localStorage; } catch (e) { return null; } }
   function readDraft(){ var s = store(); if(!s) return {}; try { return JSON.parse(s.getItem(KEY) || "{}"); } catch(e){ return {}; } }
+  // Черновик, начатый без личной ссылки, переезжает на неё: иначе ответы оставались под
+  // адресом образца, а по личной ссылке анкета открывалась пустой (аудит 01.10, UI-07).
+  // Переезжает, а не копируется: следующая личная ссылка в том же браузере иначе
+  // открылась бы с чужими ответами (ревью 01.10).
+  if (CODE) {
+    var s0 = store(), plain = s0 && s0.getItem("anketa-v1:" + location.pathname);
+    if (s0 && plain && !s0.getItem(KEY)) {
+      try { s0.setItem(KEY, plain); s0.removeItem("anketa-v1:" + location.pathname); }
+      catch (e) { /* хранилище полно — черновик остаётся под образцом, ответы не потеряны */ }
+    }
+  }
   var draft = readDraft(); draft.q = draft.q || {}; draft.links = draft.links || {};
+  // Без личной ссылки — сразу сказать, а не на кнопке «Отправить» после всех вопросов.
+  if (!CODE && META.api) {
+    var note = document.createElement("div"); note.className = "msg show warn"; note.setAttribute("role", "note");
+    note.textContent = "Это образец: ответы сохраняются в этом браузере, а отправить их можно только по вашей "
+      + "личной ссылке. Её даёт ваш Claude — спросите: «дай ссылку на анкету».";
+    page.insertBefore(note, page.firstChild);
+  }
 
   function setN(key, v, of){
     document.querySelectorAll('[data-n="' + key + '"]').forEach(function(e){ e.textContent = v; });
