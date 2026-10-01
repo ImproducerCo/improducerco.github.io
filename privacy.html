@@ -78,7 +78,7 @@ footer a{color:var(--muted)}
       вашего YouTube-канала и право вносить на нём правки. Правку система сначала
       показывает вам «было → станет» и вносит только после вашего «да» и только на вашем
       канале. Мы не удаляем видео, комментарии и субтитры, не читаем вашу почту и Google
-      Диск. Доступ хранится зашифрованным. Мы никому не передаём и не продаём эти данные.
+      Диск. Ключ доступа хранится только у сервиса, в закрытом доступе. Мы никому не передаём и не продаём эти данные.
       Отозвать доступ можно в любой момент — как именно, написано в разделе 8.</p>
     </div>
 
@@ -148,32 +148,33 @@ footer a{color:var(--muted)}
     <a href="https://www.youtube.com/t/terms">Условиях использования YouTube</a>.</p>
 
     <h2>4. Как данные хранятся и защищены</h2>
-    <p>Разрешение, которое вы выдаёте, — это ключ доступа (refresh-токен). Он хранится
-    в двух копиях, обе зашифрованы:</p>
+    <p>Разрешение, которое вы выдаёте, — это ключ доступа (refresh-токен). Им пользуются
+    только службы сервиса: чтобы готовить отчёты, продлевать доступ и вносить правки,
+    которые вы подтвердили.</p>
     <ul>
-      <li><b>Для отчётов.</b> В момент подключения сервер шифрует ключ открытым ключом
-      владельца сервиса (X25519 + AES-256-GCM). Закрытого ключа на сервере нет — эту копию
-      сервер прочитать не может. Расшифровка — только на рабочем компьютере владельца;
-      после получения конверт с сервера удаляется.</li>
-      <li><b>Для правок</b> — только если вы выдали право на изменения. Копия шифруется
-      AES-256-GCM ключом, который хранится отдельно от базы и выдаётся системой только
-      службе правок на сервере. Сервер использует её только чтобы внести подтверждённые вами правки и
-      загрузить ролик по вашему «Выпустить». При отключении доступа она стирается сразу.</li>
-      <li>В открытом виде на сервере остаются только несекретные сведения для вашего
-      личного кабинета: название и идентификатор канала, адрес почты, дата подключения
-      и состояние подключения.</li>
+      <li><b>Где хранится.</b> На сервере сервиса (DigitalOcean, Сингапур), на рабочем
+      компьютере владельца сервиса и в резервных копиях сервиса. Доступ к ним есть только
+      у владельца сервиса и служб сервиса; в публичные места и к третьим лицам ключ не
+      попадает.</li>
+      <li><b>Как передаётся.</b> Только по зашифрованным каналам (HTTPS, SSH). Получив ключ
+      от Google, сервер сразу запечатывает его открытым ключом владельца сервиса
+      (X25519 + AES-256-GCM) для передачи на рабочий компьютер владельца.</li>
+      <li><b>Копия для правок</b> — только если вы выдали право на изменения — дополнительно
+      зашифрована AES-256-GCM ключом, который хранится отдельно от базы и выдаётся системой
+      только службе правок на сервере. Она используется только чтобы внести подтверждённые
+      вами правки и загрузить ролик по вашему «Выпустить» и стирается сразу при
+      отключении доступа.</li>
       <li>Служебный журнал событий ведётся без ключей доступа, без паролей и без
       полного IP-адреса.</li>
-      <li>Все соединения идут по HTTPS.</li>
     </ul>
 
     <h2>5. Кому мы передаём данные</h2>
     <p><b>Никому.</b> Мы не продаём, не сдаём в аренду и не передаём ваши данные третьим
     лицам. На страницах подключения нет рекламы, счётчиков, пикселей и сторонних
     скриптов. Единственные технические участники — Google (источник данных) и
-    хостинг-провайдер, на котором работает сервер подключения; хостинг видит только
-    зашифрованные данные. Раскрытие возможно лишь по законному требованию
-    уполномоченного органа, и раскрыть мы можем только то, что способны прочитать.</p>
+    хостинг-провайдеры, у которых по нашему поручению работают сервер и резервные копии
+    сервиса (DigitalOcean, Google Cloud). Раскрытие возможно лишь по законному требованию
+    уполномоченного органа.</p>
 
     <h2>6. Cookie</h2>
     <p>Используется одна техническая cookie — она помнит, что это вы, пока открыт
@@ -181,7 +182,10 @@ footer a{color:var(--muted)}
 
     <h2>7. Сколько данных хранится</h2>
     <ul>
-      <li>Зашифрованный конверт с ключом доступа для отчётов — до 30 дней на сервере,
+      <li>Ключ доступа — пока действует подключение. При отключении мы отзываем разрешение
+      в Google и удаляем ключ с сервера и рабочего компьютера владельца в течение суток;
+      в резервных копиях он остаётся до окончания их срока — не дольше 90 дней.</li>
+      <li>Запечатанный конверт, которым ключ передаётся владельцу, — до 30 дней на сервере,
       затем удаляется автоматически; как правило, он забирается и удаляется в тот же день.</li>
       <li>Зашифрованная копия для правок — пока действует подключение; стирается сразу при
       отключении. Журнал правок (что, когда, «было» и «стало») — на время сотрудничества.</li>
@@ -233,7 +237,8 @@ footer a{color:var(--muted)}
       statistics and data and for permission to make changes on your channel. Every change
       is shown to you first as “current → new” and applied only after your explicit “yes”,
       only on your own channel. We never delete videos, comments or captions and never read
-      your email or Google Drive. Access is stored encrypted. We never sell or share this
+      your email or Google Drive. The access key is kept only by the service, under restricted
+      access. We never sell or share this
       data. You can revoke access at any time (see “How to revoke access”).</p>
     </div>
     <h3>Who processes the data</h3>
@@ -283,33 +288,40 @@ footer a{color:var(--muted)}
     Privacy Policy</a> and the <a href="https://www.youtube.com/t/terms">YouTube Terms of
     Service</a>.</p>
     <h3>How the data is stored and protected</h3>
+    <p>The permission you grant is an access key (refresh token). Only the service’s own
+    processes use it: to prepare reports, keep access alive and apply the changes you
+    confirmed.</p>
     <ul>
-      <li>For reports: the moment you connect, the server encrypts the access key (refresh
-      token) with the service owner’s public key (X25519 + AES-256-GCM). There is no
-      private key on the server, so it cannot decrypt this copy. Decryption happens only on
-      the owner’s work computer; after pickup the envelope is deleted from the server.</li>
-      <li>For changes, only if you granted that permission: a second copy is encrypted with
-      AES-256-GCM under a key kept apart from the database and released by the operating
-      system only to the server’s change service. It is used only to apply changes you confirmed and to upload a video
-      when you press “Release”, and it is deleted immediately when you disconnect.</li>
-      <li>Only non-secret details for your connection page stay readable on the server:
-      channel name and ID, email, connection date and status.</li>
-      <li>The event log contains no access keys, no passwords and no full IP addresses.
-      All connections use HTTPS.</li>
+      <li>Where it is kept: on the service’s server (DigitalOcean, Singapore), on the service
+      owner’s work computer and in the service’s backups. Only the service owner and the
+      service’s processes can access them; the key never goes to public places or third
+      parties.</li>
+      <li>How it travels: only over encrypted channels (HTTPS, SSH). On receiving the key
+      from Google the server immediately seals it with the service owner’s public key
+      (X25519 + AES-256-GCM) for transfer to the owner’s work computer.</li>
+      <li>The copy for changes, only if you granted that permission, is additionally
+      encrypted with AES-256-GCM under a key kept apart from the database and released by
+      the operating system only to the server’s change service. It is used only to apply
+      changes you confirmed and to upload a video when you press “Release”, and it is
+      deleted immediately when you disconnect.</li>
+      <li>The event log contains no access keys, no passwords and no full IP addresses.</li>
     </ul>
     <h3>Who we share the data with</h3>
     <p><b>No one.</b> We do not sell, rent or transfer your data to third parties. There
     are no ads, trackers, pixels or third-party scripts on the connection pages. The only
-    technical parties are Google (the data source) and the hosting provider, which sees
-    only encrypted data. Disclosure is possible only on a lawful request from an
-    authorized body, and only of what we are able to read.</p>
+    technical parties are Google (the data source) and the hosting providers that run the
+    service’s server and backups on our behalf (DigitalOcean, Google Cloud). Disclosure is
+    possible only on a lawful request from an authorized body.</p>
     <h3>Cookies</h3>
     <p>One technical cookie that remembers you while your connection page is open. No
     advertising or analytics cookies.</p>
     <h3>How long data is kept</h3>
     <ul>
-      <li>Encrypted access envelope for reports — up to 30 days on the server, then deleted
-      automatically; usually picked up and deleted the same day.</li>
+      <li>Access key — while the connection is active. On disconnect we revoke the
+      permission at Google and delete the key from the server and the owner’s work computer
+      within a day; it remains in backups until they expire, no longer than 90 days.</li>
+      <li>Sealed envelope that carries the key to the owner — up to 30 days on the server,
+      then deleted automatically; usually picked up and deleted the same day.</li>
       <li>Encrypted copy for changes — while the connection is active; deleted immediately
       on disconnect. The change log (what, when, current and saved values) — for the
       duration of our work together.</li>
