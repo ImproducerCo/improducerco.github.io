@@ -21,7 +21,7 @@
 :root{
   color-scheme:light;
   --bg:#F9FAFC; --card:#FFFFFF; --sunken:#F1F4F8; --ink:#1B2230; --body:#3C4757; --muted:#5A6575;
-  --faint:#5A6575; --line:#E4E8EF; --line-soft:#F1F4F8; --focus:#0B63C5; --red:#FF0000;
+  --faint:#97A1AF; --line:#E4E8EF; --line-soft:#F0F3F7; --focus:#0B63C5; --red:#FF0000;
   --sans:"Golos Text",ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
 }
@@ -31,43 +31,34 @@ body{
   font:16px/1.65 var(--sans); -webkit-font-smoothing:antialiased;
   -webkit-text-size-adjust:100%;
 }
-.wrap{max-width:44rem; margin:0 auto; padding:clamp(24px,6vw,48px) 24px 80px}
+.wrap{max-width:44rem; margin:0 auto; padding:clamp(24px,6vw,48px) 18px 56px}
 .brand{display:flex; flex-wrap:wrap; align-items:center; gap:4px 9px; margin:0 0 20px}
 .brand svg{flex:0 0 auto; display:block}
-.brand b{font-size:20px; font-weight:800; letter-spacing:-.02em}
-.brand span{color:var(--faint); font-size:14px; margin-left:4px}
-.card{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:clamp(24px,5vw,40px) clamp(20px,5vw,40px)}
+.brand b{font-size:19px; font-weight:800; letter-spacing:-.02em}
+.brand span{color:var(--faint); font-size:.85rem; margin-left:4px}
+.card{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:clamp(22px,5vw,36px) clamp(18px,5vw,40px)}
 /* Красная черта — слева от заголовка, на его первой строке. */
 h1,h2{position:relative}
-section[lang=en] h3{margin-top:20px}
+section[lang=en] h3{margin-top:22px}
 h1::before,h2::before{content:""; position:absolute; left:0; background:var(--red)}
-h1{font-size:40px; line-height:1.1; font-weight:800; letter-spacing:-.02em; margin:0 0 12px; padding-left:24px}
-h1::before{width:8px; height:28px; border-radius:4px; top:calc((1.1em - 28px) / 2)}
-h2{font-size:24px; line-height:1.2; font-weight:700; margin:32px 0 12px; padding-left:18px}
-h2::before{width:6px; height:17px; border-radius:3px; top:calc((1.2em - 17px) / 2)}
-h3{font-size:18px; line-height:1.3; margin:20px 0 8px}
+h1{font-size:clamp(1.6rem,5.2vw,2.1rem); line-height:1.15; font-weight:800; letter-spacing:-.02em; margin:0 0 10px; padding-left:22px}
+h1::before{width:7px; height:24px; border-radius:3.5px; top:calc((1.15em - 24px) / 2)}
+h2{font-size:1.2rem; line-height:1.3; font-weight:700; margin:32px 0 10px; padding-left:16px}
+h2::before{width:5px; height:14px; border-radius:2.5px; top:calc((1.3em - 14px) / 2)}
+h3{font-size:1rem; line-height:1.4; margin:18px 0 6px}
 p{margin:0 0 12px; color:var(--body); max-width:68ch}
 ul{margin:0 0 12px; padding-left:1.2rem; color:var(--body)}
-li{margin:0 0 8px}
+li{margin:0 0 7px}
 .muted{color:var(--muted)}
-.small{font-size:14px}
+.small{font-size:.88rem}
 .mono{font-family:var(--mono); font-size:.85em; overflow-wrap:anywhere}
 a{color:var(--ink); text-decoration-color:#C3CCD8; text-underline-offset:3px}
 a:hover{text-decoration-color:var(--ink)}
 a:focus-visible{outline:2px solid var(--focus); outline-offset:2px}
 hr{border:0; border-top:1px solid var(--line); margin:24px 0}
-.box{border:1px solid var(--line); border-radius:16px; padding:16px 20px; margin:0 0 12px; background:var(--bg)}
-footer{margin:20px 2px 0; font-size:13px; color:var(--muted); text-align:center}
-footer a{color:var(--muted); display:inline-flex; align-items:center; min-height:44px}
-/* Телефон: кегли и черта заголовков по дизайн-коду (H1 30, H2 21). */
-@media (max-width:640px){
-  .wrap{padding-left:16px; padding-right:16px; padding-bottom:64px}
-  h1{font-size:30px; padding-left:18px}
-  h1::before{width:6px; height:21px; border-radius:3px; top:calc((1.1em - 21px) / 2)}
-  h2{font-size:21px; padding-left:17px}
-  h2::before{width:5px; height:15px; border-radius:2.5px; top:calc((1.2em - 15px) / 2)}
-  h3{font-size:17px}
-}
+.box{border:1px solid var(--line); border-radius:14px; padding:14px 18px; margin:0 0 14px; background:var(--bg)}
+footer{margin:20px 2px 0; font-size:.82rem; color:var(--muted); text-align:center}
+footer a{color:var(--muted)}
 </style>
 </head>
 <body>
