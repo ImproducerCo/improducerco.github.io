@@ -314,3 +314,54 @@ label.plan{cursor:pointer}
 .compare th .btn{text-transform:none;letter-spacing:normal}
 /* Вход: колонки по центру экрана по высоте, как у образца. */
 @media (min-width:901px){.login{min-height:calc(100vh - var(--space-80))}}
+/* ── Наш фронтенд (16.10, второй проход): площадки, кабинет, свой Claude ── */
+/* Чат: на ≥820 поле ввода прижато к низу рабочей области (липкое), а не стоит сразу под сообщением.
+   Высота колонки — экран минус отступы рабочей области и строка заголовка чата. */
+@media (min-width:820px){
+  .chat-col{display:flex;flex-direction:column;
+    min-height:calc(100dvh - var(--space-page-top) - var(--space-page-bottom) - var(--space-80))}
+  .chat-col>.dock{margin-top:auto}
+}
+@media (min-width:820px) and (max-width:1180px){
+  /* Сверху ещё полоса приложения (знак и «Меню»). */
+  .chat-col{min-height:calc(100dvh - var(--space-page-top) - var(--space-page-bottom) - var(--space-80) - var(--space-64))}
+}
+/* Цены: «цена появится» — текстом, а не цифрой. */
+.plan .pp.tbd{font:var(--type-title-l-weight) var(--type-title-l-size)/var(--type-title-l-lh) var(--font-sans);color:var(--color-text-secondary)}
+/* Полоса площадок под героем. */
+.plat-strip{list-style:none;margin:0;padding:var(--space-16) 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-16);
+  border-top:var(--border-width) solid var(--color-border-default);border-bottom:var(--border-width) solid var(--color-border-default)}
+.plat-strip li{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-4) var(--space-12);min-width:0}
+.plat-strip li b{font:var(--type-title-m-weight) var(--type-title-m-size)/var(--type-title-m-lh) var(--font-sans)}
+.plat-strip li .small{flex:1 1 100%;order:3}
+@media (max-width:600px){.plat-strip{grid-template-columns:1fr}}
+/* Адрес коннектора с кнопкой «Скопировать». */
+.addr{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-8);min-width:0}
+.addr code{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;padding:var(--space-8) var(--space-12);border-radius:var(--radius-control);
+  background:var(--color-bg-sunken);font:var(--type-meta-weight) var(--type-meta-size)/var(--type-meta-lh) var(--font-mono)}
+.row-body{padding:0 var(--space-row-pad-x) var(--space-row-pad-y);min-width:0}
+.row-body>p{margin:0 0 var(--space-8)}
+.row-body .btn-row{margin:0}
+.steps .t code{overflow-wrap:anywhere}
+.set-row .val .addr{flex:1 1 100%}
+/* Кабинет: плитки площадок на всю ширину рабочей области. */
+.plats .tile.is-soon{background:var(--color-bg-surface);border-style:dashed;border-color:var(--color-border-control)}
+.plats .tile.is-soon .tt{color:var(--color-text-secondary)}
+.plats .tile .badge{align-self:flex-start}
+.plats .tile.is-add{border-style:dashed}
+a.tile.plat{color:inherit;text-decoration:none}
+/* Кабинет площадки: строка функции «ваше решение» выделена как активный пункт. */
+.row.fn.now{background:var(--nav-active-bg);border-color:var(--nav-active-border)}
+.row.fn .rtitle a{color:inherit}
+.own{position:sticky;top:var(--space-16)}
+@media (max-width:1180px){.own{position:static}}
+/* Кабинет площадки: справа карточка «свой Claude» чуть шире плитки — адрес помещается в строку;
+   на ≥1440 функции в две колонки, чтобы занять ширину. */
+.cab-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,calc(var(--tile-min) + var(--space-64)));gap:var(--space-24);align-items:start}
+.fn-list{display:grid;gap:var(--space-8)}
+@media (min-width:1440px){.fn-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1180px){.cab-split{grid-template-columns:minmax(0,1fr)}}
+/* Строки «платформа → действие»: на телефоне кнопка уходит под название, а не сжимает его. */
+.ways .row-top{flex-wrap:wrap}
+.ways .rhead{flex:1 1 calc(var(--space-80) * 2)}
+.set-row .val .gbtn{width:100%}

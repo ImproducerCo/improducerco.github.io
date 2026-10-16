@@ -1,1 +1,3 @@
-[{"sha":"342ce61","msg":"feat(site): add client path prototype under test/"}]
+[{"sha":"342ce61","msg":"feat(site): add client path prototype under test/"},
+ {"sha":"d1d7ca2","msg":"docs(site): add layout scores and commits to test/ inventory"},
+ {"sha":"c8c8627","msg":"feat(site): rebuild test/ prototype as assistant client path"}]
