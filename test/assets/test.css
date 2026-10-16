@@ -256,3 +256,61 @@ pre.quote{white-space:pre-wrap;overflow-wrap:anywhere}
 /* Телефон: в шапке знак и «Меню»; «Записаться на разговор» — первым пунктом меню (малой кнопки в _design/ нет). */
 .site-menu .hide-wide{display:none}
 @media (max-width:600px){.site-menu .hide-wide{display:block}}
+
+/* ── Путь ассистента (16.10): боковая панель, поле ввода, лимит, артефакт, цены, загрузка ── */
+.err{color:var(--field-error-text)}
+/* Боковая панель: пункт без страницы и список «Недавние» в одну строку с обрезкой. */
+.side .cnav--side .off{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-4) var(--space-8);min-height:var(--nav-height);
+  padding:0 var(--nav-pad-x);color:var(--color-text-disabled);
+  font:var(--type-control-s-weight) var(--type-control-s-size)/var(--type-control-s-lh) var(--font-sans)}
+.side .recent a span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.side .recent a{color:var(--color-text-body)}
+/* Поле ввода: «+» с меню и выбор модели. */
+.cmenu{position:relative}
+.cmenu>summary{list-style:none;cursor:pointer}
+.cmenu>summary::-webkit-details-marker{display:none}
+.cmenu .pop{min-width:var(--tile-min)}
+.composer .model{margin-left:auto;width:auto;min-width:0;max-width:60%}
+.composer .model~.send{margin-left:0}
+/* C24: плашка лимита прилегает к полю ввода сверху. */
+.limit{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-8) var(--space-16);
+  padding:var(--space-8) var(--space-16);background:var(--color-status-warn-bg);color:var(--color-status-warn-text);
+  border:var(--border-width) solid var(--color-status-warn-line);border-bottom:0;border-radius:var(--radius-card) var(--radius-card) 0 0;
+  font:var(--type-small-weight) var(--type-small-size)/var(--type-small-lh) var(--font-sans);text-align:left}
+.limit a{color:inherit;font-weight:var(--fw-600)}
+.limit+.composer{border-top-left-radius:0;border-top-right-radius:0}
+.dock-limit{width:100%}
+/* Новый чат: приветствие и поле — в середине экрана, как у образца. */
+.greet{min-height:70vh;justify-content:center}
+/* Чат и панель артефакта: рядом на широком, друг под другом на узком. */
+.chat-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-24);align-items:start}
+.chat-col{min-width:0}
+.chat-split .art{position:sticky;top:var(--space-16)}
+.art .cnav{margin-bottom:var(--space-16)}
+.art-card{display:flex;flex-direction:column;gap:var(--space-4);max-width:var(--tile-min);margin:var(--space-8) 0;padding:var(--space-12) var(--space-16);
+  border:var(--border-width) solid var(--color-border-default);border-radius:var(--radius-row);background:var(--color-bg-surface);
+  color:var(--color-text-primary);text-decoration:none}
+.art-card:hover{border-color:var(--color-border-control-hover)}
+@media (max-width:1180px){.chat-split{grid-template-columns:1fr}.chat-split .art{position:static}}
+/* Цены: две карточки на повышении плана, таблица сравнения, QR. */
+.plans--2{max-width:var(--container-dialog);margin-inline:auto}
+label.plan{cursor:pointer}
+.compare th,.compare td{text-align:center}
+.compare th:first-child,.compare td:first-child{text-align:left}
+.compare th .btn{margin-top:var(--space-8)}
+.qr-card{display:flex;flex-direction:column;align-items:center;gap:var(--space-12)}
+.qr{width:calc(var(--space-80) * 2);height:calc(var(--space-80) * 2)}
+.qr rect{fill:var(--color-text-primary)}
+.only-s{display:none}
+@media (max-width:600px){.only-s{display:inline-flex}}
+/* Проекты: поиск и сортировка в строку; статья: оглавление справа. */
+.proj-tools{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,var(--tile-min));gap:var(--space-12);margin-bottom:var(--space-24)}
+@media (max-width:600px){.proj-tools{grid-template-columns:1fr}}
+.toc{position:sticky;top:var(--space-80)}
+.toc a{color:var(--color-text-body)}
+@media (max-width:1180px){.toc{position:static;order:-1}}
+.use{margin-bottom:var(--space-16)}
+.art .panel-h{flex-wrap:wrap}
+.compare th .btn{text-transform:none;letter-spacing:normal}
+/* Вход: колонки по центру экрана по высоте, как у образца. */
+@media (min-width:901px){.login{min-height:calc(100vh - var(--space-80))}}
