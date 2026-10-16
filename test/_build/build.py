@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Прототип пути клиента improducer на improducer.co/test/.
+"""Прототип пути клиента на improducer.co/test/.
 
     python3 test/_build/build.py          # из корня сайта: пересобрать все страницы test/
 
-Раскладка и логика экранов взяты у пути клиента Claude (разбор — папка работы
-~/Desktop/improducer/работа/2026-10-16_claude/), вид — только дизайн-система improducer
-(_design/: tokens.css, components.css, шрифты, знак). Тексты свои. Примеры — выдуманный
-автор «Тест». Формы ничего не отправляют, настоящих входа, OAuth и оплаты нет.
+Экраны, порядок, переходы, блоки и состояния повторяют путь клиента образца (разбор — папка работы
+~/Desktop/improducer/работа/2026-10-16_claude/, разбор.md: экраны S01–S27, пути F01–F08, компоненты C01–C28).
+Вид — только дизайн-система improducer (_design/: tokens.css, components.css, шрифты, знак). Продукт —
+безымянный ИИ-ассистент «improducer»: чаты, проекты, артефакты, коннекторы, планы. Тексты свои.
+Пользователь — выдуманный «Тест». Формы ничего не отправляют, настоящих входа, OAuth и оплаты нет.
 
 Папка _build GitHub Pages не публикует (Jekyll пропускает папки с «_»): здесь исходник,
 снаружи — собранные test/<путь>/index.html и test/assets/.
@@ -26,11 +27,15 @@ SCORES = HERE / "scores.json"
 E = html.escape
 
 STATE_LABEL = {"full": "Заполнено", "empty": "Пусто", "loading": "Загрузка", "error": "Ошибка",
-               "denied": "Нет доступа", "long": "Длинный текст", "booked": "Записан на разговор",
-               "saved": "Сохранено", "confirm": "Подтверждение", "near": "Близко к сроку"}
-ALL6 = ["full", "empty", "loading", "error", "denied", "long"]
+               "denied": "Нет доступа", "long": "Длинный текст", "saved": "Сохранено",
+               "confirm": "Подтверждение", "sent": "Письмо отправлено", "code": "Ввод кода",
+               "badcode": "Неверный код", "limit": "Лимит исчерпан", "streaming": "Ответ идёт",
+               "paid": "Оплачено", "tool": "С инструментом", "month": "Помесячно", "canceled": "Отменён",
+               "close": "Близко к лимиту", "notfound": "Ничего не найдено", "select": "Выбор нескольких",
+               "kbfull": "Знания почти заполнены", "add": "Добавить свой", "exported": "Экспорт запрошен", "signout": "Выйти везде"}
 
 PAGES = {}  # путь → html
+KEEP = {"_build", "assets"}  # каталоги test/, которые сборка не удаляет
 
 
 def copy_assets():
@@ -118,28 +123,26 @@ def a_btn(href, text, primary=False, extra=""):
     return f'<a class="{cls}" href="{href}"{extra}>{text}</a>'
 
 
-def gbtn(href, text="Продолжить с Google"):
+def gbtn(href, text="Продолжить через Google"):
     return f'<a class="gbtn" href="{href}"><img src="/test/assets/logo/google-g.svg" alt="">{text}</a>'
 
 
-def stage(code, text="появится"):
-    return f'<span class="badge badge--wait">{text} · {code}</span>'
+def off_btn(text, primary=False):
+    """Кнопка, у которой в прототипе нет страницы: видна, но не нажимается."""
+    cls = "btn btn--primary" if primary else "btn"
+    return f'<span class="{cls}" aria-disabled="true">{text}</span>'
 
 
-def have(text="есть сейчас"):
-    return f'<span class="badge badge--ok">{text}</span>'
-
-
-PAUSED_CALL = warn("Пауза: только чтение",
-                   "Срок оплаты прошёл. Всё на месте и ничего не стирается — смотреть можно всё. "
-                   "Новые шаги, решения и разбор роликов вернутся после продления.",
-                   a_btn("/test/upgrade/", "Продлить", True))
+LONG = ("Очень длинное название, которое не помещается в одну строку и проверяет перенос на телефоне "
+        "и в узкой колонке без обрезки и наложения")
+SCRIPT = '<script src="/test/assets/test.js"></script>'
 
 
 # ── Сайт ────────────────────────────────────────────────────────────────────
 
-SITE_NAV = [("/test/product/", "Как устроено"), ("/test/pricing/", "Форматы"),
-            ("/test/download/", "В своём Claude"), ("/test/help/", "Помощь")]
+SITE_NAV = [("/test/product/", "Продукт"), ("/test/pricing/", "Цены"),
+            ("/test/download/", "Скачать"), ("/test/help/", "Помощь")]
+TRY = "Попробовать improducer"
 
 
 def site_page(path, title, desc, body, states=("full",), crumb=None):
@@ -149,183 +152,169 @@ def site_page(path, title, desc, body, states=("full",), crumb=None):
     crumbbar = ""
     if crumb:
         crumbbar = (f'<div class="crumbbar"><div class="in"><span class="meta">{E(crumb)}</span>'
-                    '<a class="meta" href="/test/help/">Вопросы →</a></div></div>')
+                    '<a class="meta" href="/test/help/">Помощь →</a></div></div>')
     PAGES[path] = (head(title, desc) + '<body class="site">'
                    f'<header class="site-head"><div class="in">{wordmark()}'
                    f'<ul class="site-nav">{nav}</ul>'
                    '<div class="site-cta">'
                    '<a class="btn hide-m" href="/test/login/">Войти</a>'
-                   '<a class="btn btn--primary hide-s" href="/test/login/">Записаться на разговор</a></div>'
+                   f'<a class="btn btn--primary hide-s" href="/test/login/">{TRY}</a></div>'
                    '<details class="site-menu"><summary class="btn">Меню</summary>'
-                   f'<div class="pop"><a class="hide-wide" href="/test/login/"><b>Записаться на разговор</b></a>{menu}<hr><a href="/test/login/">Войти</a></div></details>'
+                   f'<div class="pop"><a class="hide-wide" href="/test/login/"><b>{TRY}</b></a>{menu}<hr><a href="/test/login/">Войти</a></div></details>'
                    f'</div></header>{crumbbar}'
                    f'<main class="wrap">{body}</main>'
                    '<footer class="wrap"><div class="foot"><span>improducer.co</span>'
+                   '<a href="/test/pricing/">Цены</a><a href="/test/download/">Скачать</a>'
+                   '<a href="/test/help/">Помощь</a>'
                    '<a href="/privacy.html">Политика конфиденциальности</a>'
                    '<a href="/terms.html">Условия использования</a>'
-                   '<a href="/test/help/">Помощь</a>'
                    '<span>Прототип: формы ничего не отправляют</span></div></footer>'
-                   f'{proto(list(states))}<script src="/test/assets/test.js"></script></body></html>\n')
+                   f'{proto(list(states))}{SCRIPT}</body></html>\n')
 
 
 def bare_page(path, title, desc, body, states=("full",)):
     PAGES[path] = (head(title, desc) + '<body class="site">'
                    f'<header class="bare-head">{wordmark()}</header>'
                    f'<main>{body}</main>{proto(list(states))}'
-                   '<script src="/test/assets/test.js"></script></body></html>\n')
+                   f'{SCRIPT}</body></html>\n')
 
 
-# ── Приложение (my.) ────────────────────────────────────────────────────────
+# ── Приложение ──────────────────────────────────────────────────────────────
 
-APP_NAV = [("/test/new/", "Ваш путь", ""), ("/test/chat/", "Чат", "Э4-2"),
-           ("/test/recents/", "Решения и события", ""), ("/test/projects/", "Каналы", "")]
-SECTIONS = [("anketa", "Анкета"), ("dna", "ДНК"), ("niche", "Ниша"), ("concept", "Концепция"),
-            ("board", "Доска идей"), ("plan", "Контент-план"), ("scripts", "Сценарии"),
-            ("analytics", "Канал и аналитика")]
-ACCOUNT_MENU = [("/test/settings/general/", "Настройки"), ("/test/settings/billing/", "План и оплата"),
-                ("/test/help/", "Помощь")]
-
-
-def section_href(key):
-    return "/test/project/test/koncepciya/" if key == "concept" else f"/test/project/test/#{key}"
+APP_NAV = [("/test/recents/", "Чаты"), ("/test/projects/", "Проекты")]
+RECENT = ["План поездки в Казань на 3 дня", "Письмо соседям о ремонте", "Разбор таблицы расходов",
+          "Меню на неделю без молочного", "Как вывести пятно от кофе"]
+ACCOUNT_MENU = ('<p class="pi">test@example.com</p>'
+                '<a href="/test/settings/general/">Настройки</a>'
+                '<p class="pi">Язык · Русский</p>'
+                '<a href="/test/help/">Помощь</a><hr>'
+                '<a href="/test/upgrade/">Посмотреть планы</a><hr>'
+                '<a href="/test/logout/">Выйти</a>')
 
 
 def app_page(path, title, desc, body, states=("full",), wide=False, active=None):
     active = active or path
-    nav = "".join(
-        f'<li><a href="{h}"{" aria-current=\"page\"" if h == active else ""}>{t}'
-        f'{f" <span class=\"badge badge--wait\">{s}</span>" if s else ""}</a></li>' for h, t, s in APP_NAV)
-    secs = "".join(f'<li><a href="{section_href(k)}"'
-                   f'{" aria-current=\"page\"" if section_href(k) == active else ""}>{t}</a></li>'
-                   for k, t in SECTIONS)
-    acct_links = "".join(f'<a href="{h}">{t}</a>' for h, t in ACCOUNT_MENU)
-    menu = ("".join(f'<a href="{h}"{" aria-current=\"page\"" if h == active else ""}>{t}</a>' for h, t, _ in APP_NAV)
-            + '<hr><p class="pi">Канал «Тест»</p>'
-            + "".join(f'<a href="{section_href(k)}">{t}</a>' for k, t in SECTIONS)
-            + "<hr>" + acct_links + '<a href="/test/logout/">Выйти</a>')
+    nav = "".join(f'<li><a href="{h}"{" aria-current=\"page\"" if h == active else ""}>{t}</a></li>'
+                  for h, t in APP_NAV)
+    nav += '<li><span class="off">Артефакты <span class="meta">нет в прототипе</span></span></li>'
+    recent = "".join(f'<li><a href="/test/chat/"{" aria-current=\"page\"" if i == 0 and active == "/test/chat/" else ""}>'
+                     f'<span>{E(t)}</span></a></li>' for i, t in enumerate(RECENT))
+    menu = ('<a href="/test/new/"><b>＋ Новый чат</b></a>'
+            + "".join(f'<a href="{h}"{" aria-current=\"page\"" if h == active else ""}>{t}</a>' for h, t in APP_NAV)
+            + '<hr><p class="pi">Недавние</p>'
+            + "".join(f'<a href="/test/chat/">{E(t)}</a>' for t in RECENT[:3])
+            + "<hr>" + ACCOUNT_MENU)
     PAGES[path] = (head(title, desc) + "<body>"
                    '<div class="app"><aside class="side">'
                    f'<div class="side-top">{wordmark("/test/new/", small=True, co=False)}'
                    '<details class="side-menu"><summary class="btn">Меню</summary>'
                    f'<div class="pop">{menu}</div></details></div>'
                    '<div class="side-nav stack-s">'
-                   '<a class="btn btn--primary" href="/test/project/test/koncepciya/">Ваш шаг: концепция</a>'
+                   '<a class="btn btn--primary" href="/test/new/">＋ Новый чат</a>'
                    f'<ul class="cnav cnav--side">{nav}</ul>'
-                   f'<p class="side-k">Канал «Тест»</p><ul class="cnav cnav--side">{secs}</ul></div>'
+                   f'<p class="side-k">Недавние</p><ul class="cnav cnav--side recent">{recent}</ul></div>'
                    '<div class="side-foot"><details class="acct"><summary><span class="ava">Т</span>'
-                   '<span class="who"><b>Тест</b><span class="meta">Пилот «вместе»</span></span></summary>'
-                   f'<div class="pop"><p class="pi">test@example.com</p>{acct_links}<hr>'
-                   '<a href="/test/logout/">Выйти</a></div></details></div>'
+                   '<span class="who"><b>Тест</b><span class="meta">Бесплатный план</span></span></summary>'
+                   f'<div class="pop">{ACCOUNT_MENU}</div></details></div>'
                    '</aside>'
                    f'<main class="main"><div class="{"main-wide" if wide else "main-in"}">{body}</div></main></div>'
-                   f'{proto(list(states))}<script src="/test/assets/test.js"></script></body></html>\n')
+                   f'{proto(list(states))}{SCRIPT}</body></html>\n')
 
 
-# ── Данные «Теста» ──────────────────────────────────────────────────────────
-
-STEPS = [  # заголовки и «что / зачем» — из AI OS Basic/author_steps.json
-    ("channel", "Подключить канал", "done"),
-    ("anketa", "Анкета", "done"),
-    ("photos", "Фото для обложек", "done"),
-    ("dna", "ДНК", "done"),
-    ("niche", "Ниша и каналы-доноры", "done"),
-    ("concept", "Концепция канала", "now"),
-    ("board", "Доска идей", "wait"),
-    ("plan", "Контент-план", "wait"),
-    ("scripts", "Сценарии и упаковка", "wait"),
-    ("covers", "Обложки", "wait"),
-    ("release", "Выпуск", "wait"),
-    ("analytics", "Аналитика вышедших роликов", "wait"),
-]
-STEP_BADGE = {"done": '<span class="badge badge--ok">готово</span>',
-              "now": '<span class="badge badge--wait">ваше решение</span>',
-              "wait": '<span class="badge">ждёт</span>'}
-LONG = ("Очень длинное название, которое не помещается в одну строку и проверяет перенос на телефоне "
-        "и в узкой колонке без обрезки и наложения")
-
-
-def steps_html(first_day=False, long=False, limit=None, two=False):
-    items = []
-    for i, (key, title, state) in enumerate(STEPS[:limit] if limit else STEPS, 1):
-        if first_day:
-            state = "now" if i == 1 else "wait"
-        t = f"{title} — {LONG}" if long and i == 6 else title
-        href = section_href(key) if key in dict(SECTIONS) or key == "concept" else "/test/project/test/"
-        cls = ' class="now"' if state == "now" else ""
-        items.append(f'<li{cls}><span class="n">{i:02d}</span><a class="t" href="{href}">{E(t)}</a>{STEP_BADGE[state]}</li>')
-    return f'<ol class="steps{" steps-2" if two else ""}">{"".join(items)}</ol>'
-
-
-def composer(off=False, text="", placeholder=None):
-    ph = placeholder or "Спросите о своём канале…"
+def composer(off=False, text="", placeholder=None, nxt="/test/chat/"):
+    ph = placeholder or "Чем помочь сегодня?"
     dis = " disabled" if off else ""
     cls = " is-off" if off else ""
     return (f'<div class="composer{cls}"><label class="visually-hidden" for="q">Сообщение</label>'
-            f'<textarea id="q" rows="2" placeholder="{E(ph)}" data-next="/test/chat/"{dis}>{E(text)}</textarea>'
-            '<div class="tools"><a class="btn btn--ghost" href="/test/project/test/">＋ Материалы</a>'
-            '<span class="meta">ваш Claude</span>'
-            f'<a class="send" href="/test/chat/" aria-label="Отправить"{" aria-disabled=\"true\"" if off else ""}>'
+            f'<textarea id="q" rows="2" placeholder="{E(ph)}" data-next="{nxt}"{dis}>{E(text)}</textarea>'
+            '<div class="tools"><details class="cmenu"><summary class="btn btn--ghost" aria-label="Добавить">＋</summary>'
+            '<div class="pop"><span class="pi">Добавить файлы или фото</span>'
+            '<a href="/test/settings/connectors/">Коннекторы</a>'
+            '<span class="pi">Поиск в интернете · включён</span></div></details>'
+            f'<label class="visually-hidden" for="model">Модель</label><select id="model" class="select model"{dis}>'
+            '<option>Сбалансированная</option><option>Быстрая</option><option disabled>Мощная · план Про</option></select>'
+            f'<a class="send" href="{nxt}" aria-label="Отправить"{" aria-disabled=\"true\"" if off else ""}>'
             '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5" '
             'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></div>')
 
 
-FORMATS = [  # fmt.* из SPEC/продукт/фронтенд.json; цены не утверждены (Д1, Д7)
-    {"key": "fmt.razbor", "tab": "start", "title": "Разбор канала", "sub": "Вход без подключения канала",
-     "ticks": ["Числа канала и ниши по открытым данным", "3 решения: что менять первым", "1 разговор"],
-     "plus": None, "stage": None},
-    {"key": "fmt.dna", "tab": "start", "title": "ДНК и концепция", "sub": "Основа: кто вы и о чём канал",
-     "ticks": ["Подключение канала", "ДНК из ваших слов и материалов", "Концепция на ваше решение"],
-     "plus": "Всё из разбора, плюс:", "stage": None},
-    {"key": "fmt.pilot", "tab": "start", "title": "Пилот «вместе»", "sub": "Основной формат · 4 недели",
-     "ticks": ["Путь до 4 сценариев с упаковкой", "3 разговора по ходу", "Разбор аналитики канала"],
-     "plus": "Всё из ДНК и концепции, плюс:", "stage": None, "main": True},
-    {"key": "fmt.self", "tab": "sub", "title": "Со своим Claude", "sub": "Подписка для тех, у кого есть Claude",
-     "ticks": ["Весь путь и цикл в вашем Claude", "Приложение my.improducer.co"],
-     "plus": None, "stage": "Э3"},
-    {"key": "fmt.allin", "tab": "sub", "title": "Всё включено", "sub": "Подписка без своего Claude",
-     "ticks": ["То же, что «со своим Claude»", "Чат в приложении"],
-     "plus": None, "stage": "Э4"},
-    {"key": "fmt.studio", "tab": "studio", "title": "Студия", "sub": "До 3 каналов",
-     "ticks": ["Всё из подписки на каждый канал", "Выбор канала в приложении"],
-     "plus": None, "stage": "Э3-4"},
-]
-FMT_TABS = [("start", "Начать"), ("sub", "Подписка"), ("studio", "Студия")]
+def limit_bar(until="18:00"):
+    """C24: плашка над полем ввода — лимит до сброса и путь к плану."""
+    return (f'<div class="limit" role="status"><span>Лимит сообщений исчерпан до {until}</span>'
+            '<a href="/test/upgrade/">Повысить план</a></div>')
 
 
-def plan_card(f, cta_href="/test/login/", cta="Записаться на разговор"):
-    main = " is-main" if f.get("main") else ""
-    badge = '<span class="badge badge--accent">основной</span>' if f.get("main") else ""
-    later = stage(f["stage"]) if f["stage"] else ""
-    plus = f'<p class="small"><b>{f["plus"]}</b></p>' if f["plus"] else ""
-    btn = (f'<span class="btn" aria-disabled="true">Появится · {f["stage"]}</span>' if f["stage"]
-           else a_btn(cta_href, cta, True))
-    ticks = "".join(f'<li{" class=\"later\"" if f["stage"] else ""}>{t}</li>' for t in f["ticks"])
-    return (f'<article class="card plan{main}"><div class="sig">{badge}{later}</div>'
-            f'<h3 class="pt">{f["title"]}</h3><p class="muted">{f["sub"]}</p>'
-            '<p class="pp">цена — после решения</p>'
+# ── Планы ───────────────────────────────────────────────────────────────────
+
+PLANS = {
+    "individual": [
+        {"title": "Бесплатно", "sub": "Попробовать improducer", "price": "0 $", "pnote": "Бесплатно для всех",
+         "plus": None,
+         "ticks": ["Чат в браузере, на компьютере и телефоне", "Поиск в интернете, создание файлов и запуск кода",
+                   "Память между чатами", "Подключение своих приложений и инструментов", "Артефакты"]},
+        {"title": "Про", "sub": "Для ежедневной работы", "price": "17 $",
+         "pnote": "в месяц при оплате за год (200 $ сразу). 20 $ при оплате помесячно.",
+         "plus": "Всё из Бесплатного, плюс:",
+         "ticks": ["Больше использования*", "Задачи по расписанию", "Проекты", "Больше моделей",
+                   "Помощник в браузере и офисных программах"]},
+        {"title": "Макс", "sub": "Для тех, кто работает с improducer весь день", "price": "от 100 $",
+         "pnote": "в месяц", "plus": "Всё из Про, плюс:", "main": True,
+         "ticks": ["В 5 или 20 раз больше использования, чем в Про*", "Длиннее ответы во всех задачах",
+                   "Ранний доступ к новым возможностям", "Приоритет в часы высокой нагрузки"]},
+    ],
+    "team": [
+        {"title": "Команда", "sub": "Стандартное место", "price": None, "pnote": "за участника в месяц",
+         "plus": "Всё из Про для каждого, плюс:",
+         "ticks": ["Общие проекты команды", "Оплата и участники в одном месте",
+                   "Коннекторы для всей команды включает владелец"]},
+        {"title": "Команда", "sub": "Премиум место", "price": None, "pnote": "за участника в месяц",
+         "plus": "Всё из стандартного места, плюс:", "main": True,
+         "ticks": ["Больше использования", "Ранний доступ к новым возможностям"]},
+    ],
+    "api": [
+        {"title": "Быстрая", "sub": "Простые задачи в большом объёме", "price": None,
+         "pnote": "оплата за объём запросов", "plus": None, "api": True,
+         "ticks": ["Доступ по ключу API", "Платите только за использованное"]},
+        {"title": "Сбалансированная", "sub": "Большинство рабочих задач", "price": None,
+         "pnote": "оплата за объём запросов", "plus": None, "api": True, "main": True,
+         "ticks": ["Доступ по ключу API", "Длинные документы и инструменты"]},
+        {"title": "Мощная", "sub": "Самые сложные задачи", "price": None,
+         "pnote": "оплата за объём запросов", "plus": None, "api": True,
+         "ticks": ["Доступ по ключу API", "Самые длинные ответы"]},
+    ],
+}
+PLAN_TABS = [("individual", "Для себя"), ("team", "Команды"), ("api", "API")]
+
+
+def plan_card(p, cta_href="/test/login/", cta="Попробовать"):
+    main = " is-main" if p.get("main") else ""
+    price = f'<p class="pp">{p["price"]}</p>' if p["price"] else ""
+    plus = f'<p class="small"><b>{p["plus"]}</b></p>' if p["plus"] else ""
+    btn = off_btn("Консоль — нет в прототипе") if p.get("api") else a_btn(cta_href, cta, True)
+    ticks = "".join(f"<li>{t}</li>" for t in p["ticks"])
+    return (f'<article class="card plan{main}"><h3 class="pt">{p["title"]}</h3><p class="muted">{p["sub"]}</p>'
+            f'{price}<p class="small muted">{p["pnote"]}</p>'
             f'{btn}<hr class="hr">{plus}<ul class="ticks">{ticks}</ul></article>')
 
 
-def formats_block(active="start", cta_href="/test/login/", cta="Записаться на разговор"):
-    tabs = "".join(f'<li><a href="/test/pricing/#{k}"{" aria-current=\"page\"" if k == active else ""}>{t}</a></li>'
-                   for k, t in FMT_TABS)
-    cards = "".join(plan_card(f, cta_href, cta) for f in FORMATS if f["tab"] == active)
-    return f'<div class="center"><ul class="cnav tabs">{tabs}</ul></div><div class="plans">{cards}</div>'
+def plan_tabs(active, base="/test/pricing/"):
+    tabs = "".join(f'<li><a href="{base}#{k}"{" aria-current=\"page\"" if k == active else ""}>{t}</a></li>'
+                   for k, t in PLAN_TABS)
+    return f'<div class="center"><ul class="cnav tabs">{tabs}</ul></div>'
 
 
 FAQ_SITE = [
-    ("Нужен ли мне свой Claude?",
-     "Для пилота — желательно: система работает через ваш Claude, он подключается коннектором за пару минут. "
-     "Без своего Claude — подписка «всё включено» с чатом в приложении, она появится на этапе Э4."),
-    ("Что система видит на моём канале?",
-     "Статистику и данные канала — чтобы готовить отчёты и решения. Правки на канале — названия, описания, "
-     "плейлисты — только после вашего «да» и только на вашем канале. Видео, комментарии и субтитры мы не удаляем. "
-     "Доступ отзывается в любой момент."),
-    ("Сколько стоит?", "Цены ещё не утверждены. На разговоре назовём цену формата числом до оплаты."),
-    ("Что будет, если не продлить?",
-     "Пауза: только чтение. Всё остаётся на месте и ничего не стирается, новые шаги — после продления."),
-    ("Я живу в России — можно?",
-     "Сейчас нет: Claude не работает в России, а система работает через Claude. Если вы живёте в другой стране — можно."),
+    ("Что такое improducer?",
+     "ИИ-ассистент для повседневных задач: пишет и правит тексты, разбирает таблицы и файлы, ищет в интернете, "
+     "помогает с кодом и планами. Работает в браузере, на компьютере и телефоне."),
+    ("Это бесплатно?",
+     "Да, бесплатный план есть у всех. Платные планы дают больше использования и дополнительные возможности."),
+    ("Что такое лимит использования?",
+     "Сколько сообщений можно отправить за период. Когда лимит исчерпан, над полем ввода видно время сброса."),
+    ("Можно ли отменить подписку?",
+     "Да, в Настройках → Оплата. План работает до конца оплаченного периода."),
+    ("Где хранятся мои чаты?",
+     "В вашем аккаунте. Экспорт данных и удаление аккаунта — в Настройках."),
 ]
 
 
@@ -334,528 +323,526 @@ def faq(items):
         f'<details><summary>{E(q)}</summary><p>{E(a)}</p></details>' for q, a in items) + "</div>"
 
 
+def auth_card(email_href="/test/login/#s=sent"):
+    """C12: Google, Apple, «или», почта, согласие."""
+    return ('<div class="card auth">'
+            f'{gbtn("/test/onboarding/")}'
+            '<a class="gbtn" href="/test/onboarding/">Продолжить через Apple</a>'
+            '<div class="or">или</div>'
+            '<div class="field"><label class="visually-hidden" for="em">Почта</label>'
+            f'<input id="em" type="email" placeholder="Введите электронную почту" data-next="{email_href}"></div>'
+            f'{a_btn(email_href, "Продолжить через почту", True)}'
+            '<p class="small muted">Продолжая, вы принимаете <a href="/terms.html">условия</a> и '
+            '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
+
+
 def preview_card():
-    """Пример кабинета на сайте: «Ваш путь» выдуманного автора «Тест»."""
-    return ('<div class="preview" aria-label="Пример кабинета автора «Тест»">'
-            '<p class="meta">Пример · выдуманный автор «Тест»</p>'
-            '<div class="card stack">'
-            '<div class="inset"><p class="k">Ваш шаг 06 из 12</p><h3>Концепция канала</h3>'
-            '<p>Система предлагает, о чём канал, для кого и чем он отличается. Решение за вами.</p></div>'
-            f'{steps_html(limit=6)}'
-            '<div class="facts"><div class="fact"><span class="k">готово</span><span class="v num">5 из 12</span></div>'
-            '<div class="fact"><span class="k">ваших решений</span><span class="v num">1</span></div></div>'
-            "</div></div>")
+    """Пример чата на сайте и на входе — вместо картинки образца."""
+    return ('<div class="preview" aria-label="Пример чата">'
+            '<p class="meta">Пример чата</p>'
+            '<div class="card stack"><div class="thread">'
+            '<div class="msg-u">Помоги написать соседям, что в субботу у нас шумный ремонт</div>'
+            '<div class="msg-a"><p>Вот короткий вариант для чата дома:</p>'
+            '<p>«Добрый день! В субботу с 10 до 17 у нас в квартире 42 ремонт, будет шумно. '
+            'Простите за неудобство — постараемся закончить быстрее».</p>'
+            '<p class="small muted">Сделать мягче или короче?</p></div></div></div></div>')
 
 
 # ── Страницы сайта ──────────────────────────────────────────────────────────
 
 def page_home():
     body = ('<section class="hero"><div class="hero-text">'
-            '<h1>Основа канала, который приводит вам клиентов</h1>'
-            '<p class="lede">ДНК, ниша на измеренных числах, концепция, план и сценарии — вместе с вами, '
-            'за 4 недели. Решения на каждом шаге — ваши.</p>'
-            '<div class="card auth">'
-            f'{gbtn("/test/login/")}'
-            '<div class="or">или</div>'
-            f'{a_btn("/test/login/", "Записаться на разговор", True)}'
-            '<p class="small muted">Сначала разговор, оплата — после него. Продолжая, вы принимаете '
-            '<a href="/terms.html">условия</a> и <a href="/privacy.html">политику</a>.</p></div>'
-            f'{a_btn("/test/download/", "Подключить в своём Claude")}'
+            '<h1>Думайте шире, делайте быстрее</h1>'
+            '<p class="lede">Ассистент для текстов, таблиц, планов и кода — в браузере, на компьютере и телефоне.</p>'
+            f'{auth_card()}'
+            f'{a_btn("/test/download/", "Скачать приложение для компьютера")}'
             f'</div>{preview_card()}</section>'
-            '<section class="center mt"><h2>Форматы</h2></section>'
-            f'{formats_block()}'
-            '<p class="center small muted mt-s">Цены — после решения. Разбор засчитывается в ДНК и пилот.</p>'
+            '<section class="center mt"><h2>Посмотреть планы</h2></section>'
+            f'{plan_tabs("individual")}'
+            f'<div class="plans">{"".join(plan_card(p) for p in PLANS["individual"])}</div>'
+            '<p class="center small muted mt-s">Действуют лимиты использования. Цены без налогов.</p>'
             '<section class="center mt"><h2>Вопросы</h2></section>'
             f'{faq(FAQ_SITE)}')
-    site_page("/test/", "Главная", "Основа канала, который приводит вам клиентов — прототип пути клиента.", body)
+    site_page("/test/", "Главная", "ИИ-ассистент improducer — прототип пути клиента.", body)
 
 
 def page_product():
-    tiles = [
-        ("01", "Неделя 1", "ДНК", "Кто вы, во что верите, что продаёте и чего не делаете — из ваших слов и материалов."),
-        ("02", "Неделя 2", "Концепция и план", "О чём канал и для кого, доска идей с вашими отметками, план на 8 роликов."),
-        ("03", "Недели 3–4", "Сценарии", "4 сценария с упаковкой: название, описание, бриф обложки."),
-        ("04", "Дальше", "Разбор роликов", "Что сработало в вышедших роликах и что поменять. Автору — появится, Э1-13."),
-    ]
-    tl = "".join(f'<div class="tile"><span class="tn">{n} · {w}</span><span class="tt">{t}</span>'
-                 f'<span class="tr">{d}</span></div>' for n, w, t, d in tiles)
-    diff = [("Закрытые данные канала", "Статистика по вашему разрешению, ваша речь целиком, измеренная база ниши."),
-            ("Числа с источником", "Числа считает сервер, у каждого — откуда оно взято."),
-            ("Проверка результата", "Сдачу проверяет код: хук, длина, запреты автора — а не модель о своём тексте."),
-            ("Правило по вашим роликам", "Правило канала включается, только когда его подтвердили вышедшие ролики.")]
-    df = "".join(f'<div class="card"><h3>{t}</h3><p>{d}</p></div>' for t, d in diff)
-    who = [("Вы", "Анкета, фото, решения: концепция, отметки идей, «да» плану и сценариям. Съёмка."),
-           ("Ваш Claude", "ДНК, формулировки ниши, концепция, сценарии — через коннектор improducer."),
-           ("Система", "Данные канала, все числа, проверка каждой сдачи, разбор роликов, кабинет."),
-           ("Человек improducer", "Три разговора в пилоте и страховка там, где функция ещё не готова.")]
-    wh = "".join(f'<tr><td><b>{a}</b></td><td>{b}</td></tr>' for a, b in who)
-    body = ('<section class="center" style="padding-top:var(--space-64)"><h1>Система, которая собирает основу канала</h1>'
-            '<p class="lede">Не доступ к ИИ, а результат: путь из 12 шагов от подключения канала до разбора '
-            'вышедших роликов. Решаете вы — система считает и проверяет.</p>'
-            f'<div class="btn-row mt-s" style="justify-content:center">{a_btn("/test/login/", "Записаться на разговор", True)}'
-            f'{a_btn("/test/pricing/", "Форматы")}</div></section>'
-            '<section class="mt"><h2>Что будет по неделям</h2>'
-            '<p class="muted">Цель пилота. Сроки проверяются на первых авторах.</p>'
-            f'<div class="tiles">{tl}</div></section>'
-            f'<section class="mt"><h2>Чем это не промт в чате</h2><div class="grid2">{df}</div></section>'
-            '<section class="mt"><h2>Кто что делает</h2><div class="scroll"><table><thead><tr><th>Кто</th>'
-            f'<th>Что делает</th></tr></thead><tbody>{wh}</tbody></table></div></section>'
-            '<section class="mt"><h2>12 шагов пути</h2>'
-            f'{steps_html(two=True)}</section>')
-    site_page("/test/product/", "Как устроено", "Как устроена система improducer: 12 шагов пути.", body,
-              crumb="Как устроено")
+    caps = [("Чаты", "Спросите словами — ответ с примерами, таблицей или планом."),
+            ("Проекты", "Папка с инструкциями и файлами: каждый чат в ней знает контекст."),
+            ("Артефакты", "Документ, таблица или код — отдельной панелью рядом с чатом."),
+            ("Коннекторы", "Почта, календарь, заметки: ассистент работает с вашими инструментами."),
+            ("Поиск в интернете", "Свежие сведения со ссылками на источники."),
+            ("Файлы и данные", "Загрузите таблицу — получите разбор и график.")]
+    tl = "".join(f'<div class="tile"><span class="tn">{i:02d}</span><span class="tt">{t}</span>'
+                 f'<span class="tr">{d}</span></div>' for i, (t, d) in enumerate(caps, 1))
+    where = [("Браузер", "Откройте и войдите — ничего ставить не нужно."),
+             ("Компьютер", "Приложение для macOS и Windows."),
+             ("Телефон", "Приложение для iOS и Android, те же чаты.")]
+    wh = "".join(f'<div class="card"><h3>{t}</h3><p>{d}</p></div>' for t, d in where)
+    body = ('<section class="center" style="padding-top:var(--space-64)"><h1>Познакомьтесь с improducer</h1>'
+            '<p class="lede">Ассистент, который пишет, разбирает, ищет и считает вместе с вами.</p>'
+            f'<div class="btn-row mt-s" style="justify-content:center">{a_btn("/test/login/", TRY, True)}'
+            f'{a_btn("/test/pricing/", "Цены")}</div></section>'
+            f'<section class="mt"><h2>Что умеет</h2><div class="tiles">{tl}</div></section>'
+            f'<section class="mt"><h2>Где работает</h2><div class="grid3">{wh}</div>'
+            f'<div class="btn-row mt-s">{a_btn("/test/download/", "Скачать")}</div></section>'
+            '<section class="center mt"><h2>Начните бесплатно</h2>'
+            f'<div class="btn-row mt-s" style="justify-content:center">{a_btn("/test/login/", TRY, True)}</div></section>')
+    site_page("/test/product/", "Продукт", "Что умеет ассистент improducer.", body, crumb="Продукт")
+
+
+COMPARE = [("Чат в браузере, на компьютере и телефоне", "✓", "✓", "✓"),
+           ("Поиск в интернете", "✓", "✓", "✓"),
+           ("Артефакты", "✓", "✓", "✓"),
+           ("Память между чатами", "✓", "✓", "✓"),
+           ("Свои коннекторы", "1", "✓", "✓"),
+           ("Проекты", "×", "✓", "✓"),
+           ("Задачи по расписанию", "×", "✓", "✓"),
+           ("Больше моделей", "×", "✓", "✓"),
+           ("Использование", "базовое", "больше", "в 5 или 20 раз больше Про"),
+           ("Приоритет в часы высокой нагрузки", "×", "×", "✓"),
+           ("Ранний доступ к новому", "×", "×", "✓")]
+
+
+def compare_table():
+    def cell(v):
+        if v == "✓":
+            return '<td><span class="badge badge--ok">✓</span></td>'
+        if v == "×":
+            return '<td><span class="badge">×</span></td>'
+        return f'<td>{E(v)}</td>'
+    tb = "".join(f'<tr><td>{E(r[0])}</td>{"".join(cell(v) for v in r[1:])}</tr>' for r in COMPARE)
+    heads = "".join(f'<th>{n}<br>{a_btn("/test/login/", "Попробовать")}</th>' for n in ("Бесплатно", "Про", "Макс"))
+    return ('<div class="field" style="max-width:var(--tile-min)"><label class="visually-hidden" for="cs">Поиск</label>'
+            '<input id="cs" type="search" placeholder="Поиск по возможностям"></div>'
+            f'<div class="scroll mt-s"><table class="compare"><thead><tr><th>Возможности</th>{heads}</tr></thead>'
+            f'<tbody>{tb}</tbody></table></div>')
 
 
 def page_pricing():
     blocks = []
-    for k, t in FMT_TABS:
-        cards = "".join(plan_card(f) for f in FORMATS if f["tab"] == k)
+    for k, _ in PLAN_TABS:
+        cards = "".join(plan_card(p) for p in PLANS[k])
         tabs = "".join(f'<li><a href="#{kk}"{" aria-current=\"page\"" if kk == k else ""}>{tt}</a></li>'
-                       for kk, tt in FMT_TABS)
+                       for kk, tt in PLAN_TABS)
+        foot = {"individual": "* Действуют лимиты использования. Цены без налогов.",
+                "team": "Цена места зависит от числа участников и срока оплаты.",
+                "api": "Ключ и счёт — в консоли разработчика."}[k]
         blocks.append(f'<div id="{k}" class="fmt-tab"><div class="center"><ul class="cnav tabs">{tabs}</ul></div>'
-                      f'<div class="plans">{cards}</div></div>')
-    rows = [("Числа канала и ниши", "✓", "✓", "✓", "✓"),
-            ("Подключение канала", "—", "✓", "✓", "✓"),
-            ("ДНК и концепция", "—", "✓", "✓", "✓"),
-            ("Доска идей и план на 8 роликов", "—", "—", "✓", "✓"),
-            ("Сценарии с упаковкой", "—", "—", "до 4", "✓"),
-            ("Разбор вышедших роликов", "—", "—", "✓", "✓"),
-            ("Разговоры", "1", "—", "3", "—"),
-            ("Нужен свой Claude", "нет", "нет", "желательно", "да")]
-
-    def cell(v):
-        if v == "✓":
-            return '<td><span class="badge badge--ok">✓</span></td>'
-        if v == "—":
-            return '<td><span class="badge">—</span></td>'
-        return f'<td>{E(v)}</td>'
-    tb = "".join(f'<tr><td>{E(r[0])}</td>{"".join(cell(v) for v in r[1:])}</tr>' for r in rows)
-    body = ('<section class="center" style="padding-top:var(--space-48)"><h1>Форматы</h1>'
-            '<p class="lede">Одна лестница: разбор засчитывается в ДНК и пилот, ДНК — в пилот. '
-            'Цены ещё не утверждены — на разговоре назовём числом до оплаты.</p></section>'
+                      f'<div class="plans">{cards}</div><p class="center small muted mt-s">{foot}</p></div>')
+    body = ('<section class="center" style="padding-top:var(--space-48)"><h1>Цены</h1></section>'
             f'<div class="mt-s fmt-tabs">{"".join(blocks)}</div>'
-            '<p class="center small muted mt-s">Тариф — за канал в месяц, услуга — за результат. '
-            'За сообщения и токены не берём.</p>'
-            '<section class="mt"><h2>Что входит</h2><div class="scroll"><table><thead><tr><th>Что</th>'
-            '<th>Разбор</th><th>ДНК и концепция</th><th>Пилот</th><th>Подписка · Э3</th></tr></thead>'
-            f'<tbody>{tb}</tbody></table></div></section>'
+            f'<section class="mt"><h2>Сравнить планы</h2>{compare_table()}</section>'
             '<section class="center mt"><h2>Вопросы</h2></section>'
-            f'{faq(FAQ_SITE[2:])}'
+            f'{faq(FAQ_SITE[1:])}'
             # Вкладки — якорями, без скрипта: видна первая или та, на которую ведёт #якорь.
             '<style>.fmt-tabs:not(:has(.fmt-tab:target)) .fmt-tab:not(:first-child),'
             '.fmt-tab:target~.fmt-tab,.fmt-tab:has(~.fmt-tab:target){display:none}</style>')
-    site_page("/test/pricing/", "Форматы", "Форматы работы с improducer: разбор, ДНК и концепция, пилот.", body,
-              crumb="Форматы")
+    site_page("/test/pricing/", "Цены", "Планы improducer: Бесплатно, Про, Макс; команды; API.", body, crumb="Цены")
+
+
+def qr():
+    """C09: условный QR — рисунок из клеток, не настоящий код."""
+    cells = []
+    for y in range(21):
+        for x in range(21):
+            finder = any(x0 <= x < x0 + 7 and y0 <= y < y0 + 7 for x0, y0 in ((0, 0), (14, 0), (0, 14)))
+            if finder:
+                fx, fy = x % 14 if x >= 14 else x, y % 14 if y >= 14 else y
+                on = fx in (0, 6) or fy in (0, 6) or (2 <= fx <= 4 and 2 <= fy <= 4)
+            else:
+                on = (x * 7 + y * 13 + x * y) % 5 < 2
+            if on:
+                cells.append(f'<rect x="{x}" y="{y}" width="1" height="1"/>')
+    return f'<svg class="qr" viewBox="0 0 21 21" role="img" aria-label="QR-код для телефона">{"".join(cells)}</svg>'
 
 
 def page_download():
-    rows = [("Claude в браузере", "claude.ai — Настройки → Коннекторы → Добавить свой коннектор"),
-            ("Claude для Mac и Windows", "то же в приложении: подключение общее с браузером"),
-            ("Claude на телефоне", "тот же аккаунт Claude: подключённый коннектор виден и там")]
+    rows = [("macOS", "Apple Silicon и Intel", "Скачать"), ("Windows", "Windows 10 и новее", "Скачать"),
+            ("iOS", "iPhone и iPad", "App Store"), ("Android", "Телефоны и планшеты", "Google Play")]
     rr = "".join(f'<div class="row"><div class="row-top"><div class="rhead"><p class="rtitle">{t}</p>'
-                 f'<p class="rmeta">{d}</p></div>{a_btn("/test/settings/connectors/", "Подключить")}</div></div>'
-                 for t, d in rows)
-    steps = ("<ol class=\"stack-s\"><li>В кабинете — «Подключения» → «Получить код подключения».</li>"
-             "<li>В Claude: <b>Настройки → Коннекторы → Добавить свой коннектор</b>. Название — "
-             "<b>improducer</b>, адрес — <code>https://connect.improducer.co/mcp</code>.</li>"
-             "<li>«Подключить» → введите код. Код одноразовый, действует сутки.</li>"
-             "<li>Новый чат: «improducer, что дальше?» — Claude откроет вашу систему.</li></ol>")
-    body = ('<section class="center" style="padding-top:var(--space-48)"><h1>improducer в вашем Claude</h1>'
-            '<p class="lede">Работайте с системой словами в своём Claude: темы, сценарии, план, решения.</p>'
-            f'<div class="btn-row mt-s" style="justify-content:center">'
-            f'{a_btn("/test/settings/connectors/", "Подключить коннектор", True)}</div></section>'
-            '<section class="mt split"><div><h2>Где работает</h2>'
-            '<p class="muted">Подключаете один раз — работает везде, где вы входите в свой Claude.</p></div>'
-            f'<div class="card"><h3>Ваш Claude</h3>{rr}</div></section>'
-            f'<section class="mt split"><div><h2>Как подключить</h2><p class="muted">Две минуты.</p></div>'
-            f'<div class="card">{steps}</div></section>'
-            '<section class="mt split"><div><h2>Без своего Claude</h2></div>'
-            '<div class="card"><h3>Чат в приложении</h3><p>Подписка «всё включено» с чатом прямо в '
-            f'my.improducer.co.</p><div class="sig">{stage("Э4-2")}</div></div></section>'
+                 f'<p class="rmeta">{d}</p></div>{off_btn(b)}</div></div>' for t, d, b in rows)
+    rr += ('<div class="row"><div class="row-top"><div class="rhead"><p class="rtitle">Браузер</p>'
+           f'<p class="rmeta">Ничего ставить не нужно</p></div>{a_btn("/test/login/", "Открыть")}</div></div>')
+    body = ('<section class="center" style="padding-top:var(--space-48)"><h1>Скачать improducer</h1>'
+            '<p class="lede">Те же чаты и проекты на компьютере и телефоне.</p>'
+            '<div class="btn-row mt-s" style="justify-content:center">'
+            '<span class="btn btn--primary hide-s" aria-disabled="true">Скачать для macOS</span>'
+            '<span class="btn btn--primary only-s" aria-disabled="true">Скачать для iOS</span></div>'
+            '<p class="small muted mt-s">В прототипе файла нет.</p></section>'
+            '<section class="mt split"><div><h2>Все платформы</h2>'
+            '<p class="muted">Вход тот же, что в браузере: чаты общие.</p></div>'
+            f'<div class="card">{rr}</div></section>'
+            '<section class="mt split"><div><h2>На телефон</h2>'
+            '<p class="muted">Наведите камеру телефона на код или откройте improducer.co/download на телефоне.</p></div>'
+            f'<div class="card qr-card">{qr()}<p class="small muted">improducer.co/download</p></div></section>'
             '<section class="center mt"><h2>Вопросы</h2></section>'
-            + faq([("Какой нужен тариф Claude?",
-                    "Свои коннекторы работают на платных тарифах Claude. Лимит сообщений — ваш, в вашем Claude."),
-                   ("Где взять код подключения?", "В кабинете: «Подключения» → «Получить код подключения»."),
-                   ("Claude спрашивает разрешение на каждый вопрос",
-                    "В настройках коннектора, «Разрешения инструментов», поставьте «Разрешать всегда» на обе группы.")]))
-    site_page("/test/download/", "В своём Claude", "Подключить improducer в своём Claude.", body,
-              crumb="В своём Claude")
+            + faq([("Нужен ли отдельный аккаунт для приложения?", "Нет, вход тот же, чаты и проекты общие."),
+                   ("Работает ли приложение без интернета?", "Нет, ответы приходят с сервера."),
+                   ("Какие системы поддерживаются?", "macOS, Windows, iOS и Android, а также любой современный браузер.")]))
+    site_page("/test/download/", "Скачать", "Приложения improducer для компьютера и телефона.", body, crumb="Скачать")
 
 
-HELP_TOPICS = [("Начало", "Вход, разговор, первый запуск"), ("Канал и доступ", "Что видит система, как отозвать"),
-               ("Ваш Claude", "Коннектор, код, разрешения"), ("Оплата и пауза", "Форматы, продление, только чтение"),
-               ("Данные", "Что хранится, удаление по просьбе")]
+HELP_TOPICS = [("Начало работы", "Вход, первый чат, подсказки"), ("Аккаунт и вход", "Почта, Google, Apple, выход"),
+               ("Планы и оплата", "Про, Макс, отмена, счета"), ("Чаты и проекты", "Недавние, проекты, артефакты"),
+               ("Коннекторы", "Подключить сервис, свой коннектор"), ("Приватность", "Экспорт, удаление, хранение")]
 
 
 def page_help():
-    pop = [("С чего начать", "/test/help/start/"), ("Как подключить свой Claude", "/test/download/"),
-           ("Что будет, если не продлить", "/test/paused/"), ("Что система видит на канале", "/test/settings/privacy/")]
+    pop = ["Начало работы с improducer", "Как устроены лимиты использования", "Как войти в аккаунт",
+           "Как отменить план Про или Макс", "Как создать проект", "Как подключить свой коннектор"]
     pl = "".join(f'<div class="row"><div class="row-top"><div class="rhead"><p class="rtitle">'
-                 f'<a href="{h}">{t}</a></p></div></div></div>' for t, h in pop)
+                 f'<a href="/test/help/start/">{t}</a></p></div></div></div>' for t in pop)
     tl = "".join(f'<a class="tile" href="/test/help/start/"><span class="tt">{t}</span><span class="tr">{d}</span>'
                  '<span class="tgo">Открыть →</span></a>' for t, d in HELP_TOPICS)
-    search = ('<div class="field"><label for="hs">Поиск по вопросам</label>'
-              '<input id="hs" type="search" placeholder="Например: пауза" data-next="/test/help/#s=empty"></div>')
-    body = ('<section style="padding-top:var(--space-48)"><h1>Помощь</h1>'
+    search = ('<div class="field"><label for="hs">Поиск по статьям <span class="meta">⌘K</span></label>'
+              '<input id="hs" type="search" placeholder="Например: лимит" data-next="/test/help/#s=empty"></div>')
+    body = ('<section style="padding-top:var(--space-48)"><h1>Чем помочь?</h1>'
             f'<div class="mt-s" style="max-width:var(--container-single)">{search}</div></section>'
-            + st("full long", f'<section class="mt"><h2>Частые вопросы</h2>{pl}</section>'
+            + st("full long", f'<section class="mt"><h2>Частые статьи</h2>{pl}'
+                 '<p class="small muted mt-s">В прототипе открывается одна статья-пример.</p></section>'
                  f'<section class="mt"><h2>Разделы</h2><div class="tiles">{tl}</div></section>')
-            + st("empty", '<section class="mt">' + empty("По запросу «пауза» ничего не нашлось.",
-                                                          "в помощи появится статья об этом; пока — раздел «Оплата и пауза»")
+            + st("empty", '<section class="mt">' + empty("По запросу «лимит» ничего не нашлось.",
+                                                          "появится статья с этим словом; пока — раздел «Планы и оплата»")
                  + "</section>")
             + st("loading", '<section class="mt">' + skel(4, True) + "</section>"))
     site_page("/test/help/", "Помощь", "Помощь по improducer.", body, states=("full", "empty", "loading"))
 
 
 def page_help_start():
-    body = ('<article class="main-in" style="padding-top:var(--space-40)">'
-            '<p class="crumb"><a href="/test/help/">Помощь</a> / Начало</p><h1>С чего начать</h1>'
-            '<p class="lede">Пять шагов от сайта до первой работы.</p>'
-            '<h2 class="mt">1. Войдите</h2><p>Вход — только Google. Пароля и входа по почте нет.</p>'
-            '<h2>2. Разговор</h2><p>Выберите время. На разговоре — цель канала и формат, цена числом.</p>'
-            '<h2>3. Оплата</h2><p>Ссылка на оплату приходит после разговора: картой или в USDT. '
-            'Доступ включаем вручную в тот же день; автоматически — появится, Э3-2.</p>'
-            '<h2>4. Анкета и канал</h2><p>Анкета — одна ссылка, <code>my.improducer.co/anketa</code>. '
-            'Канал подключается входом Google на connect.improducer.co.</p>'
-            '<h2>5. Ваш путь</h2><p>В кабинете — «Ваш путь»: один шаг на экране и решение кнопкой. '
-            'Работать словами — в своём Claude.</p>'
-            + note("Не нашли ответ", "Напишите на founder@improducer.co.")
+    toc = [("what", "Что такое improducer"), ("where", "Где открыть"), ("age", "Возраст"),
+           ("how", "Как писать запросы"), ("plus", "Кнопка «+»"), ("model", "Какая модель отвечает"),
+           ("limits", "Лимиты")]
+    tc = "".join(f'<li><a href="#{k}">{t}</a></li>' for k, t in toc)
+    text = ('<h2 id="what">Что такое improducer</h2><p>ИИ-ассистент: отвечает на вопросы, пишет и правит тексты, '
+            'разбирает файлы и таблицы, помогает с кодом.</p>'
+            '<h2 id="where">Где открыть</h2><p>В браузере — improducer.co. На компьютере — приложение для macOS и '
+            'Windows. На телефоне — приложение для iOS и Android. Вход везде один.</p>'
+            '<h2 id="age">Возраст</h2><p>Пользоваться можно с 18 лет.</p>'
+            '<h2 id="how">Как писать запросы</h2><p>Пишите как коллеге — обычными словами. Простой вопрос: '
+            '«Как повесить картину?». Сложная задача: план, разбор, текст, код — по шагам.</p>'
+            '<h2 id="plus">Кнопка «+»</h2><p>Слева внизу в поле ввода: добавить файлы, включить поиск, открыть коннекторы.</p>'
+            '<h2 id="model">Какая модель отвечает</h2><p>Название модели — под полем ввода, там же её можно сменить.</p>'
+            '<h2 id="limits">Лимиты</h2><p>У каждого плана свой лимит сообщений. Когда он исчерпан, над полем '
+            'ввода видно время сброса и ссылку «Повысить план».</p>')
+    body = ('<div style="padding-top:var(--space-40)">'
+            '<p class="crumb"><a href="/test/help/">Помощь</a> / Начало работы</p>'
+            '<div class="split-r"><article><h1>Начало работы с improducer</h1>'
+            '<p class="lede">Что умеет ассистент и как начать первый чат.</p>'
+            + st("full", text) + st("long", text + f"<p>{LONG}. {LONG}. {LONG}.</p>" * 3)
             + '<div class="marks" style="border:0;padding-inline:0"><span class="small muted">Статья помогла?</span>'
             '<button class="mbtn" type="button">Да</button><button class="mbtn" type="button">Нет</button></div>'
-            "</article>")
-    site_page("/test/help/start/", "С чего начать", "С чего начать работу с improducer.", body)
+            '</article>'
+            f'<aside class="card toc"><h3>В статье</h3><ul class="plain stack-s">{tc}</ul></aside></div></div>')
+    site_page("/test/help/start/", "Начало работы", "Статья помощи: начало работы с improducer.", body,
+              states=("full", "long"))
 
 
 # ── Вход и первый запуск ─────────────────────────────────────────────────────
 
 def page_login():
-    form = ('<div class="card auth">'
-            + st("full long", gbtn("/test/login/check/"))
-            + st("loading", '<span class="gbtn" aria-busy="true">Открываем Google…</span>')
-            + st("error", warn("Google не подтвердил вход",
-                               "Окно Google закрыли или вход отменён. Попробуйте ещё раз.") + gbtn("/test/login/check/"))
-            + st("denied", note("Вход по приглашению",
-                                "Вход для авторов откроется — Э3-5. Сейчас — лист ожидания и разговор.",
-                                a_btn("/test/login/check/#s=full", "Встать в лист ожидания", True)))
-            + '<p class="small muted">Входа по почте и паролю нет — только Google. Продолжая, вы принимаете '
-            '<a href="/terms.html">условия</a> и <a href="/privacy.html">политику</a>.</p></div>')
-    h1 = st("full loading error denied", "<h1>Вход в improducer</h1>") + st("long", f"<h1>Вход в improducer — {LONG}</h1>")
+    sent = ('<div class="card auth"><span class="badge badge--ok">письмо отправлено</span>'
+            '<h2 class="screen-title">Проверьте почту</h2>'
+            '<p>Отправили ссылку для входа и код на <b>test@example.com</b>. Откройте ссылку на этом устройстве '
+            'или введите код.</p>'
+            f'{a_btn("#s=code", "Ввести код", True)}'
+            '<p class="small muted">Письмо не пришло? Проверьте «Спам» и «Промоакции». '
+            '<a href="#s=sent">Отправить ещё раз</a> · <a href="#s=full">Другая почта</a></p></div>')
+
+    def code_card(bad=False):
+        inv = ' aria-invalid="true"' if bad else ""
+        err = '<p class="err">Код неверный или устарел. Проверьте последнее письмо.</p>' if bad else ""
+        val = ' value="000000"' if bad else ""
+        return ('<div class="card auth"><h2 class="screen-title">Введите код</h2>'
+                '<p class="small muted">Код из письма на test@example.com</p>'
+                f'<div class="field"><label for="cd">Код</label><input id="cd" inputmode="numeric"{val}{inv} '
+                f'placeholder="6 цифр" data-next="/test/onboarding/">{err}</div>'
+                f'{a_btn("/test/onboarding/", "Подтвердить", True)}'
+                '<p class="small muted"><a href="#s=sent">Отправить код ещё раз</a></p></div>')
+    form = (st("full long", auth_card())
+            + st("loading", '<div class="card auth">' + skel(3) + "</div>")
+            + st("error", '<div class="card auth">' + warn("Вход не завершён",
+                                                          "Окно Google закрыли или вход отменён. Попробуйте ещё раз.")
+                 + gbtn("/test/onboarding/") + "</div>")
+            + st("sent", sent) + st("code", code_card()) + st("badcode", code_card(True)))
+    h1 = st("full loading error sent code badcode", "<h1>Думайте шире, делайте быстрее</h1>") + st("long", f"<h1>{LONG}</h1>")
     body = ('<div class="login"><div class="hero-text">'
-            f'{h1}<p class="lede">Ваш путь, решения и материалы канала — в одном кабинете.</p>{form}'
-            f'{a_btn("/test/download/", "Подключить в своём Claude")}</div>{preview_card()}</div>')
-    bare_page("/test/login/", "Вход", "Вход в кабинет improducer через Google.", body,
-              states=("full", "loading", "error", "denied", "long"))
+            f'{h1}<p class="lede">Ваш помощник для текстов, таблиц и планов</p>{form}'
+            f'{a_btn("/test/download/", "Скачать приложение для компьютера")}</div>{preview_card()}</div>')
+    bare_page("/test/login/", "Вход", "Вход в improducer: Google, Apple или почта.", body,
+              states=("full", "loading", "error", "sent", "code", "badcode", "long"))
 
 
-SLOTS = ["чт · 10:00", "чт · 15:00", "пт · 11:00", "пн · 10:00"]
-
-
-def page_login_check():
-    slots = "".join(f'<label class="switch"><input type="radio" name="slot"{" checked" if i == 0 else ""}> {s}</label>'
-                    for i, s in enumerate(SLOTS))
-    body = ('<div class="centered"><div class="box">'
-            + st("full", '<div class="card stack"><p class="meta">Вошли как test@example.com</p>'
-                 '<h1 class="screen-title">Выберите время разговора</h1>'
-                 '<p>Вход открыт по разговору: 30 минут о канале и цели, формат и цена числом. '
-                 'Оплата — после разговора.</p>'
-                 f'<div class="stack-s">{slots}</div><p class="small muted">Время — по вашему часовому поясу.</p>'
-                 f'{a_btn("#s=booked", "Записаться", True)}</div>')
-            + st("booked", '<div class="card stack"><span class="badge badge--ok">записаны</span>'
-                 '<h1 class="screen-title">Разговор в четверг, 10:00</h1>'
-                 '<p>Напоминание придёт на почту. После разговора здесь появится ссылка на оплату.</p>'
-                 f'{note("После разговора", "Ссылка на оплату выбранного формата.", a_btn("/test/upgrade/", "Перейти к оплате", True))}'
-                 '</div>')
-            + st("loading", '<div class="card stack">' + skel(3) + "</div>")
-            + st("error", '<div class="card stack">' + warn(
-                "Вход не завершён", "Google вернул отказ: доступ к адресу почты не дан. Без него войти нельзя.",
-                gbtn("/test/login/check/", "Войти ещё раз")) + "</div>")
-            + st("denied", '<div class="card stack"><h1 class="screen-title">Мы не можем открыть систему</h1>'
-                 '<p>Система работает через Claude, а Claude недоступен в стране, указанной в аккаунте. '
-                 'Если вы живёте в другой стране — напишите на founder@improducer.co.</p></div>')
-            + "</div></div>")
-    bare_page("/test/login/check/", "Проверка входа", "Возврат из Google: лист ожидания и запись на разговор.",
-              body, states=("full", "booked", "loading", "error", "denied"))
-
-
-def onboarding_shell(path, n, title, body_full, nxt, prev=None, states=("full", "loading", "error")):
+def onboarding_shell(path, n, blocks, states):
+    """C13: карточка по центру, один вопрос, счёт шагов."""
+    prev = {2: "/test/onboarding/", 3: "/test/onboarding/age/"}.get(n)
     pager = (f'<nav class="pager">{f"<a href=\"{prev}\">← Назад</a>" if prev else ""}'
              f'<span class="pos">{n:02d} / 03</span></nav>')
-    body = ('<div class="centered"><div class="box"><div class="card stack">'
-            + pager
-            + st("full long", f'<h1 class="screen-title">{title}</h1>{body_full}'
-                 f'<div class="btn-row">{a_btn(nxt, "Дальше", True)}</div>')
-            + st("loading", skel(3))
-            + st("error", warn("Не сохранилось", "Проверьте связь и нажмите «Дальше» ещё раз.",
-                               a_btn(nxt, "Дальше", True)))
+    body = ('<div class="centered"><div class="box"><div class="card stack">' + pager + "".join(blocks)
             + "</div></div></div>")
-    bare_page(path, title, "Первый запуск в кабинете improducer.", body, states=states)
+    bare_page(path, "Первый запуск", "Первый запуск: телефон, возраст и условия, имя.", body, states=states)
 
 
 def page_onboarding():
-    onboarding_shell(
-        "/test/onboarding/", 1, "Как к вам обращаться",
-        '<div class="field"><label for="nm">Имя</label><input id="nm" value="Тест" data-next="/test/onboarding/anketa/">'
-        '<p class="hint">Так система будет обращаться к вам в кабинете и в письмах.</p></div>'
-        '<label class="switch"><input type="checkbox" checked> Принимаю <a href="/terms.html">условия</a> и '
-        '<a href="/privacy.html">политику</a></label>',
-        "/test/onboarding/anketa/")
-    onboarding_shell(
-        "/test/onboarding/anketa/", 2, "Анкета",
-        '<p>Минимум анкеты — о чём канал, для кого, цель, как снимаете, границы, куда звать зрителя — и ваши '
-        'площадки. Видео, страницы сайта и посты система соберёт сама.</p>'
-        '<p class="small muted">Анкета живёт по одной ссылке: <code>my.improducer.co/anketa</code>. '
-        'Там же — 6 фото для обложек.</p>'
-        '<div class="facts" style="margin-top:0"><div class="fact"><span class="k">заполнено</span>'
-        '<span class="v num">6 из 6</span></div><div class="fact"><span class="k">фото</span><span class="v num">8</span></div></div>',
-        "/test/onboarding/kanal/", prev="/test/onboarding/")
-    onboarding_shell(
-        "/test/onboarding/kanal/", 3, "Подключите канал",
-        '<p>Войдите Google-аккаунтом своего канала и оставьте отмеченными все разрешения. По статистике система '
-        'видит, что у вас уже работает; правки на канале — только после вашего «да».</p>'
-        f'{gbtn("/test/connect/", "Подключить канал через Google")}',
-        "/test/connect/", prev="/test/onboarding/anketa/")
+    phone = ('<div class="field"><label for="cc">Страна</label><select id="cc"><option>Казахстан +7</option>'
+             '<option>Грузия +995</option><option>Сербия +381</option></select></div>'
+             '<div class="field"><label for="ph">Номер телефона</label>'
+             '<input id="ph" type="tel" value="700 000 00 00" data-next="#s=code"></div>')
+    code = ('<div class="field"><label for="pc">Код из СМС</label><input id="pc" inputmode="numeric" '
+            'placeholder="6 цифр" data-next="/test/onboarding/age/"{inv}>{err}</div>')
+    onboarding_shell("/test/onboarding/", 1, [
+        st("full", '<h1 class="screen-title">Подтвердите номер телефона</h1>'
+           '<p>Пришлём код в СМС. Номер нужен один раз — для защиты аккаунта.</p>' + phone
+           + f'<div class="btn-row">{a_btn("#s=code", "Отправить код", True)}</div>'),
+        st("code", '<h1 class="screen-title">Введите код</h1><p class="small muted">Код отправлен на +7 700 000 00 00</p>'
+           + code.format(inv="", err="")
+           + f'<div class="btn-row">{a_btn("/test/onboarding/age/", "Подтвердить", True)}{a_btn("#s=full", "Другой номер")}</div>'),
+        st("badcode", '<h1 class="screen-title">Введите код</h1>'
+           + code.format(inv=' aria-invalid="true" value="000000"', err='<p class="err">Код неверный. Попробуйте ещё раз.</p>')
+           + f'<div class="btn-row">{a_btn("/test/onboarding/age/", "Подтвердить", True)}{a_btn("#s=code", "Отправить ещё раз")}</div>'),
+        st("error", '<h1 class="screen-title">Подтвердите номер телефона</h1>'
+           + warn("Номер уже используется", "Этот номер привязан к другому аккаунту. Укажите другой номер.")
+           + phone + f'<div class="btn-row">{a_btn("#s=code", "Отправить код", True)}</div>'),
+        st("denied", '<h1 class="screen-title">Страна не поддерживается</h1>'
+           '<p>Сервис пока недоступен в стране этого номера. Список стран — в помощи.</p>'
+           f'<div class="btn-row">{a_btn("/test/help/start/", "Открыть помощь")}{a_btn("#s=full", "Другой номер")}</div>'),
+        st("loading", skel(3)),
+    ], states=("full", "code", "badcode", "error", "denied", "loading"))
+
+    terms = ('<label class="switch"><input type="checkbox" checked><span>Мне исполнилось 18 лет</span></label>'
+             '<label class="switch"><input type="checkbox" checked><span>Принимаю <a href="/terms.html">условия</a> и '
+             '<a href="/privacy.html">политику конфиденциальности</a></span></label>'
+             '<label class="switch"><input type="checkbox"><span>Присылать новости о продукте</span></label>')
+    onboarding_shell("/test/onboarding/age/", 2, [
+        st("full", '<h1 class="screen-title">Возраст и условия</h1>' + terms
+           + f'<div class="btn-row">{a_btn("/test/onboarding/name/", "Продолжить", True)}</div>'),
+        st("denied", '<h1 class="screen-title">Пользоваться можно с 18 лет</h1>'
+           '<p>Аккаунт для младше 18 лет создать нельзя.</p>'
+           f'<div class="btn-row">{a_btn("/test/", "На главную")}</div>'),
+        st("error", '<h1 class="screen-title">Возраст и условия</h1>'
+           + warn("Отметьте обязательные пункты", "Без согласия с условиями продолжить нельзя.") + terms
+           + f'<div class="btn-row">{a_btn("/test/onboarding/name/", "Продолжить", True)}</div>'),
+    ], states=("full", "denied", "error"))
+
+    name = ('<div class="field"><label for="nm">Как к вам обращаться?</label>'
+            '<input id="nm" value="Тест" data-next="/test/new/"{inv}>{err}'
+            '<p class="hint">Так ассистент будет обращаться к вам. Изменить — в Настройках.</p></div>')
+    onboarding_shell("/test/onboarding/name/", 3, [
+        st("full", '<h1 class="screen-title">Познакомимся</h1>' + name.format(inv="", err="")
+           + f'<div class="btn-row">{a_btn("/test/new/", "Готово", True)}</div>'),
+        st("error", '<h1 class="screen-title">Познакомимся</h1>'
+           + name.format(inv=' aria-invalid="true"', err='<p class="err">Введите имя.</p>').replace('value="Тест"', 'value=""')
+           + f'<div class="btn-row">{a_btn("/test/new/", "Готово", True)}</div>'),
+        st("loading", skel(3)),
+    ], states=("full", "error", "loading"))
 
 
 def page_connect():
-    scopes = ('<ul class="ticks"><li><b>Статистика и данные канала</b> — чтобы готовить отчёты и решения по контенту.</li>'
-              '<li><b>Правки на канале</b> — названия, описания и теги, плейлисты, шапка, загрузка готовых роликов. '
-              'Каждую правку система сначала показывает «было → станет» и вносит только после вашего «да».</li></ul>')
+    """Макет окна согласия стороннего сервиса (OAuth) при подключении коннектора."""
+    scopes = ('<ul class="ticks"><li>Читать ваши заметки и папки</li>'
+              '<li>Создавать и менять заметки по вашей просьбе</li></ul>')
     body = ('<div class="centered"><div class="box"><div class="card stack">'
-            '<p class="meta">connect.improducer.co</p>'
-            + st("full long", '<h1 class="screen-title">Доступ к каналу «Тест»</h1>'
-                 f'<p>Google попросит одно согласие на всё, что нужно системе:</p>{scopes}'
-                 '<p class="small muted">Видео, комментарии и субтитры мы не удаляем. Доступ отзывается в любой момент.</p>'
-                 f'<div class="btn-row">{a_btn("/test/new/", "Разрешить", True)}{a_btn("/test/onboarding/kanal/", "Не сейчас")}</div>')
+            '<p class="meta">notes.example.com · вход как test@example.com</p>'
+            + st("full long", '<h1 class="screen-title">Сервис запрашивает доступ</h1>'
+                 f'<p><b>improducer</b> хочет подключиться к вашему аккаунту в «Заметках»:</p>{scopes}'
+                 '<p class="small muted">Доступ можно отключить в Настройках → Коннекторы.</p>'
+                 f'<div class="btn-row">{a_btn("/test/chat/#s=tool", "Разрешить", True)}'
+                 f'{a_btn("/test/settings/connectors/#s=error", "Отклонить")}</div>')
             + st("loading", skel(4))
-            + st("error", warn("Не все разрешения отмечены",
-                               "Без статистики система не видит, что у вас работает. Подключите ещё раз и оставьте "
-                               "отмеченными все галочки.", gbtn("/test/connect/", "Подключить ещё раз")))
-            + st("denied", warn("Канал уже подключён к другому аккаунту",
-                                "Войдите тем аккаунтом Google, которым подключали канал, или напишите на founder@improducer.co."))
-            + "</div></div></div>")
-    bare_page("/test/connect/", "Подключение канала", "Подключение YouTube-канала: какие права и зачем.", body,
-              states=("full", "loading", "error", "denied", "long"))
+            + st("error", warn("Сервис не ответил", "Не удалось открыть окно согласия. Попробуйте ещё раз.",
+                               a_btn("/test/connect/", "Повторить", True)))
+            + "</div><p class=\"small muted center mt-s\">Макет: окно стороннего сервиса.</p></div></div>")
+    bare_page("/test/connect/", "Доступ к сервису", "Окно согласия стороннего сервиса при подключении коннектора.",
+              body, states=("full", "loading", "error"))
 
 
 # ── Работа в приложении ─────────────────────────────────────────────────────
 
+CHIPS = ('<div class="chips"><a href="/test/chat/">Написать</a><a href="/test/chat/">Разобраться</a>'
+         '<a href="/test/chat/">Код</a><a href="/test/chat/">Быт</a><a href="/test/chat/">На выбор</a></div>')
+GREET_MARK = '<img class="greet-mark" src="/test/assets/logo/mark.svg" alt="">'
+
+
 def page_new():
-    step = ('<div class="inset"><p class="k">Ваш шаг 06 из 12</p><h3>Концепция канала</h3>'
-            '<p>Система предлагает, о чём канал, для кого и чем он отличается. Зачем: от решения по концепции '
-            'зависят все темы.</p>'
-            f'<div class="btn-row">{a_btn("/test/project/test/koncepciya/", "Открыть концепцию →", True)}</div></div>')
-    chips = ('<div class="chips"><a href="/test/chat/">Что дальше?</a><a href="/test/chat/">Покажи концепцию</a>'
-             '<a href="/test/chat/">Разбери последний ролик</a></div>')
-    hint = ('<p class="small muted">Чат здесь появится — Э4-2. Сейчас то же самое — в вашем Claude: '
-            '«improducer, что дальше?»</p>')
     body = ('<div class="greet">'
-            + st("full", f'<h1>Тест, решение за вами</h1>{step}{composer()}{chips}{hint}')
-            + st("long", f'<h1>Тест, решение за вами</h1><div class="inset"><p class="k">Ваш шаг 06 из 12</p>'
-                 f'<h3>Концепция канала — {LONG}</h3><p>{LONG}. {LONG}.</p></div>{composer(text=LONG)}{chips}')
-            + st("empty", '<h1>Тест, начнём с канала</h1><div class="inset"><p class="k">Ваш шаг 01 из 12</p>'
-                 '<h3>Подключить канал</h3><p>Войти Google-аккаунтом своего канала. Зачем: по статистике система '
-                 'видит, что у вас уже работает.</p>'
-                 f'<div class="btn-row">{a_btn("/test/connect/", "Подключить канал", True)}</div></div>{composer(off=True, placeholder="Чат откроется после подключения канала")}')
-            + st("loading", '<div style="width:100%">' + skel(3, True) + "</div>")
-            + st("error", '<h1>Тест, путь не загрузился</h1>' + warn(
-                "Не удалось загрузить путь", "Сервер не ответил. Данные на месте — обновите страницу через минуту.",
-                a_btn("/test/new/", "Обновить", True)))
-            + st("denied", f'<h1>Тест, ваш путь на паузе</h1>{PAUSED_CALL}{composer(off=True, placeholder="Пауза: только чтение")}')
-            + "</div>"
-            '<section><h2>Ваш путь</h2>'
-            + st("full denied loading error", '<p class="small muted">Готово 5 из 12</p>' + steps_html())
-            + st("long", '<p class="small muted">Готово 5 из 12</p>' + steps_html(long=True))
-            + st("empty", '<p class="small muted">Готово 0 из 12</p>' + steps_html(first_day=True))
-            + "</section>")
-    app_page("/test/new/", "Ваш путь", "«Ваш путь»: где автор сейчас и что решить.", body, states=ALL6)
+            + st("full", f'<h1>{GREET_MARK}Добрый вечер, Тест</h1>{composer()}{CHIPS}')
+            + st("limit", f'<h1>{GREET_MARK}Добрый вечер, Тест</h1><div class="dock-limit">{limit_bar()}'
+                 f'{composer(off=True, placeholder="Лимит исчерпан до 18:00")}</div>')
+            + st("long", f'<h1>{GREET_MARK}Добрый вечер, Тест</h1>{composer(text=LONG)}{CHIPS}')
+            + st("loading", '<div style="width:100%">' + skel(2, True) + "</div>")
+            + "</div>")
+    app_page("/test/new/", "Новый чат", "Новый чат: приветствие, поле ввода, подсказки.", body,
+             states=("full", "limit", "long", "loading"))
 
 
-CONCEPT_DOC = ('<h3>Концепция канала «Тест» · вариант 2</h3>'
-               '<p><b>О чём.</b> Разборы реальных задач из практики автора: один случай — один ролик, с числами.</p>'
-               '<p><b>Для кого.</b> Специалисты в начале пути, которые ищут, как работают опытные коллеги.</p>'
-               '<p><b>Чем отличается.</b> Не теория, а разобранный случай: что было, что сделали, что вышло.</p>'
-               '<p class="small muted">Пример на выдуманном авторе «Тест».</p>')
+ARTIFACT = ('<h3>Казань за 3 дня</h3>'
+            '<p><b>День 1.</b> Кремль и Кул-Шариф, вечером — улица Баумана.</p>'
+            '<p><b>День 2.</b> Старо-Татарская слобода, музей чак-чака, набережная Казанки.</p>'
+            '<p><b>День 3.</b> Свияжск: утренний автобус, обратно к ужину.</p>'
+            '<p class="small muted">Пример документа-артефакта.</p>')
 
 
 def page_chat():
-    thread_ready = ('<div class="thread">'
-                    '<div class="msg-u">Что дальше по каналу?</div>'
-                    '<div class="msg-a"><p>Сейчас ваш шаг — концепция канала. Система предложила два варианта; '
-                    'второй точнее совпадает с вашей анкетой и ДНК.</p><p>Откройте концепцию справа и выберите: '
-                    'утвердить, с правками или другой вариант.</p>'
-                    '<div class="acts"><a class="btn btn--ghost" href="#s=full">Копировать</a>'
-                    '<a class="btn btn--ghost" href="#s=loading">Повторить</a></div></div></div>')
-    thread_going = ('<div class="thread"><div class="msg-u">Что дальше по каналу?</div>'
-                    '<div class="msg-a"><p>Сейчас ваш шаг — концепция канала. Система предложила</p>'
-                    '<span class="typing" aria-label="Ответ идёт"><i></i><i></i><i></i></span></div></div>')
-    thread_err = ('<div class="thread"><div class="msg-u">Что дальше по каналу?</div>'
-                  + warn("Ответ не пришёл", "Связь прервалась. Сообщение сохранено.",
-                         a_btn("#s=full", "Повторить", True)) + "</div>")
-    thread_long = ('<div class="thread">' + f'<div class="msg-u">{LONG}</div>'
-                   + "".join(f'<div class="msg-a"><p>{LONG}. {LONG}.</p></div>' for _ in range(3)) + "</div>")
-    artifact = ('<aside class="card"><div class="panel-h"><b>Концепция канала</b><span class="badge">вариант 2 из 2</span>'
-                f'<div class="btn-row">{a_btn("/test/project/test/koncepciya/", "Открыть")}</div></div>{CONCEPT_DOC}</aside>')
-    body = ('<div class="page-top"><h1 class="screen-title">Что дальше по каналу</h1>'
-            f'{stage("Э4-2", "макет · чат появится")}</div>'
-            '<div class="split"><div>'
-            + st("full", thread_ready) + st("loading", thread_going) + st("error", thread_err)
-            + st("long", thread_long)
-            + st("empty", empty("Разговора пока нет.", "вы зададите первый вопрос; подсказки — на «Ваш путь»"))
-            + st("denied", PAUSED_CALL)
+    q = '<div class="msg-u">Составь план поездки в Казань на 3 дня</div>'
+    card = ('<a class="art-card" href="#s=full"><span class="meta">Документ</span><b>Казань за 3 дня</b></a>')
+    acts = ('<div class="acts"><button class="btn btn--ghost" type="button">Копировать</button>'
+            '<a class="btn btn--ghost" href="#s=streaming">Повторить</a>'
+            '<button class="btn btn--ghost" type="button" aria-label="Хороший ответ">↑</button>'
+            '<button class="btn btn--ghost" type="button" aria-label="Плохой ответ">↓</button></div>')
+    ready = (f'<div class="thread">{q}<div class="msg-a"><p>Вот план на три дня: центр, слобода и Свияжск. '
+             f'Документ — справа.</p>{card}{acts}</div></div>')
+    going = (f'<div class="thread">{q}<div class="msg-a"><p>Вот план на три дня: центр, слобода и</p>'
+             '<span class="typing" aria-label="Ответ идёт"><i></i><i></i><i></i></span></div></div>')
+    err = (f'<div class="thread">{q}'
+           + warn("Ответ не пришёл", "Связь прервалась. Сообщение сохранено.", a_btn("#s=full", "Повторить", True))
+           + "</div>")
+    long = (f'<div class="thread"><div class="msg-u">{LONG}</div>'
+            + "".join(f'<div class="msg-a"><p>{LONG}. {LONG}.</p></div>' for _ in range(3))
+            + warn("Чат слишком длинный", "Лимит длины чата. Начните новый чат — важное можно перенести в проект.",
+                   a_btn("/test/new/", "Новый чат", True)) + "</div>")
+    tool = ('<div class="thread"><div class="msg-u">Найди в заметках список покупок и добавь хлеб</div>'
+            '<div class="msg-a"><p><span class="badge badge--ok">Заметки · найдено 1</span> '
+            '<span class="badge badge--ok">Заметки · изменено</span></p>'
+            '<p>Нашёл заметку «Покупки» и добавил в неё хлеб. Теперь в списке 7 пунктов.</p></div></div>')
+    limit_thread = ready.replace(card, "")
+
+    panel = ('<aside class="card art"><div class="panel-h"><b>Казань за 3 дня</b><span class="badge">версия 2 из 2</span>'
+             '<div class="btn-row"><button class="btn btn--ghost" type="button">Копировать</button>'
+             '<button class="btn btn--ghost" type="button">Скачать</button>'
+             '<a class="btn btn--ghost" href="#s=tool" aria-label="Закрыть">✕</a></div></div>'
+             '<ul class="cnav"><li><a href="#s=full" aria-current="page">Просмотр</a></li>'
+             '<li><a href="#s=full">Код</a></li></ul>'
+             + st("full long limit", ARTIFACT) + st("streaming", '<p class="meta">создаётся…</p>' + skel(4))
+             + "</aside>")
+    body = ('<div class="page-top"><h1 class="screen-title">' + st("full streaming error limit long", "План поездки в Казань", "span")
+            + st("tool", "Список покупок", "span") + '</h1>'
+            '<div class="btn-row"><button class="btn" type="button">Поделиться</button></div></div>'
+            '<div class="chat-split"><div class="chat-col">'
+            + st("full", ready) + st("streaming", going) + st("error", err) + st("long", long)
+            + st("tool", tool) + st("limit", limit_thread)
             + '<div class="dock">'
-            + st("full loading error long empty", composer())
-            + st("denied", composer(off=True, placeholder="Пауза: только чтение"))
+            + st("full streaming error long tool", composer(placeholder="Ответить…"))
+            + st("limit", limit_bar() + composer(off=True, placeholder="Лимит исчерпан до 18:00"))
             + "</div></div>"
-            + st("full loading long", artifact)
-            + st("error empty denied", empty("Здесь откроется результат — концепция, план или сценарий.",
-                                             "ответ сошлётся на результат шага"))
+            + st("full streaming limit long", panel)
             + "</div>")
-    app_page("/test/chat/", "Чат", "Макет чата в приложении: раскладка и состояния.", body, states=ALL6, wide=True)
+    app_page("/test/chat/", "Чат", "Чат: сообщения, ответ, панель артефакта, состояния.", body,
+             states=("full", "streaming", "error", "long", "limit", "tool"), wide=True)
 
 
-EVENTS = [("сегодня", "Система предложила концепцию, вариант 2", "ждёт решения"),
-          ("вчера", "Ниша: изучены 12 каналов и их сильные ролики", "готово"),
-          ("3 дня назад", "ДНК собрана из анкеты и 9 ваших роликов", "готово"),
-          ("5 дней назад", "Фото для обложек: принято 8", "готово"),
-          ("неделю назад", "Анкета заполнена", "готово"),
-          ("неделю назад", "Канал «Тест» подключён", "готово")]
+CHATS = [("План поездки в Казань на 3 дня", "2 часа назад"), ("Письмо соседям о ремонте", "вчера"),
+         ("Разбор таблицы расходов", "3 дня назад"), ("Меню на неделю без молочного", "5 дней назад"),
+         ("Как вывести пятно от кофе", "неделю назад"), ("Поздравление коллеге с юбилеем", "2 недели назад")]
 
 
-def events_html(long=False):
+def chat_rows(long=False, select=False, items=CHATS):
     out = []
-    for when, what, state in EVENTS:
-        b = '<span class="badge badge--wait">ждёт решения</span>' if state != "готово" else '<span class="badge badge--ok">готово</span>'
-        w = f"{what} — {LONG}" if long else what
-        out.append(f'<div class="row"><div class="row-top"><div class="rhead"><p class="rtitle">'
-                   f'<a href="/test/project/test/">{E(w)}</a></p><p class="rmeta">{when}</p></div>{b}</div></div>')
+    for i, (t, when) in enumerate(items):
+        t = f"{t} — {LONG}" if long and i == 0 else t
+        box = f'<input type="checkbox" aria-label="Выбрать"{" checked" if i < 2 else ""}> ' if select else ""
+        out.append(f'<div class="row"><div class="row-top"><div class="rhead"><p class="rtitle">{box}'
+                   f'<a href="/test/chat/">{E(t)}</a></p><p class="rmeta">Последнее сообщение {when}</p></div></div></div>')
     return "".join(out)
 
 
 def page_recents():
     search = ('<div class="field"><label class="visually-hidden" for="rs">Поиск</label>'
-              '<input id="rs" type="search" placeholder="Поиск по решениям и событиям" data-next="/test/recents/#s=error"></div>')
-    body = ('<div class="page-top"><h1>Решения и события</h1></div>'
+              '<input id="rs" type="search" placeholder="Поиск по чатам" data-next="/test/recents/#s=notfound"></div>')
+    body = ('<div class="page-top"><h1>Чаты</h1><div class="btn-row">'
+            f'{a_btn("/test/new/", "＋ Новый чат", True)}</div></div>'
             f'<div class="stack">{search}'
-            + st("full", f'<p class="small muted">6 событий канала «Тест»</p>{events_html()}')
-            + st("long", f'<p class="small muted">6 событий</p>{events_html(long=True)}')
-            + st("empty", empty("Событий пока нет.", "система сделает первый шаг — подключение канала"))
+            + st("full", f'<p class="small muted">6 чатов · <a href="#s=select">Выбрать</a></p>{chat_rows()}')
+            + st("select", '<div class="btn-row"><span class="small">Выбрано 2</span>'
+                 f'<button class="btn" type="button">Удалить</button>{a_btn("#s=full", "Отмена")}</div>'
+                 + chat_rows(select=True))
+            + st("long", f'<p class="small muted">6 чатов</p>{chat_rows(long=True)}')
+            + st("empty", empty("Чатов пока нет.", "вы начнёте первый чат") +
+                 f'<div class="btn-row">{a_btn("/test/new/", "Начать чат", True)}</div>')
+            + st("notfound", empty("По запросу «отпуск» ничего не нашлось.", "появится чат с этим словом"))
             + st("loading", skel(2) + skel(2))
-            + st("error", empty("По запросу ничего не нашлось.", "такое событие случится; попробуйте другое слово"))
-            + st("denied", PAUSED_CALL + events_html())
             + "</div>")
-    app_page("/test/recents/", "Решения и события", "Что сделано и что решено по каналу.", body, states=ALL6)
+    app_page("/test/recents/", "Чаты", "Все чаты: поиск и выбор.", body,
+             states=("full", "select", "long", "empty", "notfound", "loading"))
 
 
-def page_projects():
-    card = ('<a class="tile" href="/test/project/test/"><span class="tn">канал</span><span class="tt">{name}</span>'
-            '<span class="tr">Шаг 06 из 12 · ждёт вашего решения по концепции</span><span class="tgo">Открыть →</span></a>')
-    add = ('<div class="tile"><span class="tn">студия</span><span class="tt">Второй канал</span>'
-           f'<span class="tr">До 3 каналов в одном кабинете.</span>{stage("Э3-4")}</div>')
-    body = ('<div class="page-top"><h1>Каналы</h1><div class="btn-row">'
-            '<span class="btn" aria-disabled="true">＋ Канал · Э3-4</span></div></div>'
-            + st("full", f'<div class="tiles">{card.format(name="Тест")}{add}</div>')
-            + st("long", f'<div class="tiles">{card.format(name="Тест — " + LONG)}{add}</div>')
-            + st("empty", '<div class="tiles">' + empty("Каналов пока нет.", "вы подключите канал через Google")
-                 + "</div>" + f'<div class="btn-row mt-s">{a_btn("/test/connect/", "Подключить канал", True)}</div>')
-            + st("loading", '<div class="tiles">' + skel(1, True) + skel(1, True) + "</div>")
-            + st("error", warn("Список каналов не загрузился", "Обновите страницу через минуту.",
-                               a_btn("/test/projects/", "Обновить", True)))
-            + st("denied", PAUSED_CALL + f'<div class="tiles">{card.format(name="Тест")}</div>'))
-    app_page("/test/projects/", "Каналы", "Каналы автора.", body, states=ALL6, wide=True)
+PROJECTS = [("Домашний бюджет", "Расходы по месяцам и план накоплений", "изменён вчера"),
+            ("Поездка в Казань", "Билеты, жильё и маршрут", "изменён 3 дня назад"),
+            ("Ремонт кухни", "Смета, замеры, список покупок", "изменён 2 недели назад")]
 
 
-SECTION_TILES = [
-    ("anketa", "01", "Анкета", "6 из 6 ответов, 4 площадки", "готово"),
-    ("dna", "04", "ДНК", "Кто вы, во что верите, что продаёте", "готово"),
-    ("niche", "05", "Ниша", "12 каналов, 40 сильных роликов", "готово"),
-    ("concept", "06", "Концепция", "2 варианта, ждёт решения", "ваше решение"),
-    ("board", "07", "Доска идей", "", "ждёт"),
-    ("plan", "08", "Контент-план", "", "ждёт"),
-    ("scripts", "09", "Сценарии", "", "ждёт"),
-    ("analytics", "12", "Канал и аналитика", "", "ждёт"),
-]
-WHEN = {"board": "утверждена концепция", "plan": "отмечены идеи на доске", "scripts": "утверждён план",
-        "analytics": "выйдет первый ролик и пройдёт 14 дней"}
-
-
-def section_tiles(long=False):
+def project_tiles(long=False):
     out = []
-    for key, n, title, res, state in SECTION_TILES:
-        badge = {"готово": "badge--ok", "ваше решение": "badge--wait"}.get(state, "")
-        r = res or f"Заполнится, когда {WHEN[key]}."
-        if long and key == "concept":
-            title = f"{title} — {LONG}"
-        out.append(f'<a class="tile" id="{key}" href="{section_href(key)}"><span class="tn">{n}</span>'
-                   f'<span class="tt">{E(title)}</span><span class="tr">{E(r)}</span>'
-                   f'<span class="badge {badge}">{state}</span><span class="tgo">Открыть →</span></a>')
+    for i, (t, d, w) in enumerate(PROJECTS):
+        t = f"{t} — {LONG}" if long and i == 0 else t
+        out.append(f'<a class="tile" href="/test/project/primer/"><span class="tt">{E(t)}</span>'
+                   f'<span class="tr">{d}</span><span class="meta">{w}</span></a>')
     return f'<div class="tiles">{"".join(out)}</div>'
 
 
+def page_projects():
+    tools = ('<div class="proj-tools"><div class="field"><label class="visually-hidden" for="ps">Поиск</label>'
+             '<input id="ps" type="search" placeholder="Поиск по проектам"></div>'
+             '<div class="field"><label class="visually-hidden" for="so">Сортировка</label>'
+             '<select id="so"><option>Последние изменения</option><option>По названию</option>'
+             '<option>По дате создания</option></select></div></div>')
+    body = ('<div class="page-top"><h1>Проекты</h1><div class="btn-row">'
+            f'{a_btn("/test/project/primer/#s=empty", "＋ Новый проект", True)}</div></div>'
+            + tools
+            + st("full", project_tiles()) + st("long", project_tiles(long=True))
+            + st("empty", empty("Проектов пока нет.", "вы создадите первый проект: папку с инструкциями и файлами")
+                 + f'<div class="btn-row mt-s">{a_btn("/test/project/primer/#s=empty", "Создать проект", True)}</div>')
+            + st("loading", '<div class="tiles">' + skel(1, True) * 3 + "</div>"))
+    app_page("/test/projects/", "Проекты", "Проекты: сетка, поиск, сортировка.", body,
+             states=("full", "long", "empty", "loading"), wide=True)
+
+
+def kb_bar(pct):
+    return (f'<p class="small"><b>Ёмкость знаний</b> <span class="meta">занято {pct}%</span></p>'
+            f'<svg viewBox="0 0 100 4" preserveAspectRatio="none" width="100%" height="8" aria-hidden="true">'
+            f'<rect class="g-track" width="100" height="4" rx="2"/><rect class="g-fill" width="{pct}" height="4" rx="2"/></svg>')
+
+
 def page_project():
-    side = ('<aside class="stack"><div class="card"><h3>Концепция одной строкой</h3>'
-            '<p class="muted">Заполнится, когда вы утвердите концепцию.</p></div>'
-            '<div class="card"><h3>Источники</h3><div class="facts" style="margin-top:0">'
-            '<div class="fact"><span class="k">роликов</span><span class="v num">9</span></div>'
-            '<div class="fact"><span class="k">площадок</span><span class="v num">4</span></div>'
-            '<div class="fact"><span class="k">фото</span><span class="v num">8</span></div></div>'
-            f'<div class="btn-row mt-s">{a_btn("/test/onboarding/anketa/", "Анкета")}</div></div></aside>')
-    body = ('<p class="crumb"><a href="/test/projects/">Каналы</a> / Тест</p>'
-            '<div class="page-top"><h1>Канал «Тест»</h1><div class="btn-row">'
-            f'{a_btn("/test/project/test/koncepciya/", "Ваш шаг: концепция", True)}</div></div>'
-            '<div class="split-r"><div class="stack">'
-            + st("full", section_tiles())
-            + st("denied", PAUSED_CALL + section_tiles())
-            + st("long", section_tiles(long=True))
-            + st("empty", empty("Разделы канала пусты.", "подключён канал и заполнена анкета") + steps_html(first_day=True, limit=3))
-            + st("loading", '<div class="tiles">' + skel(1, True) * 3 + "</div>")
-            + st("error", warn("Разделы не загрузились", "Обновите страницу через минуту.",
-                               a_btn("/test/project/test/", "Обновить", True)))
-            + f'{composer()}</div>{side}</div>')
-    app_page("/test/project/test/", "Канал «Тест»", "Канал автора: разделы шагов и источники.", body,
-             states=ALL6, wide=True, active="/test/projects/")
-
-
-def page_concept():
-    decide = ('<div class="card stack"><h3>Ваше решение</h3>'
-              '<p>Концепция задаёт все темы. Выберите — система продолжит с доски идей.</p>'
-              '<div class="btn-row btn-row--stack">'
-              f'{a_btn("/test/new/#s=full", "Утвердить", True)}{a_btn("#s=confirm", "С правками")}'
-              f'{a_btn("#s=loading", "Другой вариант")}</div></div>')
-    edits = ('<div class="card stack"><h3>Что поправить</h3><div class="field"><label for="ed">Правки словами</label>'
-             '<textarea id="ed">Добавить, что ролики — с разбором ошибок, не только удачных случаев.</textarea></div>'
-             f'<div class="btn-row">{a_btn("/test/new/", "Отправить правки", True)}{a_btn("#s=full", "Отмена")}</div></div>')
-    left = ('<div class="stack"><p class="lede">Система предложила два варианта. Второй точнее совпадает '
-            'с анкетой и ДНК: те же слова о практике и случаях.</p>'
-            '<div class="facts" style="margin-top:0"><div class="fact"><span class="k">вариантов</span><span class="v num">2</span></div>'
-            '<div class="fact"><span class="k">из ДНК</span><span class="v num">5 опор</span></div>'
-            '<div class="fact"><span class="k">ниша</span><span class="v num">12 каналов</span></div></div>')
-    body = ('<p class="crumb"><a href="/test/project/test/">Канал «Тест»</a> / Концепция</p>'
-            '<div class="page-top"><h1>Концепция канала</h1>'
-            '<span class="badge badge--wait">ваше решение</span></div>'
-            '<div class="split">'
-            + st("full long", left + decide + "</div>")
-            + st("confirm", left + edits + "</div>")
-            + st("loading", '<div class="stack">' + skel(4) + "</div>")
-            + st("error", '<div class="stack">' + warn("Решение не сохранилось",
-                                                        "Связь прервалась. Нажмите ещё раз — второй раз не запишется.",
-                                                        a_btn("#s=full", "Повторить", True)) + "</div>")
-            + st("denied", '<div class="stack">' + PAUSED_CALL + "</div>")
-            + st("empty", '<div class="stack">' + empty("Концепции пока нет.", "готовы ДНК и ниша") + "</div>")
-            + st("full confirm error denied", f'<article class="card"><div class="panel-h"><b>Концепция</b>'
-                 '<span class="badge">вариант 2 из 2</span></div>' + CONCEPT_DOC + "</article>")
-            + st("long", '<article class="card"><div class="panel-h"><b>Концепция</b><span class="badge">вариант 2 из 2</span></div>'
-                 + CONCEPT_DOC + f"<p>{LONG}. {LONG}. {LONG}.</p></article>")
-            + st("loading empty", '<article class="card">' + skel(5) + "</article>")
+    files = "".join(f'<li><span>{f}</span> <span class="meta">{s}</span></li>' for f, s in
+                    (("расходы-2026.csv", "48 КБ"), ("план-накоплений.pdf", "120 КБ"), ("заметки.txt", "3 КБ")))
+    side_full = ('<aside class="stack">'
+                 '<div class="card"><div class="panel-h"><b>Инструкции</b><div class="btn-row">'
+                 '<button class="btn btn--ghost" type="button">Изменить</button></div></div>'
+                 '<p class="small">Отвечай коротко. Суммы — в рублях, округляй до сотен.</p></div>'
+                 '<div class="card"><div class="panel-h"><b>Знания</b><div class="btn-row">'
+                 '<button class="btn btn--ghost" type="button">＋ Добавить</button></div></div>'
+                 '{bar}<ul class="plain stack-s mt-s">' + files + '</ul>{warn}</div></aside>')
+    side_empty = ('<aside class="stack"><div class="card"><b>Инструкции</b>'
+                  '<p class="small muted">Расскажите, как отвечать в этом проекте.</p>'
+                  '<button class="btn" type="button">Добавить инструкции</button></div>'
+                  '<div class="card"><b>Знания</b><p class="small muted">Файлы, которые учитывает каждый чат проекта.</p>'
+                  '<button class="btn" type="button">＋ Добавить файлы</button></div></aside>')
+    chats = chat_rows(items=[("Разбор таблицы расходов", "вчера"), ("Сколько откладывать в месяц", "4 дня назад")])
+    body = ('<p class="crumb"><a href="/test/projects/">Все проекты</a></p>'
+            '<div class="page-top"><h1>' + st("full kbfull loading", "Домашний бюджет", "span")
+            + st("empty", "Новый проект", "span") + '</h1></div>'
+            + st("full kbfull", '<p class="muted">Расходы по месяцам и план накоплений</p>')
+            + '<div class="split-r"><div class="stack">'
+            + composer(placeholder="Начать чат в проекте…")
+            + st("full kbfull", f'<h2>Чаты проекта</h2>{chats}')
+            + st("empty", empty("Чатов в проекте пока нет.", "вы начнёте первый чат в поле выше"))
+            + st("loading", skel(2) + skel(2))
+            + "</div>"
+            + st("full", side_full.replace("{bar}", kb_bar(12)).replace("{warn}", ""))
+            + st("kbfull", side_full.replace("{bar}", kb_bar(92)).replace(
+                "{warn}", warn("Знания почти заполнены", "Уберите ненужные файлы или разделите проект на два.")))
+            + st("empty", side_empty)
+            + st("loading", '<aside class="stack">' + skel(3) + "</aside>")
             + "</div>")
-    app_page("/test/project/test/koncepciya/", "Концепция канала", "Результат шага и решение автора.", body,
-             states=ALL6 + ["confirm"], wide=True, active="/test/project/test/koncepciya/")
+    app_page("/test/project/primer/", "Проект", "Проект: чаты, инструкции и знания.", body,
+             states=("full", "empty", "kbfull", "loading"), wide=True, active="/test/projects/")
 
 
 # ── Настройки ───────────────────────────────────────────────────────────────
 
-SET_TABS = [("general", "Профиль"), ("account", "Аккаунт"), ("privacy", "Приватность"),
-            ("billing", "План и оплата"), ("usage", "Срок и доступ"), ("capabilities", "Возможности"),
-            ("connectors", "Подключения")]
+SET_TABS = [("general", "Общие"), ("account", "Аккаунт"), ("privacy", "Приватность"),
+            ("billing", "Оплата"), ("usage", "Использование"), ("capabilities", "Возможности"),
+            ("connectors", "Коннекторы")]
 
 
 def settings_page(key, title, body, states=("full",)):
@@ -864,7 +851,7 @@ def settings_page(key, title, body, states=("full",)):
     full = (f'<div class="page-top"><h1>Настройки</h1></div><div class="settings">'
             f'<nav aria-label="Разделы настроек"><ul class="cnav cnav--side">{tabs}</ul></nav>'
             f'<div class="card"><h2>{title}</h2>{body}</div></div>')
-    app_page(f"/test/settings/{key}/", f"Настройки · {title}", f"Настройки кабинета: {title}.", full,
+    app_page(f"/test/settings/{key}/", f"Настройки · {title}", f"Настройки: {title}.", full,
              states=states, wide=True, active=f"/test/settings/{key}/")
 
 
@@ -873,175 +860,204 @@ def set_row(label, hint, val):
     return f'<div class="set-row"><div class="lbl"><b>{label}</b>{h}</div><div class="val">{val}</div></div>'
 
 
+def switch(on=True, text="", disabled=False):
+    return (f'<label class="switch"><input type="checkbox"{" checked" if on else ""}{" disabled" if disabled else ""}>'
+            f' {text}</label>')
+
+
+def dialog(title, text, action_href, action, extra=""):
+    """C28: заголовок, текст, поля, «Отмена / Действие»."""
+    return ('<div class="dlg" role="dialog" aria-labelledby="dh" style="position:static;margin:var(--space-16) 0">'
+            f'<div class="dlg-h"><b id="dh">{title}</b>{a_btn("#s=full", "✕")}</div>'
+            f'<div class="dlg-b"><p>{text}</p>{extra}</div>'
+            f'<div class="dlg-f">{a_btn("#s=full", "Отмена")}{a_btn(action_href, action, True)}</div></div>')
+
+
+def usage_bar(label, pct, reset):
+    return (f'<div class="use"><p class="small"><b>{label}</b> <span class="meta">использовано {pct}% · {reset}</span></p>'
+            f'<svg viewBox="0 0 100 4" preserveAspectRatio="none" width="100%" height="8" aria-hidden="true">'
+            f'<rect class="g-track" width="100" height="4" rx="2"/><rect class="g-fill" width="{pct}" height="4" rx="2"/></svg></div>')
+
+
 def page_settings():
-    PAGES["/test/settings/"] = (head("Настройки", "Настройки кабинета.") +
+    PAGES["/test/settings/"] = (head("Настройки", "Настройки.") +
                                 '<body><meta http-equiv="refresh" content="0; url=/test/settings/general/">'
-                                '<p class="wrap"><a href="/test/settings/general/">Настройки → Профиль</a></p></body></html>\n')
-    profile = ('<div class="field"><label for="pn">Имя</label><input id="pn" value="Тест"></div>'
-               '<div class="field mt-s"><label for="pc">Канал одной строкой</label>'
-               '<input id="pc" value="Разборы реальных задач из практики"></div>'
-               '<div class="field mt-s"><label for="pl">Язык кабинета</label><select id="pl"><option>Русский</option>'
-               '<option disabled>English · Э3-19</option></select></div>')
-    settings_page("general", "Профиль",
+                                '<p class="wrap"><a href="/test/settings/general/">Настройки → Общие</a></p>'
+                                f'{proto(["full"])}{SCRIPT}</body></html>\n')
+    profile = ('<h3>Профиль</h3>'
+               '<div class="grid2"><div class="field"><label for="pn">Полное имя</label><input id="pn" value="Тест"></div>'
+               '<div class="field"><label for="pa">Как к вам обращаться?</label><input id="pa" value="Тест"></div></div>'
+               '<div class="field mt-s"><label for="pw">Чем вы занимаетесь?</label><select id="pw">'
+               '<option>Личные задачи</option><option>Учёба</option><option>Работа с текстами</option>'
+               '<option>Разработка</option></select></div>'
+               '<div class="field mt-s"><label for="pp">Личные предпочтения</label>'
+               '<textarea id="pp">Отвечай коротко, без лишних вступлений.</textarea>'
+               '<p class="hint">Ассистент учитывает это в каждом ответе.</p></div>'
+               '<h3 class="mt">Вид</h3>'
+               + set_row("Язык интерфейса", "", '<select class="select" aria-label="Язык"><option>Русский</option>'
+                         '<option>English</option></select>')
+               + set_row("Тема", "", '<span class="badge">Светлая</span>'))
+    settings_page("general", "Общие",
                   st("full", profile + f'<div class="btn-row mt-s">{a_btn("#s=saved", "Сохранить", True)}</div>')
                   + st("saved", profile + '<div class="btn-row mt-s"><span class="badge badge--ok">сохранено</span></div>')
-                  + st("error", profile.replace('value="Тест"', 'value="" aria-invalid="true"')
-                       + '<p class="err" style="color:var(--field-error-text)">Имя не может быть пустым.</p>'
+                  + st("error", profile.replace('id="pn" value="Тест"', 'id="pn" value="" aria-invalid="true"')
+                       + '<p class="err">Имя не может быть пустым.</p>'
                        + f'<div class="btn-row mt-s">{a_btn("#s=saved", "Сохранить", True)}</div>')
                   + st("loading", skel(4))
-                  + st("long", profile.replace("Разборы реальных задач из практики", LONG)),
+                  + st("long", profile.replace("Отвечай коротко, без лишних вступлений.", LONG)),
                   states=("full", "saved", "error", "loading", "long"))
 
-    acc = (set_row("Вход", "Google: test@example.com", '<span class="badge badge--ok">Google</span>')
-           + set_row("Выйти на всех устройствах", "Закроет вход везде, кроме этого браузера", a_btn("#s=confirm", "Выйти везде"))
-           + set_row("Удалить данные", "По вашей просьбе удаляем систему канала и материалы",
-                     a_btn("#s=confirm", "Удалить данные")))
-    dlg = ('<div class="dlg" role="dialog" aria-labelledby="dh" style="position:static;margin:var(--space-16) 0">'
-           '<div class="dlg-h"><b id="dh">Удалить данные канала «Тест»?</b>'
-           f'{a_btn("#s=full", "✕")}</div><div class="dlg-b"><p>Удалим систему канала, материалы и доступ к каналу. '
-           'Отменить нельзя. Оплаченный срок не возвращается автоматически — напишите, если нужен возврат.</p></div>'
-           f'<div class="dlg-f">{a_btn("#s=full", "Отмена")}{a_btn("/test/logout/", "Удалить", True)}</div></div>')
-    settings_page("account", "Аккаунт", st("full long", acc) + st("confirm", acc + dlg) + st("loading", skel(3)),
-                  states=("full", "confirm", "loading"))
+    acc = (set_row("Почта", "test@example.com · вход через Google", '<span class="badge badge--ok">Google</span>')
+           + set_row("Выйти на всех устройствах", "Закроет вход везде, кроме этого браузера",
+                     a_btn("#s=signout", "Выйти везде"))
+           + set_row("Удалить аккаунт", "Чаты, проекты и файлы будут удалены", a_btn("#s=confirm", "Удалить аккаунт")))
+    del_dlg = dialog("Удалить аккаунт?", "Удалим чаты, проекты и файлы. Отменить нельзя. Если есть платный план — "
+                     "сначала отмените его в разделе «Оплата».", "/test/logout/", "Удалить",
+                     '<div class="field"><label for="dc">Введите почту для подтверждения</label>'
+                     '<input id="dc" placeholder="test@example.com"></div>')
+    out_dlg = dialog("Выйти на всех устройствах?", "Придётся войти заново на телефоне и компьютере.",
+                     "/test/logout/", "Выйти везде")
+    settings_page("account", "Аккаунт", st("full", acc) + st("confirm", acc + del_dlg) + st("signout", acc + out_dlg)
+                  + st("loading", skel(3)), states=("full", "confirm", "signout", "loading"))
 
-    priv = (set_row("Статистика и данные канала", "Чтобы готовить отчёты и решения", have("разрешено"))
-            + set_row("Правки на канале", "Только после вашего «да», только на вашем канале", have("разрешено"))
-            + set_row("Отозвать доступ", "В аккаунте Google: Безопасность → Сторонние приложения → improducer",
-                      a_btn("/test/settings/connectors/#s=error", "Как это выглядит"))
-            + set_row("Политика", "Что храним и зачем", '<a href="/privacy.html">Политика конфиденциальности</a>'))
-    settings_page("privacy", "Приватность", st("full", priv) + st("loading", skel(3)), states=("full", "loading"))
+    priv = (set_row("Экспорт данных", "Архив чатов и проектов придёт ссылкой на почту",
+                    a_btn("#s=exported", "Экспортировать"))
+            + set_row("Помогать улучшать improducer", "Разрешить использовать ваши чаты для обучения моделей",
+                      switch(False))
+            + set_row("Память между чатами", "Ассистент помнит важное из прошлых чатов", switch(True))
+            + set_row("Хранение данных", "Удалённые чаты стираются с серверов за 30 дней",
+                      '<a href="/privacy.html">Политика конфиденциальности</a>'))
+    settings_page("privacy", "Приватность",
+                  st("full", priv)
+                  + st("exported", note("Экспорт запрошен", "Ссылка на архив придёт на test@example.com. "
+                                        "Ссылка действует сутки.") + priv)
+                  + st("loading", skel(3)), states=("full", "exported", "loading"))
 
-    pays = [("13.10", "Пилот «вместе», первый платёж", "оплачено"), ("—", "Второй платёж — после концепции", "ждёт")]
-    pay_rows = "".join(f'<tr><td class="n">{d}</td><td>{t}</td><td><span class="badge {"badge--ok" if s == "оплачено" else ""}">{s}</span></td></tr>'
-                       for d, t, s in pays)
-    bill = (set_row("Формат", "Пилот «вместе» · 4 недели", '<span class="badge badge--accent">основной</span>')
-            + set_row("Цена", "Назовём числом на разговоре", '<span class="meta">цена — после решения</span>')
-            + set_row("Срок", "Действует до 13.11 · письмо за 3 дня", '<span class="badge badge--ok">действует</span>')
-            + set_row("Способ", "Картой по ссылке или счётом в USDT", a_btn("/test/upgrade/", "Сменить формат"))
-            + '<h3 class="mt-s">Оплаты</h3><div class="scroll"><table><thead><tr><th>Дата</th><th>Что</th><th>Состояние</th>'
-            f'</tr></thead><tbody>{pay_rows}</tbody></table></div>'
-            + set_row("Не продлевать", "После срока — только чтение, ничего не стирается", a_btn("/test/paused/", "Отменить продление")))
-    settings_page("billing", "План и оплата",
-                  st("full long", f'<div class="sig">{stage("Э3-16")}</div>' + bill)
-                  + st("empty", empty("Формат не выбран.", "вы выберете формат после разговора")
-                       + f'<div class="btn-row mt-s">{a_btn("/test/upgrade/", "Выбрать формат", True)}</div>')
-                  + st("error", warn("Оплата не прошла", "Банк отклонил платёж. Деньги не списаны. Попробуйте другую карту или USDT.",
-                                     a_btn("/test/upgrade/", "Оплатить снова", True)) + bill)
-                  + st("denied", PAUSED_CALL + bill)
+    invoices = "".join(f'<tr><td class="n">{d}</td><td>{t}</td><td class="n">{s}</td>'
+                       f'<td><span class="badge badge--ok">оплачен</span></td></tr>'
+                       for d, t, s in (("16.10.2026", "Про · год", "200 $"),))
+    free = (set_row("Бесплатный план", "Чат, поиск, артефакты, один свой коннектор",
+                    a_btn("/test/upgrade/", "Повысить план", True)))
+    paid = (set_row("План Про", "Оплата за год · следующее списание 16.10.2027",
+                    '<span class="badge badge--ok">активен</span>')
+            + set_row("Способ оплаты", "Visa •••• 4242", '<button class="btn" type="button">Изменить</button>')
+            + '<h3 class="mt-s">Счета</h3><div class="scroll"><table><thead><tr><th>Дата</th><th>План</th><th>Сумма</th>'
+            f'<th>Состояние</th></tr></thead><tbody>{invoices}</tbody></table></div>'
+            + set_row("Отменить план", "План работает до конца оплаченного периода", a_btn("#s=canceled", "Отменить")))
+    settings_page("billing", "Оплата",
+                  st("full", free)
+                  + st("paid", note("План Про активен", "Спасибо! Больше использования и проекты уже доступны.",
+                                    a_btn("/test/new/", "Новый чат", True)) + paid)
+                  + st("canceled", note("План отменён", "Про работает до 16.10.2027, потом — бесплатный план.",
+                                        a_btn("/test/upgrade/", "Возобновить")) + paid.replace("активен", "до 16.10.2027"))
+                  + st("error", warn("Оплата не прошла", "Банк отклонил платёж. Обновите способ оплаты.",
+                                     a_btn("/test/upgrade/checkout/", "Оплатить снова", True)) + free)
                   + st("loading", skel(5)),
-                  states=("full", "empty", "error", "denied", "loading", "long"))
+                  states=("full", "paid", "canceled", "error", "loading"))
 
-    def bar(used, total, label):
-        w = round(used / total * 100)
-        return (f'<p class="small"><b>{label}</b> <span class="meta">{used} из {total} дней</span></p>'
-                f'<svg viewBox="0 0 100 4" preserveAspectRatio="none" width="100%" height="8" aria-hidden="true">'
-                f'<rect class="g-track" width="100" height="4" rx="2"/><rect class="g-fill" width="{w}" height="4" rx="2"/></svg>')
-    usage_note = ('<p class="small muted">Лимита сообщений у нас нет: тариф — за канал в месяц. '
-                  'Лимит вашего Claude виден в вашем Claude.</p>')
-    settings_page("usage", "Срок и доступ",
-                  st("full", '<div class="facts" style="margin-top:0"><div class="fact"><span class="k">доступ</span>'
-                     '<span class="v">полный</span></div><div class="fact"><span class="k">до продления</span>'
-                     '<span class="v num">27 дней</span></div></div><div class="mt-s">' + bar(3, 30, "Текущий период") + "</div>" + usage_note)
-                  + st("near", '<div class="facts" style="margin-top:0"><div class="fact"><span class="k">доступ</span>'
-                       '<span class="v">полный</span></div><div class="fact"><span class="k">до продления</span>'
-                       '<span class="v num">3 дня</span></div></div><div class="mt-s">' + bar(27, 30, "Текущий период") + "</div>"
-                       + note("Письмо отправлено", "Напоминание о продлении ушло на test@example.com.",
-                              a_btn("/test/mail/renew/", "Открыть письмо")))
-                  + st("denied", PAUSED_CALL + bar(30, 30, "Период закончился"))
+    settings_page("usage", "Использование",
+                  st("full", usage_bar("Текущая сессия", 24, "сброс через 3 ч 40 мин")
+                     + usage_bar("Неделя", 31, "сброс в пн 10:00"))
+                  + st("close", usage_bar("Текущая сессия", 88, "сброс через 1 ч 05 мин")
+                       + usage_bar("Неделя", 74, "сброс в пн 10:00")
+                       + note("Близко к лимиту", "Осталось немного сообщений до сброса.",
+                              a_btn("/test/upgrade/", "Повысить план")))
+                  + st("limit", usage_bar("Текущая сессия", 100, "сброс в 18:00")
+                       + usage_bar("Неделя", 80, "сброс в пн 10:00")
+                       + warn("Лимит исчерпан", "Сообщения снова можно отправлять в 18:00.",
+                              a_btn("/test/upgrade/", "Повысить план", True)))
                   + st("loading", skel(3)),
-                  states=("full", "near", "denied", "loading"))
+                  states=("full", "close", "limit", "loading"))
 
-    caps = [("Подключить канал", True, ""), ("Анкета и фото", True, ""), ("ДНК", True, ""),
-            ("Ниша и каналы-доноры", True, ""), ("Концепция — решение кнопкой", True, ""),
-            ("Доска идей — отметки ✓ / ✕", True, ""), ("Контент-план", True, ""),
-            ("Сценарии и упаковка", True, "закрытие через Claude — Э1-9"),
-            ("Обложки", False, "Э2-9"), ("Выпуск", False, "Э1-27"),
-            ("Разбор вышедших роликов для автора", False, "Э1-13"), ("Чат в приложении", False, "Э4-2")]
-    cr = "".join(set_row(t, n, have() if ok else stage(n)) for t, ok, n in caps)
-    cr += set_row("Письма-напоминания", "На 3-й день тишины, второе — через 7 дней · Э2-11",
-                  '<label class="switch"><input type="checkbox" checked> Включены</label>')
+    caps = [("Артефакты", "Документы, таблицы и код — отдельной панелью", switch(True)),
+            ("Анализ данных", "Запуск кода для таблиц и графиков", switch(True)),
+            ("Создание файлов", "Документы и таблицы для скачивания", switch(True)),
+            ("Поиск в интернете", "Свежие сведения со ссылками", switch(True)),
+            ("Память между чатами", "Учитывать прошлые чаты", switch(False)),
+            ("Задачи по расписанию", "Доступно на плане Про", '<span class="badge">Про</span>' + switch(False, "", True))]
+    cr = "".join(set_row(t, h, v) for t, h, v in caps)
     settings_page("capabilities", "Возможности", st("full", cr) + st("loading", skel(6)), states=("full", "loading"))
 
-    yt_ok = set_row("YouTube: канал «Тест»", "Статистика и правки после «да» · подключён неделю назад",
-                    '<span class="badge badge--ok">подключён</span>' + a_btn("/test/settings/privacy/", "Отключить"))
-    yt_off = set_row("YouTube-канал", "Войти Google-аккаунтом канала", a_btn("/test/connect/", "Подключить", True))
-    yt_err = set_row("YouTube: канал «Тест»", "Доступ отозван в Google — система не видит статистику",
-                     '<span class="badge badge--no">нет доступа</span>' + a_btn("/test/connect/", "Подключить снова", True))
-    cl_ok = set_row("Ваш Claude: коннектор improducer", "connect.improducer.co/mcp · последний вызов сегодня",
-                    '<span class="badge badge--ok">подключён</span>' + a_btn("#s=loading", "Новый код"))
-    cl_off = set_row("Ваш Claude", "Коннектор improducer: код действует сутки",
-                     a_btn("#s=loading", "Получить код подключения", True))
-    code = note("Код подключения", "1. В Claude: Настройки → Коннекторы → Добавить свой коннектор. Название — improducer, "
-                "адрес — <code>https://connect.improducer.co/mcp</code>.<br>2. «Подключить» → код "
-                "<code>TEST-0000</code> (пример).<br>3. «Разрешения инструментов» → «Разрешать всегда» на обе группы.")
-    gl = set_row("Вход в кабинет", "Google: test@example.com", '<span class="badge badge--ok">Google</span>')
-    settings_page("connectors", "Подключения",
-                  st("full long", yt_ok + cl_ok + gl) + st("empty", yt_off + cl_off + gl)
-                  + st("error", yt_err + cl_ok + gl) + st("loading", yt_ok + cl_off + code + gl),
-                  states=("full", "empty", "error", "loading"))
+    rows_ok = (set_row("Календарь", "События и встречи · подключён",
+                       '<span class="badge badge--ok">подключён</span><button class="btn" type="button">Отключить</button>')
+               + set_row("Почта", "Поиск и черновики писем", a_btn("/test/connect/", "Подключить", True))
+               + set_row("Диск", "Файлы и папки · нужен повторный вход",
+                         '<span class="badge badge--no">ошибка</span>' + a_btn("/test/connect/", "Переподключить"))
+               + set_row("Таблицы", "Доступно на плане Про", '<span class="badge">Про</span>'))
+    custom = set_row("Свой коннектор", "Удалённый сервер по адресу · на бесплатном плане — один",
+                     a_btn("#s=add", "Добавить свой"))
+    add = dialog("Добавить свой коннектор", "Укажите название и адрес удалённого сервера.", "/test/connect/", "Добавить",
+                 '<div class="field"><label for="cn">Название</label><input id="cn" value="Заметки"></div>'
+                 '<div class="field mt-s"><label for="cu">Адрес сервера</label>'
+                 '<input id="cu" value="https://notes.example.com/mcp"></div>')
+    cat = '<p class="small muted mt-s">Каталог коннекторов — нет в прототипе.</p>'
+    settings_page("connectors", "Коннекторы",
+                  st("full", rows_ok + custom + cat)
+                  + st("add", rows_ok + custom + add)
+                  + st("error", warn("Не подключено", "Доступ не разрешён или сервер не ответил. Попробуйте ещё раз.",
+                                     a_btn("/test/connect/", "Повторить", True)) + rows_ok + custom)
+                  + st("loading", skel(4)),
+                  states=("full", "add", "error", "loading"))
 
 
-# ── Оплата, пауза, письмо, выход ─────────────────────────────────────────────
+# ── Повышение плана, оплата, выход ───────────────────────────────────────────
 
 def page_upgrade():
-    pay_tabs = ('<ul class="cnav"><li><a href="#s=full" aria-current="page">Картой</a></li>'
-                '<li><a href="#s=full">USDT</a></li></ul>')
-    cards = "".join(plan_card(f, "/test/upgrade/paid/", "Оплатить") for f in FORMATS if f["tab"] == "start")
-    body = ('<div class="center"><h1>Выберите формат</h1>'
-            '<p class="lede">Разбор засчитывается в ДНК и пилот. Цены — после решения: на разговоре назовём числом.</p>'
-            f'<div class="mt-s">{pay_tabs}</div></div>'
-            + st("full long", f'<div class="plans">{cards}</div>')
-            + st("loading", '<div class="plans">' + skel(5) * 3 + "</div>")
-            + st("error", warn("Оплата не прошла", "Банк отклонил платёж, деньги не списаны. Попробуйте другую карту или USDT.",
-                               a_btn("#s=full", "Выбрать снова", True)))
-            + st("denied", note("Оплата — после разговора", "Ссылка на оплату приходит после разговора о канале.",
-                                a_btn("/test/login/check/", "Записаться на разговор", True)))
-            + '<p class="center small muted mt-s">Картой — ссылкой на оплату, комиссию берёт платёжный сервис. '
-            'USDT — счётом на кошелёк, возврат только переводом вручную. Оплата автоматически — Э3-2.</p>')
-    app_page("/test/upgrade/", "Выбрать формат", "Выбор формата и способа оплаты.", body,
-             states=("full", "loading", "error", "denied", "long"), wide=True, active="/test/settings/billing/")
-    paid = ('<div class="centered"><div class="box"><div class="card stack">'
-            '<span class="badge badge--ok">оплачено</span><h1 class="screen-title">Оплата получена</h1>'
-            '<p>Пилот «вместе», первый платёж. Доступ включаем вручную — обычно в тот же день. '
-            'Письмо придёт на test@example.com.</p>'
-            f'<div class="btn-row">{a_btn("/test/onboarding/", "Начать", True)}{a_btn("/test/settings/billing/", "План и оплата")}</div>'
-            "</div></div></div>")
-    bare_page("/test/upgrade/paid/", "Оплата получена", "Подтверждение оплаты.", paid)
+    def cards(year):
+        pro_price = "17 $" if year else "20 $"
+        pro_note = "в месяц, 200 $ за год сразу" if year else "в месяц"
+        return ('<div class="plans plans--2">'
+                '<label class="card plan is-main"><span class="switch"><input type="radio" name="plan" checked> Про</span>'
+                f'<p class="muted">Для ежедневной работы</p><p class="pp">{pro_price}</p><p class="small muted">{pro_note}</p>'
+                '<ul class="ticks"><li>Больше использования</li><li>Проекты</li><li>Задачи по расписанию</li></ul></label>'
+                '<label class="card plan"><span class="switch"><input type="radio" name="plan"> Макс</span>'
+                '<p class="muted">Для тех, кто работает весь день</p><p class="pp">от 100 $</p><p class="small muted">в месяц</p>'
+                '<ul class="ticks"><li>В 5 или 20 раз больше, чем в Про</li><li>Приоритет в часы нагрузки</li></ul></label>'
+                '</div>')
 
+    def period(active):
+        return ('<ul class="cnav tabs">'
+                f'<li><a href="#s=month"{" aria-current=\"page\"" if active == "month" else ""}>Помесячно</a></li>'
+                f'<li><a href="#s=full"{" aria-current=\"page\"" if active == "year" else ""}>За год · выгоднее</a></li></ul>')
+    go = f'<div class="btn-row mt-s" style="justify-content:center">{a_btn("/test/upgrade/checkout/", "Перейти к оплате", True)}</div>'
+    body = ('<div class="center"><h1>Повысьте план</h1>'
+            '<p class="lede">Больше использования и новые возможности. Отменить можно в любой момент.</p></div>'
+            + st("full", f'<div class="center mt-s">{period("year")}</div>{cards(True)}{go}')
+            + st("month", f'<div class="center mt-s">{period("month")}</div>{cards(False)}{go}')
+            + st("loading", '<div class="plans plans--2">' + skel(4) * 2 + "</div>")
+            + '<p class="center small muted mt-s">Цены без налогов. Оплата — на странице платёжного сервиса.</p>')
+    app_page("/test/upgrade/", "Повысить план", "Выбор плана: Про или Макс, помесячно или за год.", body,
+             states=("full", "month", "loading"), wide=True, active="/test/upgrade/")
 
-def page_paused():
-    body = ('<div class="greet"><h1>Тест, ваш путь на паузе</h1>'
-            + st("full", PAUSED_CALL) + st("near", note("Через 3 дня — продление",
-                                                        "Если не продлить, кабинет перейдёт в режим «только чтение». Ничего не стирается.",
-                                                        a_btn("/test/upgrade/", "Продлить", True)))
-            + st("full", composer(off=True, placeholder="Пауза: только чтение · продлите, чтобы продолжить"))
-            + st("near", composer())
-            + "</div><section><h2>Ваш путь</h2>"
-            '<p class="small muted">Готово 5 из 12 · смотреть можно всё</p>' + steps_html() + "</section>")
-    app_page("/test/paused/", "Пауза", "Пауза — только чтение: ничего не стирается.", body, states=("full", "near"))
-
-
-def page_mail():
-    body = ('<div class="wrap" style="padding-top:var(--space-40)"><div class="mail">'
-            '<p class="crumb">Письмо · пример</p><div class="card stack">'
-            '<div class="mail-h meta"><span>От</span><span>improducer &lt;founder@improducer.co&gt;</span>'
-            '<span>Кому</span><span>test@example.com</span><span>Тема</span><span>Через 3 дня — продление</span></div>'
-            f'{wordmark()}<p>Тест, здравствуйте.</p>'
-            '<p>13.11 заканчивается оплаченный срок пилота «вместе». Чтобы путь шёл дальше без перерыва, продлите его.</p>'
-            '<p>Если не продлить — кабинет перейдёт в режим «только чтение»: всё останется на месте, ничего не '
-            'стирается. Новые шаги, решения и разбор роликов вернутся после продления.</p>'
-            f'<div class="btn-row">{a_btn("/test/upgrade/", "Продлить", True)}{a_btn("/test/settings/billing/", "План и оплата")}</div>'
-            '<p class="small muted">Письма о продлении приходят за 3 дня до срока · появится, Э2-12.</p></div></div></div>')
-    PAGES["/test/mail/renew/"] = (head("Письмо о продлении", "Письмо за 3 дня до продления.") + '<body class="site">'
-                                  + body + proto(["full"]) + '<script src="/test/assets/test.js"></script></body></html>\n')
+    form = ('<div class="field"><label for="ce">Почта</label><input id="ce" value="test@example.com" disabled></div>'
+            '<div class="field mt-s"><label for="cc">Номер карты</label><input id="cc" placeholder="1234 1234 1234 1234" disabled></div>'
+            '<div class="grid2 mt-s"><div class="field"><label for="cx">Срок</label><input id="cx" placeholder="ММ / ГГ" disabled></div>'
+            '<div class="field"><label for="cv">CVC</label><input id="cv" placeholder="123" disabled></div></div>'
+            '<div class="field mt-s"><label for="cn">Страна</label><select id="cn" disabled><option>Казахстан</option></select></div>')
+    pay = a_btn("/test/settings/billing/#s=paid", "Оплатить 200 $", True)
+    checkout = ('<div class="wrap" style="padding-block:var(--space-40)"><div class="split">'
+                '<div class="stack"><p class="meta">improducer · оплата</p><h1 class="screen-title">Про · за год</h1>'
+                '<div class="facts" style="margin-top:0"><div class="fact"><span class="k">к оплате</span>'
+                '<span class="v num">200 $</span></div><div class="fact"><span class="k">это в месяц</span>'
+                '<span class="v num">17 $</span></div></div>'
+                f'<p class="small muted">Продлевается раз в год. Отменить — в Настройках → Оплата.</p>{a_btn("/test/upgrade/", "← Назад")}</div>'
+                '<div class="card stack">'
+                + st("full", form + f'<div class="btn-row">{pay}</div>')
+                + st("error", warn("Карта отклонена", "Банк не подтвердил платёж, деньги не списаны. Попробуйте другую карту.")
+                     + form + f'<div class="btn-row">{pay}</div>')
+                + st("loading", skel(4))
+                + '<p class="small muted">Макет страницы платёжного сервиса: поля выключены, деньги не списываются.</p>'
+                "</div></div></div>")
+    bare_page("/test/upgrade/checkout/", "Оплата", "Макет страницы платёжного сервиса.", checkout,
+              states=("full", "error", "loading"))
 
 
 def page_logout():
     body = ('<div class="centered"><div class="box"><div class="card stack">'
-            '<h1 class="screen-title">Вы вышли</h1><p>Кабинет и материалы на месте. Войти снова — тем же аккаунтом Google.</p>'
+            '<h1 class="screen-title">Вы вышли</h1><p>Чаты и проекты на месте. Войти снова — тем же способом.</p>'
             f'<div class="btn-row">{a_btn("/test/login/", "Войти", True)}{a_btn("/test/", "На главную")}</div>'
             "</div></div></div>")
-    bare_page("/test/logout/", "Вы вышли", "Выход из кабинета.", body)
+    bare_page("/test/logout/", "Вы вышли", "Выход из аккаунта.", body)
 
 
 # ── Опись ───────────────────────────────────────────────────────────────────
@@ -1049,120 +1065,138 @@ def page_logout():
 OPIS_SCREENS = [
     # id, их экран, их адрес, наш адрес, что взяли, чего нет и почему, состояния
     ("S01", "Выдача поиска", "google.com/search?q=claude", None,
-     "—", "Без аналога: выдача — чужая страница. Наш вход — метка go.improducer.co/<код> → /test/.", "—"),
+     "—", "Без аналога: выдача — чужая страница, в прототип не входит.", "—"),
     ("S02", "Главная", "claude.com/", "/test/",
-     "Герой с карточкой входа по центру слева и примером справа; кнопка «в своём Claude» под карточкой; "
-     "блок форматов с вкладками; вопросы",
-     "Картинки нет — вместо неё пример кабинета «Теста». Кнопки «Скачать» нет: приложения нет, есть коннектор.",
-     "заполнено"),
+     "Герой: слева заголовок, карточка входа (Google, Apple, почта) и «Скачать приложение», справа картинка; "
+     "ниже «Посмотреть планы» с вкладками и тремя карточками; вопросы",
+     "Вместо фотографии — пример чата. Тоста «Новости» (C27) нет.", "заполнено"),
     ("S03", "Продукт", "claude.com/product/overview", "/test/product/",
-     "Заголовок по центру с двумя кнопками, крошка раздела, блоки ниже",
-     "Россыпи картинок нет: показываем недели, отличия и 12 шагов", "заполнено"),
+     "Полоса раздела, заголовок по центру с двумя кнопками, блоки ниже",
+     "Россыпи картинок и видео нет: возможности — плитками", "заполнено"),
     ("S04", "Цены", "claude.com/pricing", "/test/pricing/",
-     "Вкладки, три карточки с «всё из …, плюс», таблица сравнения, вопросы",
-     "Цен нет — «цена — после решения» (Д1). Подписки и студия — «появится Э3/Э4»", "заполнено"),
+     "Вкладки «Для себя / Команды / API», три карточки с ценой, пояснением и «Всё из …, плюс», "
+     "таблица сравнения с поиском и кнопками в шапке, вопросы",
+     "У «Команды» и «API» чисел нет — их нет в снимках и статьях. Карточки «Предприятие» нет: у образца "
+     "она ведёт в отдел продаж, а путь без людей. Групп сравнения одна, без сворачивания.", "заполнено (вкладки якорями)"),
     ("S05", "Скачать", "claude.com/download", "/test/download/",
-     "Заголовок с главной кнопкой; слева подпись блока, справа карточка со строками «где → действие»",
-     "Без QR и магазинов: своего приложения нет, коннектор живёт в Claude автора", "заполнено"),
+     "Заголовок с главной кнопкой (на телефоне — iOS вместо macOS), строки «платформа → действие», QR, вопросы",
+     "Файлов нет: кнопки скачивания выключены, QR — условный рисунок", "заполнено"),
     ("S06", "Помощь", "support.claude.com/en/", "/test/help/",
-     "Поиск, частые вопросы строками, разделы плитками", "Бокового меню разделов нет: разделов 5, хватает плиток",
+     "Поиск с ⌘K, частые статьи строками, коллекции плитками", "Бокового меню разделов нет; открывается одна статья",
      "заполнено · пусто · загрузка"),
     ("S07", "Вход", "claude.ai/login", "/test/login/",
-     "Две колонки: слева заголовок и карточка входа, справа картинка; кнопка под карточкой",
-     "Только Google: входа по почте и Apple нет (S-073). Справа — пример кабинета",
-     "заполнено · загрузка · ошибка · нет доступа · длинный"),
-    ("S08", "Письмо и код", "claude.ai/login (шаг 2)", "/test/login/check/",
-     "Экран после выбора способа входа: что дальше, ошибка",
-     "Кода по почте нет. На его месте — наш шаг: лист ожидания и запись на разговор",
-     "заполнено · записан · загрузка · ошибка · нет доступа"),
+     "Две колонки: слева заголовок, карточка входа C12 и «Скачать приложение», справа картинка",
+     "Вместо фотографии — пример чата", "заполнено · загрузка · ошибка · длинный"),
+    ("S08", "Письмо и код", "claude.ai/login (шаг 2)", "/test/login/#s=sent",
+     "Письмо отправлено → ввод кода → неверный код; «письмо не пришло» и «отправить ещё раз»",
+     "Ссылки из письма нет: письма не уходят", "письмо отправлено · ввод кода · неверный код"),
     ("S09", "Каталог коннекторов", "claude.com/marketplace/connectors-plugins", None,
-     "—", "Без аналога: у нас один коннектор, каталог — у Anthropic (вход in.catalog). Подключение — /test/download/", "—"),
+     "—", "Без аналога: каталога в прототипе нет; подключение — через «Добавить свой» в Настройках → Коннекторы", "—"),
     ("S10", "Статья помощи", "support.claude.com/en/articles/8114491", "/test/help/start/",
-     "Крошки, H1, разделы статьи, «помогла?»", "Оглавления нет: статья короткая", "заполнено"),
-    ("S11", "Первый запуск", "claude.ai (первый вход)", "/test/onboarding/",
-     "Карточка по центру, один вопрос на экран, счёт шагов, «Дальше»",
-     "Телефона и кода нет. Шаги наши: имя и согласие → анкета → канал", "заполнено · загрузка · ошибка"),
-    ("S11b", "Доступ сервиса (OAuth)", "окно согласия коннектора", "/test/connect/",
-     "Экран прав перед согласием", "Права — дословно наши две группы", "заполнено · загрузка · ошибка · нет доступа · длинный"),
+     "Крошки, H1, разделы, оглавление справа, «помогла?»", "—", "заполнено · длинный"),
+    ("S11", "Первый запуск", "claude.ai/onboarding (шаги)", "/test/onboarding/",
+     "Карточка по центру, один вопрос на экран, счёт шагов: телефон и код → 18+ и условия → как обращаться",
+     "СМС не уходит", "телефон: заполнено · код · неверный код · номер занят · страна не поддерживается · загрузка; "
+     "возраст: младше 18 · ошибка; имя: ошибка · загрузка"),
     ("S12", "Новый чат", "claude.ai/new", "/test/new/",
-     "Боковая панель; приветствие по центру; поле ввода; подсказки под ним; меню аккаунта внизу",
-     "Чата нет (Э4-2): поле ведёт на макет, над ним — «Ваш шаг». Ниже — 12 шагов пути", "все шесть"),
+     "Боковая панель C14; знак и приветствие по центру; поле ввода с «+» и выбором модели; подсказки под ним",
+     "Боковая панель не сворачивается; «Артефакты» — без страницы", "заполнено · лимит · длинный · загрузка"),
     ("S13", "Чат", "claude.ai/chat/<id>", "/test/chat/",
-     "Реплики, ответ с действиями, поле внизу, результат в панели справа", "Макет: чат не построен (Э4-2)", "все шесть"),
+     "Реплика справа плашкой, ответ текстом с действиями (копировать, повторить, оценка), поле внизу",
+     "Ответ не печатается вживую — состояние «ответ идёт» показано отдельно",
+     "заполнено · ответ идёт · ошибка · длинный (лимит длины) · лимит · с инструментом"),
     ("S14", "Недавние", "claude.ai/recents", "/test/recents/",
-     "Поиск сверху и строки «что · когда»", "Вместо чатов — решения и события канала", "все шесть"),
+     "Поиск, строки «название · последнее сообщение», «Выбрать», новый чат", "—",
+     "заполнено · выбор нескольких · длинный · пусто · ничего не найдено · загрузка"),
     ("S15", "Проекты", "claude.ai/projects", "/test/projects/",
-     "Сетка карточек и кнопка «новый» справа от заголовка", "Второй канал — студия, Э3-4", "все шесть"),
-    ("S16", "Проект", "claude.ai/project/<id>", "/test/project/test/",
-     "Слева работа и поле ввода, справа — знания проекта", "Вместо чатов проекта — разделы шагов", "все шесть"),
-    ("S17", "Артефакт", "панель справа в чате", "/test/project/test/koncepciya/",
-     "Результат отдельной панелью рядом с разговором; версия", "Вместо «копировать» — решение кнопками",
-     "все шесть + подтверждение"),
-    ("S18", "Настройки: профиль", "claude.ai/settings/general", "/test/settings/general/",
-     "Вкладки слева, форма справа, «Сохранить»", "—", "заполнено · сохранено · ошибка · загрузка · длинный"),
+     "Сетка карточек (название, описание, «изменён»), «Новый проект», поиск, сортировка",
+     "Все карточки ведут на один проект-пример", "заполнено · длинный · пусто · загрузка"),
+    ("S16", "Проект", "claude.ai/project/<id>", "/test/project/primer/",
+     "Слева поле ввода и чаты проекта, справа инструкции, знания и ёмкость", "Файлы не загружаются",
+     "заполнено · пустой проект · знания почти заполнены · загрузка"),
+    ("S17", "Артефакт", "панель справа в чате", "/test/chat/",
+     "Панель справа: заголовок, версия, «Просмотр / Код», копировать, скачать, закрыть; карточка в ответе",
+     "На телефоне панель под чатом, не на весь экран", "готов · создаётся"),
+    ("S18", "Настройки: общие", "claude.ai/settings/general", "/test/settings/general/",
+     "Вкладки слева в порядке образца, профиль, предпочтения, вид, «Сохранить»", "Тема только светлая",
+     "заполнено · сохранено · ошибка · загрузка · длинный"),
     ("S19", "Настройки: оплата", "claude.ai/settings/billing", "/test/settings/billing/",
-     "Строки «подпись — значение», оплаты таблицей, отмена продления", "Цена — после решения", "все шесть"),
+     "Бесплатный план с «Повысить»; платный: план, способ, счета, отмена до конца периода", "—",
+     "бесплатный · оплачено · отменён · ошибка · загрузка"),
     ("S20", "Настройки: использование", "claude.ai/settings/usage", "/test/settings/usage/",
-     "Полоса периода с подписью", "Лимита сообщений нет: тариф за канал (S-074)", "заполнено · близко к сроку · нет доступа · загрузка"),
+     "Полосы «сессия» и «неделя» со временем сброса", "—", "норма · близко к лимиту · лимит · загрузка"),
     ("S21", "Настройки: возможности", "claude.ai/settings/capabilities", "/test/settings/capabilities/",
-     "Строки функций с переключателем", "Функции не выключаются — показываем «есть / появится Э-…»", "заполнено · загрузка"),
+     "Строки функций с переключателем; недоступное на плане", "—", "заполнено · загрузка"),
     ("S22", "Настройки: коннекторы", "claude.ai/settings/connectors", "/test/settings/connectors/",
-     "Строки подключений с состоянием и кнопкой", "—", "заполнено · пусто · ошибка · загрузка"),
+     "Строки коннекторов: подключён, не подключён, ошибка, требует план; «Добавить свой» с адресом",
+     "Каталога нет", "заполнено · добавить свой · ошибка · загрузка"),
     ("S23", "Повысить план", "claude.ai/upgrade", "/test/upgrade/",
-     "Заголовок, переключатель способа, карточки, «Оплатить»", "Цен нет; оплата — после разговора", "заполнено · загрузка · ошибка · нет доступа · длинный"),
-    ("S24", "Лимит исчерпан", "плашка над полем ввода", "/test/paused/",
-     "Плашка над полем, поле недоступно, кнопка «Продлить»", "Лимита нет — есть пауза «только чтение» (S-077)", "заполнено · близко к сроку"),
-    ("S25", "Меню и выход", "поповер аккаунта", "/test/logout/",
-     "Меню внизу боковой панели; экран после выхода", "—", "заполнено"),
+     "Карточки Про / Макс, помесячно / за год, «Перейти к оплате»", "Макс — одна карточка «от 100 $»",
+     "за год · помесячно · загрузка"),
+    ("—", "Оплата (платёжный сервис)", "checkout.stripe.com", "/test/upgrade/checkout/",
+     "Слева сумма, справа поля карты и «Оплатить»", "Макет: поля выключены, деньги не списываются",
+     "заполнено · карта отклонена · загрузка"),
+    ("S24", "Лимит исчерпан", "плашка над полем ввода", "/test/new/#s=limit",
+     "Плашка «до ЧЧ:ММ · Повысить план» над полем, поле недоступно; то же в чате", "Недельного лимита плашкой нет",
+     "лимит сессии"),
+    ("S25", "Меню аккаунта и выход", "поповер внизу боковой панели", "/test/logout/",
+     "Почта, Настройки, Язык, Помощь, Посмотреть планы, Выйти; экран после выхода", "Язык не переключается", "заполнено"),
+    ("—", "Окно согласия сервиса", "OAuth стороннего сервиса", "/test/connect/",
+     "Что запрашивается, «Разрешить / Отклонить»", "Макет чужого окна", "заполнено · загрузка · ошибка"),
     ("S26", "Настройки: аккаунт", "claude.ai/settings/account", "/test/settings/account/",
-     "Выйти везде, удалить — с подтверждением", "Удаление — по просьбе", "заполнено · подтверждение · загрузка"),
+     "Выйти везде и удалить аккаунт — с подтверждением в диалоге", "—",
+     "заполнено · подтверждение удаления · выйти везде · загрузка"),
     ("S27", "Настройки: приватность", "claude.ai/settings/privacy", "/test/settings/privacy/",
-     "Строки «что видим — состояние»", "Экспорта нет", "заполнено · загрузка"),
-    ("—", "Письмо о продлении", "у образца не снято", "/test/mail/renew/",
-     "—", "Наш шаг пути: письмо за 3 дня (Э2-12)", "заполнено"),
+     "Экспорт данных, обучение на чатах, память, хранение", "—", "заполнено · экспорт запрошен · загрузка"),
 ]
 
 OPIS_PATHS = [
     ("F01", "Найти, войти, начать",
-     "S01 → S07 → Google → S11 (телефон, код, 18+, имя) → S12 · ≈7 кликов",
-     "/test/ → «Войти» → /test/login/ → Google → /test/login/check/ (время, «Записаться») → «Перейти к оплате» → "
-     "/test/upgrade/ → «Оплатить» → /test/upgrade/paid/ → «Начать» → /test/onboarding/ → анкета → канал → "
-     "/test/connect/ → «Разрешить» → /test/new/ · 12 кликов",
-     "/test/", "У нас разговор и оплата — до работы (§4.8, S-073): бесплатного входа нет до проверки Google"),
+     "S01 → S07 → Google → S11 (телефон, 18+, имя) → S12 · ≈7 кликов (через сайт +2)",
+     "/test/ → «Попробовать improducer» → /test/login/ → «Продолжить через Google» → /test/onboarding/ "
+     "(«Отправить код», «Подтвердить») → age/ («Продолжить») → name/ («Готово») → /test/new/ · 6 кликов. "
+     "Почтой: «Продолжить через почту» → #s=sent → «Ввести код» → «Подтвердить» → /test/onboarding/",
+     "/test/", "Окна Google нет — кнопка сразу ведёт в первый запуск"),
     ("F02", "Первая работа", "S12 → ввод → S13 (идёт → готов) → S17 → S14 · 3 клика",
-     "/test/new/ → «Открыть концепцию» → /test/project/test/koncepciya/ → «Утвердить» → /test/new/ → /test/recents/ · 3 клика",
-     "/test/new/", "Работа — решения кнопками; разговор словами — в своём Claude, чат в приложении — Э4-2"),
-    ("F03", "Работа в проекте", "S12 → S15 → S16 → S13 · 4 клика",
-     "/test/new/ → «Каналы» → /test/projects/ → «Тест» → /test/project/test/ → раздел · 3 клика",
-     "/test/projects/", "Проект = канал; второй канал — студия, Э3-4"),
-    ("F04", "Подключить инструмент", "S25 → S22 → «Добавить свой» → OAuth → S13 · 5 кликов",
-     "/test/download/ → «Подключить коннектор» → /test/settings/connectors/ → «Получить код» → код в Claude · 3 клика",
-     "/test/download/", "Наш коннектор подключается в Claude автора; каталога нет"),
-    ("F05", "Упёрся в лимит → заплатил", "S13 → S24 → «Повысить» → S23 → оплата → S19 · 4 клика",
-     "/test/mail/renew/ → «Продлить» или /test/paused/ → «Продлить» → /test/upgrade/ → «Оплатить» → /test/upgrade/paid/ · 3 клика",
-     "/test/mail/renew/", "Лимита нет — есть срок: письмо за 3 дня, потом пауза «только чтение»"),
+     "/test/new/ → подсказка или «Отправить» → /test/chat/ (ответ и панель артефакта) → «Чаты» → /test/recents/ · 2 клика",
+     "/test/new/", "Ответ не печатается: «идёт» — отдельное состояние"),
+    ("F03", "Работа в проекте", "S12 → S15 → «Новый проект» → S16 → S13 · 4 клика",
+     "/test/new/ → «Проекты» → /test/projects/ → «＋ Новый проект» → /test/project/primer/#s=empty → «Отправить» → /test/chat/ · 3 клика",
+     "/test/projects/", "—"),
+    ("F04", "Подключить инструмент", "S12 → S25 → S22 → «Добавить свой» (URL) → OAuth → S13 · 5 кликов",
+     "/test/new/ → «＋» → «Коннекторы» → /test/settings/connectors/ → «Добавить свой» → «Добавить» → /test/connect/ → "
+     "«Разрешить» → /test/chat/#s=tool · 5 кликов",
+     "/test/settings/connectors/", "Каталога (S09) нет"),
+    ("F05", "Упёрся в лимит → заплатил", "S13 → S24 → «Повысить» → S23 → оплата → S19 → S12 · 4 клика + оплата",
+     "/test/new/#s=limit → «Повысить план» → /test/upgrade/ → «Перейти к оплате» → /test/upgrade/checkout/ → «Оплатить» → "
+     "/test/settings/billing/#s=paid → «Новый чат» → /test/new/ · 4 клика",
+     "/test/new/#s=limit", "Оплата — макет"),
     ("F06", "Настройки и выход", "S25 → S18 → S20 → S21 → S26 → «Выйти» → S07 · 5 кликов",
-     "меню аккаунта → /test/settings/general/ → вкладки → /test/settings/account/ → «Выйти» → /test/logout/ · 5 кликов",
-     "/test/settings/general/", "—"),
-    ("F07", "Помощь", "S02 → S06 → S10 · 2 клика", "/test/ → «Помощь» → /test/help/ → /test/help/start/ · 2 клика",
+     "меню аккаунта → /test/settings/general/ → «Использование» → «Возможности» → «Аккаунт» → меню → «Выйти» → "
+     "/test/logout/ → «Войти» → /test/login/ · 6 кликов",
+     "/test/settings/general/", "Экран «Вы вышли» между выходом и входом"),
+    ("F07", "Помощь", "S02 → S06 → S10 · 2 клика", "/test/ → «Помощь» → /test/help/ → статья → /test/help/start/ · 2 клика",
      "/test/help/", "—"),
     ("F08", "Поставить приложение", "S02 → S05 → файл · 2 клика",
-     "/test/ → «Подключить в своём Claude» → /test/download/ → «Подключить» · 2 клика", "/test/download/",
-     "Приложения нет — коннектор в Claude автора"),
+     "/test/ → «Скачать приложение для компьютера» → /test/download/ → «Скачать для macOS» · 2 клика", "/test/download/",
+     "Файла нет — кнопка выключена"),
 ]
 
 DESIGN_TODO = [
     ("Оболочка приложения: боковая панель + рабочая область", "≥1180 — панель слева; меньше — полоса сверху и меню по кнопке",
      "component.app.side-width = 260 (сейчас --tile-min)"),
     ("Шапка сайта", "обычная · липкая · телефон — меню по кнопке", "без новых значений: --nav-height, --sticky-bar-*"),
-    ("Поле ввода чата", "пусто · текст · отправка · недоступно (пауза) · ошибка",
+    ("Поле ввода (C15)", "пусто · текст · недоступно (лимит) · «+» · выбор модели",
      "component.composer: радиус = --radius-card, высота = --field-textarea-min; стрелка — красная (исключение README)"),
-    ("Сообщение чата", "реплика автора · ответ · идёт · ошибка · длинный", "component.message.author-bg = --color-bg-sunken"),
-    ("Две колонки «работа · результат»", "≥1180 рядом, меньше — друг под другом", "сетка по --breakpoint-desktop"),
-    ("Аккордеон вопросов", "свёрнут · раскрыт · фокус", "component.disclosure.marker"),
-    ("Поповер (меню аккаунта, меню на телефоне)", "открыт · закрыт · фокус", "component.popover.shadow = --shadow-popover"),
-    ("Карточка формата", "обычная · основной · появится Э-…", "без новых значений"),
-    ("Шаги пути", "готово · ваше решение · ждёт", "в кабинете есть path-steps, в _design/ нет — перенести"),
+    ("Плашка лимита (C24)", "лимит сессии", "цвета --color-status-warn-*"),
+    ("Сообщение чата (C16)", "реплика · ответ · идёт · ошибка · длинный", "component.message.author-bg = --color-bg-sunken"),
+    ("Панель артефакта (C20)", "создаётся · готов · версия", "две колонки по --breakpoint-desktop"),
+    ("Карточка плана (C04)", "обычная · выделенная", "без новых значений"),
+    ("Таблица сравнения (C05)", "обычная · телефон — прокрутка", "без новых значений"),
+    ("Аккордеон вопросов (C06)", "свёрнут · раскрыт · фокус", "component.disclosure.marker"),
+    ("Поповер (меню аккаунта, «+», меню на телефоне)", "открыт · закрыт · фокус", "component.popover.shadow = --shadow-popover"),
+    ("Строка коннектора (C22)", "не подключён · подключён · ошибка · требует план", "set-row + badge"),
+    ("Полоса использования (C23)", "норма · близко · исчерпан", "g-track / g-fill"),
     ("Пустое место «заполнится, когда…»", "пусто", "пунктирная граница --color-border-control"),
     ("Заготовки загрузки", "загрузка", "фон --color-bg-sunken, радиус --radius-8"),
 ]
@@ -1189,8 +1223,9 @@ def page_opis():
     screens = []
     for sid, name, their, ours, took, miss, states in OPIS_SCREENS:
         link = f'<a href="{ours}">{ours}</a>' if ours else "без аналога"
+        rid = sid if sid != "—" else ours.strip("/").replace("/", "-")
         screens.append(
-            f'<div class="row" data-id="{sid}"><div class="row-top"><span class="rank">{sid}</span><div class="rhead">'
+            f'<div class="row" data-id="{rid}"><div class="row-top"><span class="rank">{sid}</span><div class="rhead">'
             f'<p class="rtitle">{E(name)} → {link}</p><p class="rmeta">{E(their)} · совпадение {score(sid)}</p></div></div>'
             f'<div class="cols"><p><b>Взяли:</b> {E(took)}</p><p><b>Нет и почему:</b> {E(miss)}</p>'
             f'<p><b>Состояния:</b> {E(states)}</p></div>'
@@ -1217,8 +1252,9 @@ def page_opis():
 <header class="page-head" style="padding-top:0">{wordmark()}
 <p class="crumb">Прототип · опись</p>
 <h1>Путь клиента: Claude → improducer</h1>
-<p class="lede">Раскладка и логика пути клиента Claude, собранные для improducer в нашей дизайн-системе.
-Примеры — выдуманный автор «Тест». Формы ничего не отправляют, входа, OAuth и оплаты нет.</p>
+<p class="lede">Путь клиента Claude — те же экраны, порядок, переходы, блоки и состояния — в дизайн-системе
+improducer и с нашим знаком. Продукт — безымянный ассистент «improducer». Пользователь — выдуманный «Тест».
+Формы ничего не отправляют, входа, OAuth и оплаты нет.</p>
 <div class="btn-row mt-s"><a class="btn btn--primary" href="/test/">Открыть прототип</a>
 <button class="btn" type="button" data-act="copy-marks">Скопировать отметки</button></div>
 <pre class="quote small" data-copy-out hidden></pre>
@@ -1231,7 +1267,7 @@ def page_opis():
 {paths}</section>
 
 <section><h2>2. Экраны</h2><p class="muted">Совпадение раскладки — imgdiff.py, режим layout: края, не цвет;
-снимки с домена 16.10, на 390 / 820 / 1440.</p>
+снимки с домена 16.10, на 390 / 820 / 1440 (прошлая сборка: баллы не пересчитаны).</p>
 {note("Почему все баллы ниже 75",
       "Мера считает плотность краёв в клетках сетки, а края на странице — это в основном буквы. Тексты у нас свои, "
       "поэтому баллы 3–23. Проверка меры: две разные страницы самого образца друг с другом дают 7–28 "
@@ -1253,7 +1289,8 @@ def page_opis():
 <ul><li>Сайт: репозиторий <code>ImproducerCo/improducerco.github.io</code>, на Маке — <code>~/.improducer/site</code>.</li>
 <li>Страницы: <code>test/&lt;путь&gt;/index.html</code>, общий вид — <code>test/assets/</code>.</li>
 <li>Исходник: <code>test/_build/build.py</code> (тексты и разметка), <code>test.css</code>, <code>test.js</code>.
-Папку <code>_build</code> GitHub Pages не публикует.</li>
+Папку <code>_build</code> GitHub Pages не публикует. Сборка удаляет из <code>test/</code> всё, кроме
+<code>_build</code> и <code>assets</code>, и пишет страницы заново.</li>
 <li>Разбор образца: <code>~/Desktop/improducer/работа/2026-10-16_claude/</code> — <code>разбор.md</code>, снимки
 <code>screens/</code> (их), <code>ours/</code> (наши), <code>diffs/</code>.</li></ul>
 <h3>Поправить одну страницу и выложить</h3>
@@ -1273,16 +1310,19 @@ git pull --rebase &amp;&amp; git push</pre>
 <footer class="foot"><span>Все страницы /test/ закрыты от поиска (noindex), ссылок на них с сайта нет.</span></footer>
 </div>"""
     PAGES["/test/opis/"] = (head("Опись", "Опись прототипа пути клиента и инструкция.") + "<body>" + body
-                            + '<script src="/test/assets/test.js"></script></body></html>\n')
+                            + f"{SCRIPT}</body></html>\n")
 
 
 def main():
     copy_assets()
     for fn in (page_home, page_product, page_pricing, page_download, page_help, page_help_start,
-               page_login, page_login_check, page_onboarding, page_connect, page_new, page_chat, page_recents,
-               page_projects, page_project, page_concept, page_settings, page_upgrade, page_paused, page_mail,
-               page_logout, page_opis):
+               page_login, page_onboarding, page_connect, page_new, page_chat, page_recents,
+               page_projects, page_project, page_settings, page_upgrade, page_logout, page_opis):
         fn()
+    # Старое не остаётся: всё, кроме исходника и общего вида, собирается заново.
+    for d in TEST.iterdir():
+        if d.is_dir() and d.name not in KEEP:
+            shutil.rmtree(d)
     for path, text in PAGES.items():
         out = TEST / path.removeprefix("/test/") / "index.html"
         out.parent.mkdir(parents=True, exist_ok=True)
