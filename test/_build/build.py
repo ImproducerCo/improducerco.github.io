@@ -62,11 +62,6 @@ def copy_assets():
         shutil.copy2(DESIGN / "logo" / name, out / "logo" / name)
     for name in ("test.css", "test.js"):
         shutil.copy2(HERE / name, out / name)
-    # Знак в шапке входа — полоски в цветах площадок, как большой знак на странице (владелец 17.10).
-    (out / "logo" / "mark-platforms.svg").write_text(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
-        + "".join(f'<rect x="{x:g}" y="{50 - h / 2:g}" width="{MARK_BAR_W}" height="{h}" rx="{MARK_BAR_W / 2:g}" '
-                  f'fill="{c}"/>' for _, x, h, c in MARK_BARS) + "</svg>\n", encoding="utf-8")
     # Geologica — шрифт строки площадок на входе (владелец 17.10, выбран из шести); в _design/ его пока нет.
     for f in (HERE / "fonts").iterdir():
         shutil.copy2(f, out / "fonts" / f.name)
@@ -97,8 +92,8 @@ def head(title, desc):
 """
 
 
-def wordmark(href="/test/", small=False, co=True, extra=""):
-    cls = ("wordmark wordmark--sm" if small else "wordmark") + (f" {extra}" if extra else "")
+def wordmark(href="/test/", small=False, co=True):
+    cls = "wordmark wordmark--sm" if small else "wordmark"
     suffix = '<span class="co">.co</span>' if co else ""
     return f'<a class="{cls}" href="{href}"><span>improducer{suffix}</span></a>'
 
@@ -197,9 +192,9 @@ def site_page(path, title, desc, body, states=("full",), crumb=None):
                    f'{proto(list(states))}{SCRIPT}</body></html>\n')
 
 
-def bare_page(path, title, desc, body, states=("full",), mark=""):
+def bare_page(path, title, desc, body, states=("full",)):
     PAGES[path] = (head(title, desc) + '<body class="site">'
-                   f'<header class="bare-head">{wordmark(extra=mark)}</header>'
+                   f'<header class="bare-head">{wordmark()}</header>'
                    f'<main>{body}</main>{proto(list(states))}'
                    f'{SCRIPT}</body></html>\n')
 
@@ -605,28 +600,43 @@ def page_help_start():
               states=("full", "long"))
 
 
-# Знак площадок — сам знак _design/logo/mark.svg (владелец 17.10: «оставь только полоски, которые залиты, без серых»):
-# пять его полосок, каждая залита цветом своей площадки — состояние «Все пять» знака в шапке из
-# _design/ideas/platforms-wave.html (headMark), цвета оттуда же. Пульс — как в идее: контур цвета полоски расходится
-# и гаснет, 2.4 с, одна фаза (test.css .wave-pulse). Форму и цвета знака не менять (владелец 17.10).
-# Поля: название, x и высота полоски знака, цвет.
-MARK_BARS = [("TikTok", 13.5, 12, "#FE2C55"),
-             ("Instagram", 29.5, 36, "#D62976"),
-             ("YouTube", 45.5, 64, "#FF0000"),
-             ("Telegram", 61.5, 36, "#2AABEE"),
-             ("X", 77.5, 12, "#1B2230")]
-MARK_BAR_W, MARK_PULSE_W = 9, 1.8  # толщина контура пульса — как в идее (0.9 при полоске 4.5)
+# Знак площадок — контур знака _design/logo/mark.svg, по полоске на каждую площадку из строки названий, все залиты
+# (владелец 17.10: «7 полосок на все площадки», «без серых пустых»). Как в _design/ideas/platforms-wave.html, контур
+# тот же ромб: полоски на том же размахе (центры 18…82), высота — по контуру знака (12 · 36 · 64 · 36 · 12 в его
+# полосках, между ними по прямой), толщина к шагу — как у знака (9 к 16). Цвета симметрично: по краям тёмные,
+# дальше розовые, у центра синие, в центре красная YouTube. Пульс — из идеи, 2.4 с, одна фаза (test.css .wave-pulse).
+MARK_PLATFORMS = [("Threads", "#1B2230"), ("Instagram", "#D62976"), ("Facebook", "#0866FF"), ("YouTube", "#FF0000"),
+                  ("Telegram", "#2AABEE"), ("TikTok", "#FE2C55"), ("X", "#1B2230")]
+MARK_CONTOUR = [(18, 12), (34, 36), (50, 64), (66, 36), (82, 12)]  # центр полоски знака → её высота
+
+
+def mark_height(cx):
+    for (x0, h0), (x1, h1) in zip(MARK_CONTOUR, MARK_CONTOUR[1:]):
+        if x0 <= cx <= x1:
+            return h0 + (h1 - h0) * (cx - x0) / (x1 - x0)
+    raise ValueError(cx)
+
+
+def mark_bars():
+    n = len(MARK_PLATFORMS)
+    step = (MARK_CONTOUR[-1][0] - MARK_CONTOUR[0][0]) / (n - 1)
+    w = step * 9 / 16
+    return [(name, MARK_CONTOUR[0][0] + step * i, mark_height(MARK_CONTOUR[0][0] + step * i), w, color)
+            for i, (name, color) in enumerate(MARK_PLATFORMS)]
+
+
 # Строка названий под знаком — вразнобой (владелец 17.10); RedNote убран 17.10.
 PLATFORM_CLOUD = ["TikTok", "YouTube", "Threads", "Telegram", "Facebook", "Instagram", "X"]
 
 
 def platform_wave():
     bars = []
-    for name, x, h, color in MARK_BARS:
-        box = f'x="{x:g}" y="{50 - h / 2:g}" width="{MARK_BAR_W}" height="{h}" rx="{MARK_BAR_W / 2:g}"'
-        bars.append(f'<rect class="wave-pulse" {box} fill="none" stroke="{color}" stroke-width="{MARK_PULSE_W}"/>'
+    for name, cx, h, w, color in mark_bars():
+        box = f'x="{cx - w / 2:.2f}" y="{50 - h / 2:.2f}" width="{w:.2f}" height="{h:.2f}" rx="{w / 2:.2f}"'
+        # контур пульса к толщине полоски — как в идее (0.9 при 4.5)
+        bars.append(f'<rect class="wave-pulse" {box} fill="none" stroke="{color}" stroke-width="{w * .2:.2f}"/>'
                     f'<rect {box} fill="{color}"><title>{name}</title></rect>')
-    names = ", ".join(n for n, _, _, _ in MARK_BARS)
+    names = ", ".join(n for n, _ in MARK_PLATFORMS)
     return f'<svg class="wave" viewBox="0 0 100 100" role="img" aria-label="Площадки: {names}">{"".join(bars)}</svg>'
 
 
@@ -683,7 +693,7 @@ def page_login(path="/test/login/"):
             '<p class="signin-claim">Один вход — все ваши площадки.</p>'
             f'{form}</section></div>')
     bare_page(path, "Вход", "Вход в improducer: Google или почта.", body,
-              states=("full", "loading", "error", "sent", "code", "badcode"), mark="wordmark--platforms")
+              states=("full", "loading", "error", "sent", "code", "badcode"))
 
 
 def onboarding_shell(path, n, blocks, states):
@@ -1402,8 +1412,8 @@ OPIS_SCREENS = [
     ("S07", "Вход", "claude.ai/login", "/test/login/",
      "Пропорции образца, половины зеркально (владелец 17.10): слева знак площадок и названия, справа заголовок и форма "
      "в карточке; на телефоне знака нет, как фото у образца",
-     "Вместо фото — знак _design/logo/mark.svg, пять полосок залиты цветами TikTok, Instagram, YouTube, Telegram, X "
-     "(как знак в шапке из _design/ideas/platforms-wave.html), пульс 2.4 с; под ним названия TikTok, YouTube, Threads, "
+     "Вместо фото — знак площадок: контур знака _design/logo/mark.svg, семь полосок — по одной на площадку, все "
+     "залиты её цветом, пульс 2.4 с из _design/ideas/platforms-wave.html; под ним названия TikTok, YouTube, Threads, "
      "Telegram, Facebook, Instagram, X шрифтом Geologica. "
      "Заголовок «Один вход — все ваши площадки.», без слова «Вход»; форма — Google, «или», почта → «Продолжить»; "
      "Apple и «скачать приложение» убраны", "заполнено · загрузка · ошибка"),

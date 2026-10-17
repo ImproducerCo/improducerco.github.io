@@ -385,9 +385,7 @@ a.tile.plat{color:inherit;text-decoration:none}
 /* «Всё крупнее» (владелец 17.10): кнопки и поле входа выше и крупнее штатных. */
 .signin .auth--login :is(.gbtn,.btn,.field input){min-height:var(--space-52);font-size:var(--fs-17)}
 
-/* Знак в шапке входа — те же цвета площадок (файл пишет сборка из MARK_BARS). */
-.wordmark--platforms::before{background-image:url("logo/mark-platforms.svg")}
-/* Знак — _design/logo/mark.svg, полоски в цветах площадок; пульс — из _design/ideas/platforms-wave.html, 2.4 с. */
+/* Знак площадок — контур знака _design/logo/mark.svg, семь залитых полосок; пульс — из platforms-wave.html, 2.4 с. */
 /* Размер и зазор — как в первой из трёх версий 17.10, которая владельцу понравилась больше. */
 .signin-stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-40);min-width:0}
 .signin-stage .wave{display:block;width:min(100%, calc(var(--tile-min) * 1.75));height:auto;overflow:visible}
