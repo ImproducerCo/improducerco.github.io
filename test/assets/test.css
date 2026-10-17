@@ -376,7 +376,7 @@ a.tile.plat{color:inherit;text-decoration:none}
 /* Строка площадок: тихая, одним стилем; название загорается вместе со своей полоской волны. */
 .pcloud{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;
   gap:var(--space-12) var(--space-24);color:var(--color-text-secondary);
-  font:var(--fw-500) var(--fs-16)/1 var(--font-sans)}
+  font:var(--type-meta-weight) var(--fs-13)/1 var(--font-mono);text-transform:uppercase;letter-spacing:.12em}
 .pcloud li{animation:pcloud-lit var(--wave-cycle) ease-in-out infinite both}
 .signin-claim{margin:0;color:var(--color-text-primary);
   font:var(--type-title-l-weight) var(--type-title-l-size)/var(--type-title-l-lh) var(--font-sans)}
@@ -397,7 +397,7 @@ a.tile.plat{color:inherit;text-decoration:none}
   .signin-stage,.signin-form{width:100%;max-width:calc(var(--tile-min) * 1.5)}
   .signin-stage{gap:var(--space-20)}
   .signin-stage .wave{width:calc(var(--tile-min) * .6)}
-  .pcloud{gap:var(--space-8) var(--space-16);font-size:var(--fs-14)}
+  .pcloud{gap:var(--space-12) var(--space-20);font-size:var(--fs-12)}
   .signin-claim{font:var(--type-title-m-weight) var(--type-title-m-size)/var(--type-title-m-lh) var(--font-sans)}
 }
 
