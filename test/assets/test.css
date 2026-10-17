@@ -278,7 +278,7 @@ pre.quote{white-space:pre-wrap;overflow-wrap:anywhere}
   border:var(--border-width) solid var(--color-status-warn-line);border-bottom:0;border-radius:var(--radius-card) var(--radius-card) 0 0;
   font:var(--type-small-weight) var(--type-small-size)/var(--type-small-lh) var(--font-sans);text-align:left}
 .limit a{color:inherit;font-weight:var(--fw-600)}
-.limit+.composer{border-top-left-radius:0;border-top-right-radius:0}
+.limit+.composer-wrap>.composer,.limit+.composer{border-top-left-radius:0;border-top-right-radius:0}
 .dock-limit{width:100%}
 /* Новый чат: приветствие и поле — в середине экрана, как у образца. */
 .greet{min-height:70vh;justify-content:center}
@@ -398,3 +398,90 @@ a.tile.plat{color:inherit;text-decoration:none}
   .signin-stage .wave{max-width:calc(var(--tile-min) * .45)}
   .signin-claim{font:var(--type-title-m-weight) var(--type-title-m-size)/var(--type-title-m-lh) var(--font-sans)}
 }
+
+/* ── Приложение по снимку claude.ai/new (владелец 17.10) ──────────────────
+   Боковая панель: свернуть · знак · переключатель «Чат | Кабинет», поиск, пункты с иконками, «Закреплённые»,
+   «Недавние», аккаунт внизу с меню (настройки, использование, подписка). Иконки — своё, на правку _design/. */
+.ic{width:var(--space-20);height:var(--space-20);flex:0 0 auto}
+.icon-btn{display:inline-grid;grid-auto-flow:column;place-items:center;gap:var(--space-4);min-width:var(--nav-height);height:var(--nav-height);
+  padding:0 var(--space-8);border:0;border-radius:var(--radius-control);background:transparent;color:var(--color-text-secondary);cursor:pointer;
+  list-style:none;text-decoration:none}
+.icon-btn::-webkit-details-marker{display:none}
+.icon-btn:hover{background:var(--color-bg-sunken);color:var(--color-text-primary)}
+.side{gap:var(--space-12)}
+.side-top .seg{margin-left:auto;display:inline-flex;padding:var(--space-4);gap:var(--space-4);border-radius:var(--radius-control);
+  background:var(--color-bg-sunken)}
+.seg a{display:inline-grid;place-items:center;padding:var(--space-4) var(--space-8);border-radius:var(--radius-8);color:var(--color-text-secondary)}
+.seg a[aria-current="page"]{background:var(--color-bg-surface);color:var(--color-text-primary);
+  box-shadow:0 0 0 var(--border-width) var(--color-border-default)}
+.side-top .wordmark{margin-right:var(--space-4)}
+.side-nav{display:flex;flex-direction:column;gap:var(--space-8);flex:1;min-height:0;overflow:auto}
+.side-search{display:flex;align-items:center;gap:var(--space-8);min-height:var(--nav-height);padding:0 var(--space-12);
+  border:var(--border-width) solid var(--color-border-default);border-radius:var(--radius-control);background:var(--color-bg-surface);
+  color:var(--color-text-secondary)}
+.side-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;color:var(--color-text-primary)}
+.snav{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.snav a,.snav .off,.snav summary{display:flex;align-items:center;gap:var(--space-12);min-height:var(--nav-height);padding:0 var(--space-12);
+  border-radius:var(--radius-control);color:var(--color-text-body);text-decoration:none;cursor:pointer;list-style:none}
+.snav summary::-webkit-details-marker{display:none}
+.snav a:hover,.snav summary:hover{background:var(--color-bg-sunken);color:var(--color-text-primary)}
+.snav a[aria-current="page"]{background:var(--color-bg-sunken);color:var(--color-text-primary);font-weight:var(--fw-600)}
+.snav .off{color:var(--color-text-secondary);cursor:default}
+.snav .ic{color:var(--color-text-secondary)}
+.snav .more[open] summary .ic{transform:rotate(90deg)}
+.snav .more summary{color:var(--color-text-secondary)}
+.more-in{display:flex;flex-direction:column;padding-left:calc(var(--space-12) * 2 + var(--space-20))}
+.more-in a{min-height:auto;padding:var(--space-8) var(--space-12)}
+.snav.recent a{gap:0}
+.snav.recent span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.side-k{margin-top:var(--space-12)}
+.side-k--row{display:flex;align-items:center;justify-content:space-between;padding-right:0}
+.side-k--row .icon-btn{min-width:0;height:auto;padding:var(--space-4)}
+.acct>summary{border-color:transparent}
+.acct>summary:hover{background:var(--color-bg-sunken);border-color:transparent}
+.acct>summary .ic{margin-left:auto;color:var(--color-text-secondary)}
+.acct-pop{left:0;right:0;min-width:0}
+.acct-pop a{display:flex;align-items:center;gap:var(--space-12)}
+.acct-pop a>span{display:flex;flex-direction:column;min-width:0;flex:1}
+.acct-pop a>.meta{flex:0 0 auto}
+.acct-pop .ic{color:var(--color-text-secondary)}
+.acct-pop .up{color:var(--color-text-primary);font-weight:var(--fw-600)}
+.bar-mini{display:block;height:var(--space-4);margin:var(--space-4) 0;border-radius:var(--radius-pill);background:var(--color-bg-sunken);overflow:hidden}
+.bar-mini i{display:block;height:100%;background:var(--color-text-primary);border-radius:inherit}
+
+/* Экран после входа */
+.home{position:relative;min-height:calc(100vh - var(--space-page-top) - var(--space-page-bottom));display:grid;place-items:center}
+.tmp-chat{position:absolute;top:0;right:0}
+.home-c{width:100%;max-width:var(--container-dialog);display:flex;flex-direction:column;align-items:center;gap:var(--space-24);
+  padding-bottom:10vh}
+.home-c [data-st]{width:100%;display:flex;flex-direction:column;align-items:center;gap:var(--space-24)}
+.home-c [data-st][hidden]{display:none}
+.hello{display:flex;align-items:center;gap:var(--space-12);margin:0;padding-left:0;text-align:center}
+.hello::before{display:none}
+.hello img{width:var(--space-40);height:var(--space-40);flex:0 0 auto}
+.composer-wrap{width:100%}
+.composer .tools{display:flex;align-items:center;gap:var(--space-8)}
+.tools-r{margin-left:auto;display:flex;align-items:center;gap:var(--space-4)}
+.composer .cmenu>summary{list-style:none}
+.composer .mic .ic+.ic{width:var(--space-12);height:var(--space-12)}
+.composer .voice{display:inline-grid;place-items:center;width:var(--nav-height);height:var(--nav-height);border-radius:var(--radius-control);
+  color:var(--color-text-primary)}
+.composer .voice:hover{background:var(--color-bg-sunken)}
+.composer .send{display:none;margin-left:0;color:var(--color-brand-red)}
+.composer:has(textarea:not(:placeholder-shown)) .send{display:inline-grid}
+.composer:has(textarea:not(:placeholder-shown)) .voice{display:none}
+.composer .cmenu .pop a{display:flex;align-items:center;gap:var(--space-12)}
+.composer .cmenu .pop a .meta{margin-left:auto}
+.under{display:flex;align-items:center;gap:var(--space-16);padding:var(--space-8) var(--space-16) 0;color:var(--color-text-body)}
+.umenu{position:relative}
+.umenu>summary{list-style:none;display:inline-flex;align-items:center;gap:var(--space-4);cursor:pointer}
+.umenu>summary::-webkit-details-marker{display:none}
+.umenu>summary .ic{width:var(--space-12);height:var(--space-12)}
+.umenu--r{margin-left:auto}
+.umenu .pop{top:calc(100% + var(--space-8));bottom:auto;min-width:calc(var(--tile-min) * .8)}
+.umenu--r .pop{left:auto;right:0}
+.ubtn{border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;padding:0}
+.side-top{gap:var(--space-4)}
+.side-top>.icon-btn{min-width:0;padding:0 var(--space-4)}
+.seg a{padding:var(--space-4)}
+@media (max-width:1180px){.side-top .seg,.side-nav{display:none}}

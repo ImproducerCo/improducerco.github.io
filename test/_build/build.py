@@ -190,66 +190,136 @@ def bare_page(path, title, desc, body, states=("full",)):
                    f'{SCRIPT}</body></html>\n')
 
 
+# Иконки боковой панели и поля ввода: линии в цвет текста, viewBox 20. Своих иконок в _design/ нет —
+# рисуем простые, на правку _design/ (см. DESIGN_TODO).
+_IC = {
+    "panel": '<rect x="3" y="4" width="14" height="12" rx="2"/><path d="M8 4v12"/>',
+    "chat": '<path d="M4 5.5h12v8H9.5L6 16v-2.5H4z"/>',
+    "cabinet": '<rect x="3.5" y="3.5" width="5.5" height="5.5" rx="1.2"/><rect x="11" y="3.5" width="5.5" height="5.5" rx="1.2"/>'
+               '<rect x="3.5" y="11" width="5.5" height="5.5" rx="1.2"/><rect x="11" y="11" width="5.5" height="5.5" rx="1.2"/>',
+    "search": '<circle cx="9" cy="9" r="5"/><path d="m13 13 3.5 3.5"/>',
+    "plus": '<path d="M10 4v12M4 10h12"/>',
+    "projects": '<rect x="3.5" y="7" width="13" height="9.5" rx="1.8"/><path d="M5.5 4.5h9"/>',
+    "artifacts": '<circle cx="7" cy="7" r="3"/><rect x="11" y="11" width="6" height="6" rx="1.2"/><path d="M13.5 3.5l3 5h-6z"/>',
+    "clock": '<circle cx="10" cy="10" r="6.5"/><path d="M10 6.5V10l2.5 1.5"/>',
+    "sliders": '<path d="M4 6h7M15 6h1M4 14h1M9 14h7"/><circle cx="13" cy="6" r="2"/><circle cx="7" cy="14" r="2"/>',
+    "right": '<path d="m8 5 5 5-5 5"/>',
+    "down": '<path d="m6 8 4 4 4-4"/>',
+    "file": '<path d="M6 3.5h5.5L15 7v9.5H6z"/><path d="M11.5 3.5V7H15"/>',
+    "ghost": '<path d="M5 17V9a5 5 0 0 1 10 0v8l-1.7-1.3L11.7 17 10 15.7 8.3 17l-1.6-1.3z"/><path d="M8 9h.01M12 9h.01"/>',
+    "mic": '<rect x="8" y="3" width="4" height="9" rx="2"/><path d="M5 10a5 5 0 0 0 10 0M10 15v2.5"/>',
+    "voice": '<path d="M4 8.5v3M7 6v8M10 3.5v13M13 6v8M16 8.5v3"/>',
+    "settings": '<circle cx="10" cy="10" r="2.5"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2M5 5l1.4 1.4M13.6 13.6 15 15M5 15l1.4-1.4M13.6 6.4 15 5"/>',
+    "help": '<circle cx="10" cy="10" r="6.5"/><path d="M8.2 8a1.9 1.9 0 1 1 2.6 1.8c-.5.2-.8.6-.8 1.2M10 13.5h.01"/>',
+    "globe": '<circle cx="10" cy="10" r="6.5"/><path d="M3.5 10h13M10 3.5c2 2 2 11 0 13M10 3.5c-2 2-2 11 0 13"/>',
+    "out": '<path d="M8 4H5v12h3M12 6.5 15.5 10 12 13.5M15.5 10H8"/>',
+    "up": '<path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/>',
+    "gauge": '<path d="M4 14a6 6 0 1 1 12 0"/><path d="m10 14 3-3.5"/>',
+    "card": '<rect x="3" y="5" width="14" height="10" rx="1.8"/><path d="M3 8.5h14"/>',
+}
+
+
+def ic(name, label=None):
+    aria = f' role="img" aria-label="{E(label)}"' if label else ' aria-hidden="true"'
+    return (f'<svg class="ic" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" '
+            f'stroke-linecap="round" stroke-linejoin="round"{aria}>{_IC[name]}</svg>')
+
+
 # ── Приложение ──────────────────────────────────────────────────────────────
 
-APP_NAV = [("/test/recents/", "Чаты"), ("/test/projects/", "Проекты"), ("/test/cabinet/", "Кабинет")]
 RECENT = [("Что дальше по каналу?", "/test/chat/youtube/"), ("План поездки в Казань на 3 дня", "/test/chat/"),
           ("Письмо соседям о ремонте", "/test/chat/"), ("Разбор таблицы расходов", "/test/chat/"),
           ("Меню на неделю без молочного", "/test/chat/")]
 ACCOUNT_MENU = ('<p class="pi">test@example.com</p>'
-                '<a href="/test/settings/general/">Настройки</a>'
-                '<p class="pi">Язык · Русский</p>'
-                '<a href="/test/help/">Помощь</a><hr>'
-                '<a href="/test/upgrade/">Посмотреть планы</a><hr>'
-                '<a href="/test/logout/">Выйти</a>')
+                f'<a href="/test/settings/general/">{ic("settings")}<span>Настройки</span></a>'
+                f'<a class="usage-mini" href="/test/settings/usage/">{ic("gauge")}<span>Использование'
+                '<span class="bar-mini"><i style="width:62%"></i></span>'
+                '<span class="meta">62% · сброс в 18:00</span></span></a>'
+                f'<a href="/test/settings/billing/">{ic("card")}<span>Подписка<span class="meta">Бесплатный план</span></span></a>'
+                f'<a class="up" href="/test/upgrade/">{ic("up")}<span>Повысить план</span></a><hr>'
+                f'<a href="/test/settings/general/#lang">{ic("globe")}<span>Язык</span><span class="meta">Русский</span></a>'
+                f'<a href="/test/help/">{ic("help")}<span>Помощь</span></a><hr>'
+                f'<a href="/test/logout/">{ic("out")}<span>Выйти</span></a>')
+
+
+SIDE_NAV = [("/test/new/", "plus", "Новый чат"), ("/test/projects/", "projects", "Проекты"),
+            ("/test/cabinet/", "cabinet", "Кабинет"), (None, "artifacts", "Артефакты"),
+            (None, "clock", "Расписание"), ("/test/settings/capabilities/", "sliders", "Настроить")]
+SIDE_MORE = [("/test/recents/", "Все чаты"), ("/test/settings/connectors/", "Коннекторы"), ("/test/help/", "Помощь")]
+PINNED = [("Канал «Тест»", "/test/cabinet/youtube/"), ("Пример проекта", "/test/project/primer/")]
 
 
 def app_page(path, title, desc, body, states=("full",), wide=False, active=None):
     active = active or path
-    nav = "".join(f'<li><a href="{h}"{" aria-current=\"page\"" if h == active else ""}>{t}</a></li>'
-                  for h, t in APP_NAV)
-    nav += '<li><span class="off">Артефакты <span class="meta">нет в прототипе</span></span></li>'
+
+    def item(h, icon, t):
+        if not h:
+            return f'<li><span class="off">{ic(icon)}<span>{t}</span></span></li>'
+        cur = ' aria-current="page"' if h == active or (h == "/test/cabinet/" and active.startswith("/test/cabinet/")) else ""
+        return f'<li><a href="{h}"{cur}>{ic(icon)}<span>{t}</span></a></li>'
+    nav = "".join(item(*x) for x in SIDE_NAV)
+    more = "".join(f'<a href="{h}">{t}</a>' for h, t in SIDE_MORE)
+    nav += (f'<li><details class="more"><summary>{ic("right")}<span>Ещё</span></summary>'
+            f'<div class="more-in">{more}</div></details></li>')
+    pinned = "".join(f'<li><a href="{h}"{" aria-current=\"page\"" if h == active else ""}>{ic("projects")}'
+                     f'<span>{E(t)}</span></a></li>' for t, h in PINNED)
     # Один чат на адрес: подсвечен первый пункт «Недавних» с адресом текущей страницы.
     lit = next((i for i, (_, h) in enumerate(RECENT) if h == active), None)
     recent = "".join(f'<li><a href="{h}"{" aria-current=\"page\"" if i == lit else ""}>'
                      f'<span>{E(t)}</span></a></li>' for i, (t, h) in enumerate(RECENT))
-    menu = ('<a href="/test/new/"><b>＋ Новый чат</b></a>'
-            + "".join(f'<a href="{h}"{" aria-current=\"page\"" if h == active else ""}>{t}</a>' for h, t in APP_NAV)
+    menu = (f'<a href="/test/new/"><b>Новый чат</b></a>'
+            + "".join(f'<a href="{h}">{t}</a>' for h, _, t in SIDE_NAV if h and h != "/test/new/")
             + '<hr><p class="pi">Недавние</p>'
             + "".join(f'<a href="{h}">{E(t)}</a>' for t, h in RECENT[:3])
             + "<hr>" + ACCOUNT_MENU)
+    seg = (f'<span class="seg"><a href="/test/new/"{" aria-current=\"page\"" if not active.startswith("/test/cabinet/") else ""} '
+           f'title="Чат">{ic("chat", "Чат")}</a><a href="/test/cabinet/"'
+           f'{" aria-current=\"page\"" if active.startswith("/test/cabinet/") else ""} title="Кабинет">{ic("cabinet", "Кабинет")}</a></span>')
     PAGES[path] = (head(title, desc) + "<body>"
                    '<div class="app"><aside class="side">'
-                   f'<div class="side-top">{wordmark("/test/new/", small=True, co=False)}'
+                   f'<div class="side-top"><button class="icon-btn hide-m" type="button" aria-label="Свернуть панель">{ic("panel")}</button>'
+                   f'{wordmark("/test/new/", small=True, co=False)}{seg}'
                    '<details class="side-menu"><summary class="btn">Меню</summary>'
                    f'<div class="pop">{menu}</div></details></div>'
-                   '<div class="side-nav stack-s">'
-                   '<a class="btn btn--primary" href="/test/new/">＋ Новый чат</a>'
-                   f'<ul class="cnav cnav--side">{nav}</ul>'
-                   f'<p class="side-k">Недавние</p><ul class="cnav cnav--side recent">{recent}</ul></div>'
+                   '<div class="side-nav">'
+                   f'<label class="side-search">{ic("search")}<span class="visually-hidden">Поиск</span>'
+                   '<input type="search" placeholder="Поиск"></label>'
+                   f'<ul class="snav">{nav}</ul>'
+                   f'<p class="side-k">Закреплённые</p><ul class="snav">{pinned}</ul>'
+                   f'<div class="side-k side-k--row"><span>Недавние</span>'
+                   f'<button class="icon-btn" type="button" aria-label="Фильтр">{ic("sliders")}</button></div>'
+                   f'<ul class="snav recent">{recent}</ul></div>'
                    '<div class="side-foot"><details class="acct"><summary><span class="ava">Т</span>'
-                   '<span class="who"><b>Тест</b><span class="meta">Бесплатный план</span></span></summary>'
-                   f'<div class="pop">{ACCOUNT_MENU}</div></details></div>'
+                   '<span class="who"><b>Тест</b><span class="meta">Бесплатный план</span></span>'
+                   f'{ic("down")}</summary><div class="pop acct-pop">{ACCOUNT_MENU}</div></details></div>'
                    '</aside>'
                    f'<main class="main"><div class="{"main-wide" if wide else "main-in"}">{body}</div></main></div>'
                    f'{proto(list(states))}{SCRIPT}</body></html>\n')
 
 
-def composer(off=False, text="", placeholder=None, nxt="/test/chat/"):
+def composer(off=False, text="", placeholder=None, nxt="/test/chat/", under=True):
     ph = placeholder or "Чем помочь сегодня?"
     dis = " disabled" if off else ""
     cls = " is-off" if off else ""
-    return (f'<div class="composer{cls}"><label class="visually-hidden" for="q">Сообщение</label>'
+    under_html = ('<div class="under">'
+                  f'<details class="umenu"><summary>Проект {ic("down")}</summary><div class="pop">'
+                  '<a href="/test/project/primer/">Пример проекта</a><a href="/test/cabinet/youtube/">Канал «Тест»</a>'
+                  '<hr><a href="/test/projects/">Все проекты</a></div></details>'
+                  f'<details class="umenu umenu--r"><summary><b>Sonnet 5.5</b> <span class="muted">Средне</span> {ic("down")}</summary>'
+                  '<div class="pop"><p class="pi">Модель</p><a href="#">Opus 5.5</a><a href="#"><b>Sonnet 5.5</b></a>'
+                  '<a href="#">Haiku 4.5</a><hr><p class="pi">Глубина</p><a href="#">Быстро</a><a href="#"><b>Средне</b></a>'
+                  '<a href="#">Глубоко</a></div></details>'
+                  '<button class="ubtn" type="button">Авто</button></div>') if under else ""
+    return (f'<div class="composer-wrap"><div class="composer{cls}"><label class="visually-hidden" for="q">Сообщение</label>'
             f'<textarea id="q" rows="2" placeholder="{E(ph)}" data-next="{nxt}"{dis}>{E(text)}</textarea>'
-            '<div class="tools"><details class="cmenu"><summary class="btn btn--ghost" aria-label="Добавить">＋</summary>'
-            '<div class="pop"><span class="pi">Файлы · нет в прототипе</span>'
-            '<a href="/test/cabinet/">Площадки: YouTube ✓</a>'
-            '<a href="/test/settings/connectors/">Коннекторы</a></div></details>'
-            f'<label class="visually-hidden" for="model">Модель</label><select id="model" class="select model"{dis}>'
-            '<option>Сбалансированная</option><option>Быстрая</option><option disabled>Мощная · план Про</option></select>'
-            f'<a class="send" href="{nxt}" aria-label="Отправить"{" aria-disabled=\"true\"" if off else ""}>'
-            '<svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5" '
-            'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></div>')
+            f'<div class="tools"><details class="cmenu"><summary class="icon-btn" aria-label="Добавить">{ic("plus")}</summary>'
+            f'<div class="pop"><a href="#">{ic("file")}<span>Файлы и фото</span></a>'
+            f'<a href="/test/cabinet/">{ic("cabinet")}<span>Площадки</span><span class="meta">YouTube ✓</span></a>'
+            f'<a href="/test/settings/connectors/">{ic("sliders")}<span>Коннекторы</span></a></div></details>'
+            f'<span class="tools-r"><button class="icon-btn mic" type="button" aria-label="Диктовка"{dis}>{ic("mic")}{ic("down")}</button>'
+            f'<a class="voice" href="#" aria-label="Голосовой режим">{ic("voice")}</a>'
+            f'<a class="send" href="{nxt}" aria-label="Отправить"{" aria-disabled=\"true\"" if off else ""}>{ic("up")}</a>'
+            f'</span></div></div>{under_html}</div>')
 
 
 def limit_bar(until="18:00"):
@@ -744,14 +814,17 @@ CHIPS = ('<div class="chips"><a href="/test/chat/youtube/">Что дальше �
 
 
 def page_new():
-    body = ('<div class="greet">'
-            + st("full", f'<h1>Добрый вечер, Тест</h1>{composer()}{CHIPS}')
-            + st("limit", f'<h1>Добрый вечер, Тест</h1><div class="dock-limit">{limit_bar()}'
+    hello = ('<h1 class="hello"><img src="/test/assets/logo/mark.svg" alt="" width="44" height="44">'
+             '<span>Привет, Тест</span></h1>')
+    tmp = f'<a class="icon-btn tmp-chat" href="#" title="Временный чат" aria-label="Временный чат">{ic("ghost")}</a>'
+    body = (f'<div class="home">{tmp}<div class="home-c">'
+            + st("full", hello + composer())
+            + st("limit", hello + f'<div class="dock-limit">{limit_bar()}'
                  f'{composer(off=True, placeholder="Лимит исчерпан до 18:00")}</div>')
-            + st("long", f'<h1>Добрый вечер, Тест</h1>{composer(text=LONG)}{CHIPS}')
+            + st("long", hello + composer(text=LONG))
             + st("loading", '<div style="width:100%">' + skel(2, True) + "</div>")
-            + "</div>")
-    app_page("/test/new/", "Новый чат", "Новый чат: приветствие, поле ввода, подсказки.", body,
+            + "</div></div>")
+    app_page("/test/new/", "Новый чат", "Экран после входа: приветствие, поле ввода, проект и модель.", body,
              states=("full", "limit", "long", "loading"))
 
 
