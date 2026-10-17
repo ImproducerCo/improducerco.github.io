@@ -366,13 +366,26 @@ a.tile.plat{color:inherit;text-decoration:none}
 .ways .rhead{flex:1 1 calc(var(--space-80) * 2)}
 .set-row .val .gbtn{width:100%}
 
-/* ── Вход: три версии на выбор владельцу (17.10) ───────────────────────────
-   Волна — строго _design/ideas/platforms-wave.html: форма знака, серые колонки, пульс цвета площадки 2.4 с одной фазой.
-   1 — две колонки крупно; 2 — одна колонка по центру, названия пилюлями; 3 — две колонки, волна во всю колонку. */
-.signin{display:grid;align-items:center;align-content:center;margin:0 auto;
-  padding:var(--space-16) var(--space-page-gutter) var(--space-64);min-height:calc(100vh - var(--space-80))}
-.signin-stage{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0}
-.signin-stage .wave{display:block;height:auto;overflow:visible}
+/* ── Вход: пропорции claude.ai/login (владелец 17.10) ────────────────────
+   Слева заголовок и форма в карточке, справа на месте их фото — волна площадок и названия, на всю высоту.
+   Подложки у правой половины нет: серую панель за волной владелец отверг 17.10. На телефоне правой половины нет. */
+.signin{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-40);max-width:var(--size-1440);
+  margin:0 auto;padding:var(--space-24) var(--space-page-gutter) var(--space-36);min-height:calc(100vh - var(--space-80))}
+.signin-form{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-32);min-width:0}
+.signin-claim{margin:0;max-width:14ch;text-align:center;color:var(--color-text-primary);
+  font:var(--fw-800) var(--fs-52)/1.1 var(--font-sans);letter-spacing:-.02em}
+.signin-form > [data-st]{display:flex;justify-content:center;width:100%}
+.signin-form .auth{width:100%;max-width:calc(var(--tile-min) * 1.75)}
+.signin .auth--login{gap:var(--space-16);padding:var(--space-32);background:var(--color-bg-surface);
+  border:1px solid var(--color-border-default);border-radius:var(--radius-card)}
+.signin .auth--login .small{text-align:center}
+/* «Всё крупнее» (владелец 17.10): кнопки и поле входа выше и крупнее штатных. */
+.signin .auth--login :is(.gbtn,.btn,.field input){min-height:var(--space-52);font-size:var(--fs-17)}
+
+/* Волна — строго _design/ideas/platforms-wave.html: форма знака, пульс цвета площадки 2.4 с одной фазой. */
+/* Зазора нет: в SVG знака над и под полосками и так 18% пустого поля. */
+.signin-stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:0}
+.signin-stage .wave{display:block;width:min(100%, calc(var(--tile-min) * 2), 58vh);height:auto;overflow:visible}
 .wave-pulse{transform-box:fill-box;transform-origin:center;opacity:0;
   animation:wave-pulse 2.4s cubic-bezier(.2,.7,.3,1) infinite}
 @keyframes wave-pulse{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.9,1.14);opacity:0}}
@@ -380,63 +393,23 @@ a.tile.plat{color:inherit;text-decoration:none}
 /* Названия — строчными блоками: если строка не влезает, text-wrap:balance делит её поровну; отрицательное поле
    гасит поля крайних названий. */
 .pcloud{--pc-gap:var(--space-24);--pc-row:var(--space-12);list-style:none;padding:0;
-  margin:calc(var(--pc-row) / -2) calc(var(--pc-gap) / -2);text-align:center;text-wrap:balance;color:var(--color-text-secondary)}
+  margin:calc(var(--pc-row) / -2) calc(var(--pc-gap) / -2);text-align:center;text-wrap:balance;
+  color:var(--color-text-secondary);font:var(--fw-500) var(--fs-17)/1.2 var(--font-mono)}
 .pcloud li{display:inline-block;margin:calc(var(--pc-row) / 2) calc(var(--pc-gap) / 2)}
-.signin-claim{margin:0;color:var(--color-text-primary);font-family:var(--font-sans);font-weight:var(--fw-800);letter-spacing:-.02em}
-.signin-form{display:flex;flex-direction:column;justify-content:center;width:100%;min-width:0}
-.auth--login{max-width:none;gap:var(--space-16)}
-/* «Всё крупнее» (владелец 17.10): кнопки и поле входа выше и крупнее штатных. */
-.signin .auth--login :is(.gbtn,.btn,.field input){min-height:var(--space-52);font-size:var(--fs-17)}
-.signin .auth--login .small{font-size:var(--fs-14)}
-
-.signin--v1{grid-template-columns:minmax(0,1fr) minmax(0,calc(var(--tile-min) * 1.75));gap:var(--space-80);max-width:var(--size-1440)}
-.signin--v1 .signin-stage{gap:var(--space-40)}
-.signin--v1 .wave{width:calc(var(--tile-min) * 1.75)}
-.signin--v1 .pcloud{--pc-gap:var(--space-32);font:var(--fw-500) var(--fs-18)/1.2 var(--font-mono)}
-.signin--v1 .signin-claim{font-size:var(--fs-32);line-height:1.2}
-
-.signin--v2{grid-template-columns:minmax(0,calc(var(--tile-min) * 2.6));justify-content:center;gap:var(--space-40);
-  max-width:var(--size-1180);padding-top:0}
-.signin--v2 .signin-stage{gap:var(--space-24)}
-.signin--v2 .wave{width:var(--tile-min)}
-.signin--v2 .pcloud{--pc-gap:var(--space-8);--pc-row:var(--space-8);color:var(--color-text-primary);
-  font:var(--fw-500) var(--fs-16)/1 var(--font-mono)}
-.signin--v2 .pcloud li{padding:var(--space-8) var(--space-16);border:1px solid var(--color-border-default);
-  border-radius:var(--radius-pill);background:var(--color-bg-surface)}
-.signin--v2 .signin-claim{font-size:var(--fs-40);line-height:1.1}
-.signin--v2 .signin-form{max-width:calc(var(--tile-min) * 1.75);margin:0 auto}
-
-.signin--v3{grid-template-columns:minmax(0,1fr) minmax(0,calc(var(--tile-min) * 1.75));gap:var(--space-80);max-width:var(--size-1440)}
-.signin--v3 .signin-stage{gap:var(--space-48)}
-/* Волна во всю колонку, но не выше половины экрана — иначе на 900 по высоте подпись уходит вниз. */
-.signin--v3 .wave{width:min(100%, calc(var(--tile-min) * 2.3), 55vh)}
-.signin--v3 .pcloud{--pc-gap:var(--space-24);font:var(--fw-400) var(--fs-20)/1.2 var(--font-mono);text-transform:lowercase}
-.signin--v3 .signin-claim{font-size:var(--fs-40);line-height:1.1}
 
 @media (max-width:1180px){
-  .signin--v1,.signin--v3{grid-template-columns:minmax(0,1fr) minmax(0,calc(var(--tile-min) * 1.4));gap:var(--space-48)}
-  .signin--v1 .wave{width:calc(var(--tile-min) * 1.3)}
-  .signin--v3 .wave{width:calc(var(--tile-min) * 1.6)}
-  .signin--v1 .pcloud{--pc-gap:var(--space-20);font-size:var(--fs-15)}
-  .signin--v3 .pcloud{--pc-gap:var(--space-16);font-size:var(--fs-16)}
-  .signin--v1 .signin-claim{font-size:var(--fs-26)}
-  .signin--v3 .signin-claim{font-size:var(--fs-30)}
+  .signin-claim{font-size:var(--fs-40)}
+  .pcloud{--pc-gap:var(--space-16);font-size:var(--fs-15)}
 }
 @media (max-width:900px){
-  .signin--v1,.signin--v2,.signin--v3{grid-template-columns:minmax(0,1fr);justify-items:center;min-height:0;
-    gap:var(--space-40);padding-top:var(--space-24)}
-  .signin-stage,.signin-form{width:100%;max-width:calc(var(--tile-min) * 1.75)}
-  .signin--v1 .signin-stage,.signin--v2 .signin-stage,.signin--v3 .signin-stage{gap:var(--space-24)}
-  .signin--v1 .wave,.signin--v2 .wave,.signin--v3 .wave{width:calc(var(--tile-min) * .8)}
-  .signin--v1 .pcloud,.signin--v3 .pcloud{--pc-gap:var(--space-16);font-size:var(--fs-15)}
-  .signin--v2 .pcloud{font-size:var(--fs-14)}
-  .signin--v1 .signin-claim{font-size:var(--fs-24)}
-  .signin--v2 .signin-claim,.signin--v3 .signin-claim{font-size:var(--fs-28)}
+  .signin{grid-template-columns:minmax(0,1fr);padding-top:var(--space-40)}
+  .signin-stage{display:none}
 }
 @media (max-width:640px){
-  .signin--v1 .wave,.signin--v2 .wave,.signin--v3 .wave{width:calc(var(--tile-min) * .7)}
-  .signin--v1 .signin-claim{font-size:var(--fs-22)}
-  .signin--v2 .signin-claim,.signin--v3 .signin-claim{font-size:var(--fs-26)}
+  .signin{min-height:0}
+  .signin-form{justify-content:flex-start}
+  .signin-claim{font-size:var(--fs-32)}
+  .signin .auth--login{padding:var(--space-24)}
 }
 
 /* ── Приложение по снимку claude.ai/new (владелец 17.10) ──────────────────

@@ -610,8 +610,8 @@ WAVE_NETS = {0: ("TikTok", ["#25F4EE", "#FE2C55"], False),
              4: ("YouTube", ["#FF0000"], False),
              6: ("Telegram", ["#2AABEE", "#229ED9"], False),
              8: ("X", ["#1B2230"], False)}
-# Залита только средняя — красная черта знака; остальные площадки серые с пульсом своего цвета.
-WAVE_FILLED = {"YouTube"}
+# Все площадки залиты своим цветом (владелец 17.10) — состояние «Все пять» из идеи; пульс тот же.
+WAVE_FILLED = {name for name, _, _ in WAVE_NETS.values()}
 # Строка названий под волной — вразнобой (владелец 17.10); RedNote убран 17.10.
 PLATFORM_CLOUD = ["TikTok", "YouTube", "Threads", "Telegram", "Facebook", "Instagram", "X"]
 
@@ -656,12 +656,7 @@ def login_form():
             '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
 
 
-# Три версии входа на выбор владельцу (17.10): 1 — две колонки крупно, названия моноширинным как пишут площадки;
-# 2 — одна колонка по центру, названия пилюлями; 3 — две колонки, волна во всю колонку, названия строчными.
-LOGIN_VERSIONS = {1: "/test/login/", 2: "/test/login/2/", 3: "/test/login/3/"}
-
-
-def page_login(path="/test/login/", v=1):
+def page_login(path="/test/login/"):
     sent = ('<div class="card auth"><span class="badge badge--ok">письмо отправлено</span>'
             '<h2 class="screen-title">Проверьте почту</h2>'
             '<p>Отправили ссылку для входа и код на <b>test@example.com</b>. Откройте ссылку на этом устройстве '
@@ -686,20 +681,18 @@ def page_login(path="/test/login/", v=1):
                                                                  "Окно Google закрыли или вход отменён. Попробуйте ещё раз.")
                  + gbtn("/test/onboarding/") + "</div>")
             + st("sent", sent) + st("code", code_card()) + st("badcode", code_card(True)))
-    # Видимого заголовка нет (владелец 17.10: «слово вход убери») — только для экранных чтецов.
-    h1 = '<h1 class="visually-hidden">Вход в improducer</h1>'
-    body = (f'<div class="signin signin--v{v}">'
-            '<section class="signin-stage" aria-label="Площадки">'
-            f'{platform_wave()}<ul class="pcloud">{platform_cloud()}</ul>'
-            '<p class="signin-claim">Один вход — все ваши площадки.</p></section>'
+    # Пропорции claude.ai/login (владелец 17.10): слева заголовок и форма в карточке, справа панель на всю высоту —
+    # у них фото, у нас волна площадок и их названия. Слова «Вход» на экране нет (владелец 17.10), H1 — только для
+    # экранных чтецов; обещание — абзацем, у штатного H1 черта слева, а здесь текст по центру.
+    body = ('<div class="signin">'
             '<section class="signin-form">'
-            f'{h1}{form}</section></div>')
+            '<h1 class="visually-hidden">Вход в improducer</h1>'
+            '<p class="signin-claim">Один вход — все ваши площадки.</p>'
+            f'{form}</section>'
+            '<section class="signin-stage" aria-label="Площадки">'
+            f'{platform_wave()}<ul class="pcloud">{platform_cloud()}</ul></section></div>')
     bare_page(path, "Вход", "Вход в improducer: Google или почта.", body,
               states=("full", "loading", "error", "sent", "code", "badcode"))
-    if path == "/test/login/":
-        for n, other in LOGIN_VERSIONS.items():
-            if n != v:
-                page_login(other, n)
 
 
 def onboarding_shell(path, n, blocks, states):
@@ -1416,11 +1409,12 @@ OPIS_SCREENS = [
      "Поиск с ⌘K, частые статьи строками, коллекции плитками", "Бокового меню разделов нет; открывается одна статья",
      "заполнено · пусто · загрузка"),
     ("S07", "Вход", "claude.ai/login", "/test/login/",
-     "Ничего: вход свой (владелец 17.10 — раскладка образца слишком похожа на Claude)",
-     "Своя страница: волна площадок строго по _design/ideas/platforms-wave.html (форма знака, 9 полосок, серые колонки, "
-     "пульс цвета площадки 2.4 с одной фазой; YouTube залита красным), под ней названия TikTok, YouTube, Threads, Telegram, "
-     "Facebook, Instagram, X и «Один вход — все ваши площадки.»; форма — Google, «или», почта → «Продолжить». Заголовка "
-     "нет. Три версии на выбор (17.10): /test/login/, /test/login/2/, /test/login/3/", "заполнено · загрузка · ошибка"),
+     "Пропорции образца (владелец 17.10): слева заголовок и форма в карточке, справа панель на всю высоту; "
+     "на телефоне панели нет",
+     "Вместо фото — волна площадок строго по _design/ideas/platforms-wave.html (форма знака, 9 полосок, площадки "
+     "залиты своим цветом, пульс 2.4 с одной фазой) и названия TikTok, YouTube, Threads, Telegram, Facebook, Instagram, X. "
+     "Заголовок «Один вход — все ваши площадки.», без слова «Вход»; форма — Google, «или», почта → «Продолжить»; "
+     "Apple и «скачать приложение» убраны", "заполнено · загрузка · ошибка"),
     ("S08", "Письмо и код", "claude.ai/login (шаг 2)", "/test/login/#s=sent",
      "Письмо отправлено → ввод кода → неверный код; «письмо не пришло» и «отправить ещё раз»",
      "Ссылки из письма нет: письма не уходят", "письмо отправлено · ввод кода · неверный код"),
