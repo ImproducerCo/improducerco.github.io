@@ -597,44 +597,46 @@ def page_help_start():
               states=("full", "long"))
 
 
-# Волна площадок — геометрия и цвета из _design/ideas/platforms-wave.html (идея владельца 08.10):
-# 9 полосок знака, площадки на своих местах и в своих цветах, общий пульс 2.4 с. Остальные — серые, как в идее.
-WAVE_CX = [18, 26, 34, 42, 50, 58, 66, 74, 82]
-WAVE_HT = [12, 24, 36, 50, 64, 50, 36, 24, 12]
-WAVE_NETS = {2: ("ig", ["#FEDA75", "#FA7E1E", "#D62976", "#962FBF", "#4F5BD5"], True),
-             4: ("yt", ["#FF0000"], False),
-             6: ("tg", ["#2AABEE", "#229ED9"], False)}
-# Площадки под волной — россыпью, вразнобой (владелец 17.10): наши три + площадки, где люди ведут свои страницы:
-# TikTok, Facebook, X, Threads и азиатская RedNote (Xiaohongshu). Pinterest и Snapchat убраны по просьбе владельца.
-# Второе поле — размер в россыпи: l · m · s.
-PLATFORM_CLOUD = [("TikTok", "m"), ("YouTube", "l"), ("Threads", "s"), ("Telegram", "l"),
-                  ("Facebook", "s"), ("Instagram", "l"), ("X", "m"), ("RedNote", "s")]
+# Волна площадок — из _design/ideas/platforms-wave.html (идея владельца 08.10), 17.10 расширена: по полоске на каждую
+# площадку, все в своих цветах и пульсируют. Высоты неровные, как у звуковой волны; выше всех — YouTube
+# (как центральная красная черта знака). Поля: название, высота, цвета снизу вверх (градиент — если цветов несколько).
+WAVE = [("Threads", 18, ["#101010"]),
+        ("Facebook", 30, ["#0866FF"]),
+        ("Instagram", 48, ["#FEDA75", "#FA7E1E", "#D62976", "#962FBF", "#4F5BD5"]),
+        ("YouTube", 66, ["#FF0000"]),
+        ("Telegram", 56, ["#229ED9", "#2AABEE"]),
+        ("TikTok", 40, ["#FE2C55", "#25F4EE"]),
+        ("X", 28, ["#1B2230"]),
+        ("RedNote", 18, ["#FF2442"])]
+WAVE_STEP, WAVE_BAR = 9, 5
+# Площадки под волной — россыпью, вразнобой, одним стилем (владелец 17.10): наши три + площадки, где люди ведут
+# свои страницы: TikTok, Facebook, X, Threads и азиатская RedNote (Xiaohongshu). Pinterest и Snapchat убраны.
+PLATFORM_CLOUD = ["TikTok", "YouTube", "Threads", "Telegram", "Facebook", "Instagram", "X", "RedNote"]
 
 
 def platform_wave():
-    bw, r = 4.5, 2.25
+    r = WAVE_BAR / 2
+    first = 50 - WAVE_STEP * (len(WAVE) - 1) / 2
     defs, bars = [], []
-    for i, (cx, h) in enumerate(zip(WAVE_CX, WAVE_HT)):
-        x, y = cx - bw / 2, 50 - h / 2
-        net = WAVE_NETS.get(i)
-        if not net:
-            bars.append(f'<rect x="{x}" y="{y}" width="{bw}" height="{h}" rx="{r}" fill="#C9D1DC"/>')
-            continue
-        nid, grad, up = net
+    for i, (name, h, grad) in enumerate(WAVE):
+        x, y = first + WAVE_STEP * i - WAVE_BAR / 2, 50 - h / 2
         if len(grad) > 1:
             stops = "".join(f'<stop offset="{k / (len(grad) - 1):.2f}" stop-color="{c}"/>' for k, c in enumerate(grad))
-            defs.append(f'<linearGradient id="w{nid}" x1="0" y1="{1 if up else 0}" x2="0" y2="{0 if up else 1}">{stops}</linearGradient>')
-            paint = f"url(#w{nid})"
+            defs.append(f'<linearGradient id="w{i}" x1="0" y1="1" x2="0" y2="0">{stops}</linearGradient>')
+            paint = f"url(#w{i})"
         else:
             paint = grad[0]
-        bars.append(f'<rect class="wave-pulse" x="{x}" y="{y}" width="{bw}" height="{h}" rx="{r}" stroke="{paint}" stroke-width=".9"/>'
-                    f'<rect x="{x}" y="{y}" width="{bw}" height="{h}" rx="{r}" fill="{paint}"/>')
-    return (f'<svg class="wave" viewBox="0 0 100 100" role="img" aria-label="Площадки: YouTube, Telegram, Instagram">'
+        # Пульс вразнобой: у каждой полоски своя задержка, чтобы волна «дышала», а не мигала разом.
+        bars.append(f'<rect class="wave-pulse" style="animation-delay:{i * 0.3:.1f}s" x="{x}" y="{y}" width="{WAVE_BAR}" '
+                    f'height="{h}" rx="{r}" stroke="{paint}" stroke-width=".9"/>'
+                    f'<rect x="{x}" y="{y}" width="{WAVE_BAR}" height="{h}" rx="{r}" fill="{paint}"><title>{name}</title></rect>')
+    names = ", ".join(n for n, _, _ in WAVE)
+    return (f'<svg class="wave" viewBox="0 0 100 100" role="img" aria-label="Площадки: {names}">'
             f'<defs>{"".join(defs)}</defs>{"".join(bars)}</svg>')
 
 
 def platform_cloud():
-    return "".join(f'<li class="pc-{z}">{t}</li>' for t, z in PLATFORM_CLOUD)
+    return "".join(f'<li>{t}</li>' for t in PLATFORM_CLOUD)
 
 
 # ── Вход и первый запуск ─────────────────────────────────────────────────────
@@ -669,13 +671,14 @@ def page_login(path="/test/login/"):
                 f'placeholder="6 цифр" data-next="/test/onboarding/">{err}</div>'
                 f'{a_btn("/test/onboarding/", "Подтвердить", True)}'
                 '<p class="small muted"><a href="#s=sent">Отправить код ещё раз</a></p></div>')
-    form = (st("full long", login_form())
+    form = (st("full", login_form())
             + st("loading", '<div class="auth auth--login">' + skel(3) + "</div>")
             + st("error", '<div class="auth auth--login">' + warn("Вход не завершён",
                                                                  "Окно Google закрыли или вход отменён. Попробуйте ещё раз.")
                  + gbtn("/test/onboarding/") + "</div>")
             + st("sent", sent) + st("code", code_card()) + st("badcode", code_card(True)))
-    h1 = st("full loading error sent code badcode", "<h1>Вход</h1>") + st("long", f"<h1>{LONG}</h1>")
+    # Видимого заголовка нет (владелец 17.10: «слово вход убери») — только для экранных чтецов.
+    h1 = '<h1 class="visually-hidden">Вход в improducer</h1>'
     body = ('<div class="signin">'
             '<section class="signin-stage" aria-label="Площадки">'
             f'{platform_wave()}<ul class="pcloud">{platform_cloud()}</ul>'
@@ -683,7 +686,7 @@ def page_login(path="/test/login/"):
             '<section class="signin-form">'
             f'{h1}{form}</section></div>')
     bare_page(path, "Вход", "Вход в improducer: Google или почта.", body,
-              states=("full", "loading", "error", "sent", "code", "badcode", "long"))
+              states=("full", "loading", "error", "sent", "code", "badcode"))
 
 
 def onboarding_shell(path, n, blocks, states):
@@ -1382,7 +1385,7 @@ OPIS_SCREENS = [
     ("S02", "Главная", "claude.com/", "/test/",
      "Ничего: главная — это вход (владелец 17.10: на главной только вход, остальное — вода)",
      "Та же страница, что /test/login/: волна площадок и вход через Google или почту. Героя, планов, вопросов и "
-     "примера чата нет; Продукт, Цены, Помощь — по своим адресам.", "заполнено · загрузка · ошибка · длинный"),
+     "примера чата нет; Продукт, Цены, Помощь — по своим адресам.", "заполнено · загрузка · ошибка"),
     ("S03", "Продукт", "claude.com/product/overview", "/test/product/",
      "Полоса раздела, заголовок по центру с двумя кнопками, блоки ниже",
      "Россыпи картинок и видео нет: функции YouTube — плитками, площадки — карточками, два пути работы", "заполнено"),
@@ -1403,7 +1406,8 @@ OPIS_SCREENS = [
      "Ничего: вход свой (владелец 17.10 — раскладка образца слишком похожа на Claude)",
      "Своя страница: слева волна площадок из _design/ideas/platforms-wave.html с подписями YouTube · Telegram · "
      "Instagram, справа «Вход» — Google, «или», почта → «Продолжить». Без пояснений и ссылки на свой Claude; Apple убран. "
-     "Под волной — россыпь площадок: YouTube, Telegram, Instagram, TikTok, Facebook, X, Threads, RedNote, без фона и полосок", "заполнено · загрузка · ошибка · длинный"),
+     "Над формой заголовка нет. Волна — по полоске на каждую из восьми площадок в их цветах, пульсирует; под ней россыпь "
+     "названий одним стилем: YouTube, Telegram, Instagram, TikTok, Facebook, X, Threads, RedNote", "заполнено · загрузка · ошибка"),
     ("S08", "Письмо и код", "claude.ai/login (шаг 2)", "/test/login/#s=sent",
      "Письмо отправлено → ввод кода → неверный код; «письмо не пришло» и «отправить ещё раз»",
      "Ссылки из письма нет: письма не уходят", "письмо отправлено · ввод кода · неверный код"),
