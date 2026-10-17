@@ -62,6 +62,11 @@ def copy_assets():
         shutil.copy2(DESIGN / "logo" / name, out / "logo" / name)
     for name in ("test.css", "test.js"):
         shutil.copy2(HERE / name, out / name)
+    # Знак в шапке входа — полоски в цветах площадок, как большой знак на странице (владелец 17.10).
+    (out / "logo" / "mark-platforms.svg").write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+        + "".join(f'<rect x="{x:g}" y="{50 - h / 2:g}" width="{MARK_BAR_W}" height="{h}" rx="{MARK_BAR_W / 2:g}" '
+                  f'fill="{c}"/>' for _, x, h, c in MARK_BARS) + "</svg>\n", encoding="utf-8")
     # Geologica — шрифт строки площадок на входе (владелец 17.10, выбран из шести); в _design/ его пока нет.
     for f in (HERE / "fonts").iterdir():
         shutil.copy2(f, out / "fonts" / f.name)
@@ -92,8 +97,8 @@ def head(title, desc):
 """
 
 
-def wordmark(href="/test/", small=False, co=True):
-    cls = "wordmark wordmark--sm" if small else "wordmark"
+def wordmark(href="/test/", small=False, co=True, extra=""):
+    cls = ("wordmark wordmark--sm" if small else "wordmark") + (f" {extra}" if extra else "")
     suffix = '<span class="co">.co</span>' if co else ""
     return f'<a class="{cls}" href="{href}"><span>improducer{suffix}</span></a>'
 
@@ -192,9 +197,9 @@ def site_page(path, title, desc, body, states=("full",), crumb=None):
                    f'{proto(list(states))}{SCRIPT}</body></html>\n')
 
 
-def bare_page(path, title, desc, body, states=("full",)):
+def bare_page(path, title, desc, body, states=("full",), mark=""):
     PAGES[path] = (head(title, desc) + '<body class="site">'
-                   f'<header class="bare-head">{wordmark()}</header>'
+                   f'<header class="bare-head">{wordmark(extra=mark)}</header>'
                    f'<main>{body}</main>{proto(list(states))}'
                    f'{SCRIPT}</body></html>\n')
 
@@ -678,7 +683,7 @@ def page_login(path="/test/login/"):
             '<p class="signin-claim">Один вход — все ваши площадки.</p>'
             f'{form}</section></div>')
     bare_page(path, "Вход", "Вход в improducer: Google или почта.", body,
-              states=("full", "loading", "error", "sent", "code", "badcode"))
+              states=("full", "loading", "error", "sent", "code", "badcode"), mark="wordmark--platforms")
 
 
 def onboarding_shell(path, n, blocks, states):
