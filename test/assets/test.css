@@ -365,3 +365,36 @@ a.tile.plat{color:inherit;text-decoration:none}
 .ways .row-top{flex-wrap:wrap}
 .ways .rhead{flex:1 1 calc(var(--space-80) * 2)}
 .set-row .val .gbtn{width:100%}
+
+/* ── Вход: своя раскладка (владелец 17.10 — не как у образца) ─────────────
+   Слева — волна площадок из _design/ideas/platforms-wave.html с подписями сбоку, справа — короткая форма. */
+.signin{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:var(--space-48);align-items:stretch;
+  max-width:var(--container-tool);margin:0 auto;padding:var(--space-16) var(--space-page-gutter) var(--space-64);
+  min-height:calc(100vh - var(--space-80))}
+.signin-stage{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--space-32);
+  padding:var(--space-48);background:var(--color-bg-sunken);border-radius:var(--radius-card)}
+.signin-stage .wave{width:100%;max-width:calc(var(--tile-min) * 1.4);height:auto;justify-self:center}
+.wave-labels{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--space-16)}
+.wave-labels li{display:grid;grid-template-columns:auto 1fr;column-gap:var(--space-12)}
+.wave-labels i{grid-row:span 2;width:var(--space-4);border-radius:var(--radius-4);align-self:stretch}
+.wave-labels b{font:var(--type-title-m-weight) var(--type-title-m-size)/var(--type-title-m-lh) var(--font-sans);color:var(--color-text-primary)}
+.wave-labels span{color:var(--color-text-body)}
+.signin-claim{grid-column:1/-1;margin:0;color:var(--color-text-primary);
+  font:var(--type-title-l-weight) var(--type-title-l-size)/var(--type-title-l-lh) var(--font-sans)}
+.signin-form{display:flex;flex-direction:column;justify-content:center;gap:var(--space-16);
+  width:100%;max-width:var(--container-single);justify-self:center}
+.signin-form h1{margin:0}
+.signin-form .lede{margin:0}
+.auth--login{max-width:none}
+.signin-own{margin:0}
+.wave-pulse{fill:none;transform-box:fill-box;transform-origin:center;opacity:0;
+  animation:wave-pulse 2.4s cubic-bezier(.2,.7,.3,1) infinite}
+@keyframes wave-pulse{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.9,1.14);opacity:0}}
+@media (prefers-reduced-motion:reduce){.wave-pulse{animation:none}}
+@media (max-width:1180px){.signin-stage{grid-template-columns:1fr;justify-items:center;padding:var(--space-32)}}
+@media (max-width:900px){
+  .signin{grid-template-columns:minmax(0,1fr);min-height:0;gap:var(--space-24)}
+  .signin-stage{grid-template-columns:auto minmax(0,1fr);justify-items:start;gap:var(--space-20);padding:var(--space-20)}
+  .signin-stage .wave{max-width:calc(var(--tile-min) * .45)}
+  .signin-claim{font:var(--type-title-m-weight) var(--type-title-m-size)/var(--type-title-m-lh) var(--font-sans)}
+}

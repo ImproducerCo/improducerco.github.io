@@ -320,7 +320,7 @@ def plan_tabs(active, base="/test/pricing/"):
 
 FAQ_SITE = [
     ("Что такое improducer?",
-     "Чат, который работает с вашими площадками: сейчас YouTube, Telegram и Instagram — скоро. Анкета, ДНК, ниша, "
+     "Чат, который работает с вашими площадками: YouTube, Telegram, Instagram. Анкета, ДНК, ниша, "
      "концепция, идеи, план, сценарии, обложки, выпуск и аналитика — функциями, результаты — в кабинете."),
     ("Это бесплатно?",
      "Бесплатный план есть у всех. Цены платных планов появятся на странице «Цены»."),
@@ -364,13 +364,12 @@ def preview_card():
 
 
 PLATFORMS = [("YouTube", "Канал: статистика, идеи, сценарии, выпуск", "есть"),
-             ("Telegram", "Канал и посты", "скоро"), ("Instagram", "Профиль и ролики", "скоро")]
+             ("Telegram", "Канал и посты", ""), ("Instagram", "Профиль и рилсы", "")]
 
 
 def platform_strip():
-    """Полоса площадок под героем: что есть сейчас и что скоро."""
-    items = "".join(f'<li><b>{t}</b><span class="small muted">{d}</span>'
-                    f'<span class="badge{" badge--ok" if s == "есть" else ""}">{s}</span></li>' for t, d, s in PLATFORMS)
+    """Полоса площадок под героем: название и описание сбоку, без отметок «есть / скоро»."""
+    items = "".join(f'<li><b>{t}</b><span class="small">{d}</span></li>' for t, d, s in PLATFORMS)
     return f'<ul class="plat-strip" aria-label="Площадки">{items}</ul>'
 
 
@@ -389,7 +388,7 @@ def two_ways():
 # ── Страницы сайта ──────────────────────────────────────────────────────────
 
 HERO_H1 = "Ваши площадки — в одном чате"
-HERO_LEDE = "YouTube сейчас, Telegram и Instagram — скоро. Работайте здесь или в своём Claude."
+HERO_LEDE = "YouTube, Telegram, Instagram — в одном месте. Работайте здесь или в своём Claude."
 
 
 def page_home():
@@ -575,7 +574,56 @@ def page_help_start():
               states=("full", "long"))
 
 
+# Волна площадок — геометрия и цвета из _design/ideas/platforms-wave.html (идея владельца 08.10):
+# 9 полосок знака, площадки на своих местах и в своих цветах, общий пульс 2.4 с. Остальные — серые, как в идее.
+WAVE_CX = [18, 26, 34, 42, 50, 58, 66, 74, 82]
+WAVE_HT = [12, 24, 36, 50, 64, 50, 36, 24, 12]
+WAVE_NETS = {2: ("ig", ["#FEDA75", "#FA7E1E", "#D62976", "#962FBF", "#4F5BD5"], True),
+             4: ("yt", ["#FF0000"], False),
+             6: ("tg", ["#2AABEE", "#229ED9"], False)}
+WAVE_LABELS = [("yt", "YouTube", "ролики, статистика, выпуск", "#FF0000"),
+               ("tg", "Telegram", "канал и посты", "#2AABEE"),
+               ("ig", "Instagram", "профиль и рилсы", "#D62976")]
+
+
+def platform_wave():
+    bw, r = 4.5, 2.25
+    defs, bars = [], []
+    for i, (cx, h) in enumerate(zip(WAVE_CX, WAVE_HT)):
+        x, y = cx - bw / 2, 50 - h / 2
+        net = WAVE_NETS.get(i)
+        if not net:
+            bars.append(f'<rect x="{x}" y="{y}" width="{bw}" height="{h}" rx="{r}" fill="#C9D1DC"/>')
+            continue
+        nid, grad, up = net
+        if len(grad) > 1:
+            stops = "".join(f'<stop offset="{k / (len(grad) - 1):.2f}" stop-color="{c}"/>' for k, c in enumerate(grad))
+            defs.append(f'<linearGradient id="w{nid}" x1="0" y1="{1 if up else 0}" x2="0" y2="{0 if up else 1}">{stops}</linearGradient>')
+            paint = f"url(#w{nid})"
+        else:
+            paint = grad[0]
+        bars.append(f'<rect class="wave-pulse" x="{x}" y="{y}" width="{bw}" height="{h}" rx="{r}" stroke="{paint}" stroke-width=".9"/>'
+                    f'<rect x="{x}" y="{y}" width="{bw}" height="{h}" rx="{r}" fill="{paint}"/>')
+    return (f'<svg class="wave" viewBox="0 0 100 100" role="img" aria-label="Площадки: YouTube, Telegram, Instagram">'
+            f'<defs>{"".join(defs)}</defs>{"".join(bars)}</svg>')
+
+
+def wave_labels():
+    return "".join(f'<li><i style="background:{c}"></i><b>{t}</b><span>{d}</span></li>' for _, t, d, c in WAVE_LABELS)
+
+
 # ── Вход и первый запуск ─────────────────────────────────────────────────────
+
+def login_form():
+    return ('<div class="auth auth--login">'
+            f'{gbtn("/test/onboarding/")}'
+            '<div class="or">или почтой</div>'
+            '<div class="field"><label for="em">Почта</label>'
+            '<input id="em" type="email" placeholder="you@example.com" autocomplete="email"></div>'
+            f'{a_btn("#s=sent", "Получить код на почту")}'
+            '<p class="small muted">Продолжая, вы принимаете <a href="/terms.html">условия</a> и '
+            '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
+
 
 def page_login():
     sent = ('<div class="card auth"><span class="badge badge--ok">письмо отправлено</span>'
@@ -596,17 +644,22 @@ def page_login():
                 f'placeholder="6 цифр" data-next="/test/onboarding/">{err}</div>'
                 f'{a_btn("/test/onboarding/", "Подтвердить", True)}'
                 '<p class="small muted"><a href="#s=sent">Отправить код ещё раз</a></p></div>')
-    form = (st("full long", auth_card())
-            + st("loading", '<div class="card auth">' + skel(3) + "</div>")
-            + st("error", '<div class="card auth">' + warn("Вход не завершён",
-                                                          "Окно Google закрыли или вход отменён. Попробуйте ещё раз.")
+    form = (st("full long", login_form())
+            + st("loading", '<div class="auth auth--login">' + skel(3) + "</div>")
+            + st("error", '<div class="auth auth--login">' + warn("Вход не завершён",
+                                                                 "Окно Google закрыли или вход отменён. Попробуйте ещё раз.")
                  + gbtn("/test/onboarding/") + "</div>")
             + st("sent", sent) + st("code", code_card()) + st("badcode", code_card(True)))
-    h1 = st("full loading error sent code badcode", f"<h1>{HERO_H1}</h1>") + st("long", f"<h1>{LONG}</h1>")
-    body = ('<div class="login"><div class="hero-text">'
-            f'{h1}<p class="lede">{HERO_LEDE}</p>{form}'
-            f'{a_btn("/test/download/", OWN_CLAUDE)}</div>{preview_card()}</div>')
-    bare_page("/test/login/", "Вход", "Вход в improducer: Google, Apple или почта.", body,
+    h1 = st("full loading error sent code badcode", "<h1>Вход</h1>") + st("long", f"<h1>{LONG}</h1>")
+    body = ('<div class="signin">'
+            '<section class="signin-stage" aria-label="Площадки">'
+            f'{platform_wave()}<ul class="wave-labels">{wave_labels()}</ul>'
+            '<p class="signin-claim">Один вход — все ваши площадки.</p></section>'
+            '<section class="signin-form">'
+            f'{h1}<p class="lede">Google или почта. Дальше всё делает система.</p>{form}'
+            '<p class="small signin-own">Работаете в своём Claude? '
+            '<a href="/test/download/#claude">Подключить коннектор →</a></p></section></div>')
+    bare_page("/test/login/", "Вход", "Вход в improducer: Google или почта.", body,
               states=("full", "loading", "error", "sent", "code", "badcode", "long"))
 
 
@@ -649,7 +702,7 @@ def page_onboarding():
     ], states=("full", "denied", "error"))
 
     soon = "".join(f'<div class="set-row"><div class="lbl"><b>{t}</b><span class="small muted">{d}</span></div>'
-                   f'<div class="val"><span class="badge">скоро</span></div></div>' for t, d, st_ in PLATFORMS[1:])
+                   '</div>' for t, d, st_ in PLATFORMS[1:])
     yt = ('<div class="set-row"><div class="lbl"><b>YouTube</b><span class="small muted">Вход через Google: система '
           'увидит статистику канала. Править канал — только после вашего «да» в чате.</span></div>'
           f'<div class="val">{gbtn("/test/connect/", "Подключить YouTube через Google")}</div></div>')
@@ -979,8 +1032,8 @@ def plat_tiles(long=False):
           f'<span class="tt">{E(yt_title)}</span><span class="tr">канал «Тест» · подключён</span>'
           f'<span class="tv">{DONE} из {len(FUNCS)}</span><span class="small muted">функций готово · '
           'ваше решение: концепция</span><span class="tgo">Открыть кабинет →</span></a>')
-    soon = "".join(f'<div class="tile plat is-soon"><span class="tn">Площадка</span><span class="tt">{t}</span>'
-                   f'<span class="tr">{d}</span><span class="badge">скоро</span></div>' for t, d, _ in PLATFORMS[1:])
+    soon = "".join(f'<div class="tile plat"><span class="tn">Площадка</span><span class="tt">{t}</span>'
+                   f'<span class="tr">{d}</span></div>' for t, d, _ in PLATFORMS[1:])
     add = ('<a class="tile plat is-add" href="/test/settings/connectors/"><span class="tt">＋ Добавить площадку</span>'
            '<span class="tr">Подключения площадок и своих сервисов — в Настройках → Коннекторы.</span>'
            '<span class="tgo">Открыть →</span></a>')
@@ -1209,7 +1262,7 @@ def page_settings():
 
     rows_ok = (set_row("YouTube (Google)", "Канал «Тест» · статистика; правки — только после вашего «да» в чате",
                        '<span class="badge badge--ok">подключён</span><button class="btn" type="button">Отключить</button>')
-               + "".join(set_row(t, d, '<span class="badge">скоро</span>') for t, d, _ in PLATFORMS[1:])
+               + "".join(set_row(t, d, '') for t, d, _ in PLATFORMS[1:])
                + set_row("Ваш Claude", "Подключите improducer к своему Claude: Настройки → Коннекторы → "
                          "«Добавить свой коннектор», этот адрес, вход через Google",
                          connector_addr() + a_btn("/test/download/#steps", "Как подключить")))
@@ -1304,7 +1357,7 @@ OPIS_SCREENS = [
      "Герой: слева заголовок, карточка входа (Google, Apple, почта) и вторая кнопка, справа картинка; "
      "ниже «Посмотреть планы» с вкладками и тремя карточками; вопросы",
      "Вместо фотографии — пример чата про канал «Тест». Своё: заголовок про площадки, полоса площадок под героем "
-     "(YouTube · Telegram скоро · Instagram скоро), блок «Здесь или в своём Claude». «Скачать приложение» → "
+     "(YouTube · Telegram · Instagram — названия с описанием сбоку), блок «Здесь или в своём Claude». «Скачать приложение» → "
      "«Подключить в своём Claude». Тоста «Новости» (C27) нет.", "заполнено"),
     ("S03", "Продукт", "claude.com/product/overview", "/test/product/",
      "Полоса раздела, заголовок по центру с двумя кнопками, блоки ниже",
@@ -1323,8 +1376,9 @@ OPIS_SCREENS = [
      "Поиск с ⌘K, частые статьи строками, коллекции плитками", "Бокового меню разделов нет; открывается одна статья",
      "заполнено · пусто · загрузка"),
     ("S07", "Вход", "claude.ai/login", "/test/login/",
-     "Две колонки: слева заголовок, карточка входа C12 и «Скачать приложение», справа картинка",
-     "Вместо фотографии — пример чата", "заполнено · загрузка · ошибка · длинный"),
+     "Ничего: вход свой (владелец 17.10 — раскладка образца слишком похожа на Claude)",
+     "Своя страница: слева волна площадок из _design/ideas/platforms-wave.html с подписями YouTube · Telegram · "
+     "Instagram, справа «Вход» — Google и код на почту; Apple убран", "заполнено · загрузка · ошибка · длинный"),
     ("S08", "Письмо и код", "claude.ai/login (шаг 2)", "/test/login/#s=sent",
      "Письмо отправлено → ввод кода → неверный код; «письмо не пришло» и «отправить ещё раз»",
      "Ссылки из письма нет: письма не уходят", "письмо отправлено · ввод кода · неверный код"),
@@ -1368,7 +1422,7 @@ OPIS_SCREENS = [
      "Строки функций с переключателем; недоступное на плане", "—", "заполнено · загрузка"),
     ("S22", "Настройки: коннекторы", "claude.ai/settings/connectors", "/test/settings/connectors/",
      "Строки коннекторов: подключён, не подключён, ошибка; «Добавить свой» с адресом",
-     "Каталога нет. Свои строки: YouTube (Google) — подключён; Telegram, Instagram — скоро; «Ваш Claude» — адрес и "
+     "Каталога нет. Свои строки: YouTube (Google) — подключён; Telegram, Instagram — строки с описанием; «Ваш Claude» — адрес и "
      "«Скопировать»", "заполнено · добавить свой · добавлен · ошибка · загрузка"),
     ("S23", "Повысить план", "claude.ai/upgrade", "/test/upgrade/",
      "Карточки Про / Макс, помесячно / за год, «Перейти к оплате»", "Цен нет: «цена появится»; Макс — одна карточка",
@@ -1387,7 +1441,7 @@ OPIS_SCREENS = [
      "заполнено · загрузка · ошибка"),
     ("—", "Кабинет", "без аналога (свой экран)", "/test/cabinet/",
      "Сетка плиток, как «Проекты» образца", "Свой экран: площадки YouTube (подключён, 6 из 12), Telegram и Instagram — "
-     "скоро, «Добавить площадку» → Коннекторы", "заполнено · пусто · загрузка · ошибка · длинный"),
+     "плитки с описанием, «Добавить площадку» → Коннекторы", "заполнено · пусто · загрузка · ошибка · длинный"),
     ("—", "Кабинет площадки YouTube", "без аналога (свой экран)", "/test/cabinet/youtube/",
      "Раскладка проекта образца: слева основное, справа карточка", "Свой экран: 3 факта, 12 функций со состоянием, "
      "«в чате: …» и ссылкой; справа «Работать в своём Claude»", "заполнено · загрузка · ошибка · длинный"),
@@ -1447,7 +1501,7 @@ DECISIONS = [
     ("Лицо и приложение — как у Claude", "Сайт и основной интерфейс повторяют образец; главный экран приложения — чат."),
     ("Кабинет — кнопка, не главная", "«Кабинет» — пункт боковой панели. В нём площадки; у каждой свой кабинет: функции "
      "и готовые страницы результатов."),
-    ("Площадки", "Сейчас YouTube; Telegram и Instagram — плитки «скоро», страниц у них нет."),
+    ("Площадки", "YouTube, Telegram, Instagram стоят на своих местах обычным текстом с описанием, без «скоро» (владелец 17.10). Кабинет и функции есть у YouTube; у Telegram и Instagram страниц в прототипе нет."),
     ("Два пути работы", "Чат на improducer.co или свой Claude через коннектор https://connect.improducer.co/mcp. "
      "Результаты в обоих случаях — в одном кабинете."),
     ("Коннекторы — как у Claude", "Подключаются и здесь: Настройки → Коннекторы, «Добавить свой»."),
@@ -1475,10 +1529,10 @@ DESIGN_TODO = [
     ("Полоса использования (C23)", "норма · близко · исчерпан", "g-track / g-fill"),
     ("Пустое место «заполнится, когда…»", "пусто", "пунктирная граница --color-border-control"),
     ("Заготовки загрузки", "загрузка", "фон --color-bg-sunken, радиус --radius-8"),
-    ("Плитка площадки", "подключена · скоро · добавить", "tile + badge; «скоро» — пунктир --color-border-control"),
+    ("Плитка площадки", "подключена · без подключения · добавить", "tile + badge; «скоро» — пунктир --color-border-control"),
     ("Строка функции площадки", "готово · ваше решение · ждёт", "row + badge; «ваше решение» — --nav-active-*"),
     ("Адрес коннектора с «Скопировать»", "обычный", "code на --color-bg-sunken, радиус --radius-control"),
-    ("Полоса площадок на сайте", "есть · скоро", "без новых значений"),
+    ("Полоса площадок на сайте", "название + описание", "без новых значений"),
 ]
 
 
@@ -1523,7 +1577,7 @@ def page_opis():
         ("«Лимит исчерпан» (S24)", "не вызвать без расхода лимита владельца; по статье 11647753"),
         ("Оплата Stripe", "платить нельзя; по статье 8325609"),
         ("Выдача на 390 и 820", "по заданию — одна выдача, один снимок 1440"),
-        ("Telegram и Instagram", "плитки «скоро» в кабинете, на сайте и в первом запуске; страниц у них нет — площадок ещё нет"),
+        ("Telegram и Instagram", "в кабинете, на сайте и в первом запуске — названием с описанием, без «скоро»; страниц у них нет — площадок ещё нет"),
         ("Страницы результатов, кроме концепции", "в прототипе одна страница-пример — концепция; у остальных функций "
          "кабинета ссылка заменена пометкой «нет в прототипе» или «заполнится, когда …»"),
     ]
