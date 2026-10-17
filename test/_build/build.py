@@ -180,10 +180,10 @@ def site_page(path, title, desc, body, states=("full",), crumb=None):
                    f'<header class="site-head"><div class="in">{wordmark()}'
                    f'<ul class="site-nav">{nav}</ul>'
                    '<div class="site-cta">'
-                   '<a class="btn hide-m" href="/test/login/">Войти</a>'
-                   f'<a class="btn btn--primary hide-s" href="/test/login/">{TRY}</a></div>'
+                   '<a class="btn hide-m" href="/login/">Войти</a>'
+                   f'<a class="btn btn--primary hide-s" href="/login/">{TRY}</a></div>'
                    '<details class="site-menu"><summary class="btn">Меню</summary>'
-                   f'<div class="pop"><a class="hide-wide" href="/test/login/"><b>{TRY}</b></a>{menu}<hr><a href="/test/login/">Войти</a></div></details>'
+                   f'<div class="pop"><a class="hide-wide" href="/login/"><b>{TRY}</b></a>{menu}<hr><a href="/login/">Войти</a></div></details>'
                    f'</div></header>{crumbbar}'
                    f'<main class="wrap">{body}</main>'
                    '<footer class="wrap"><div class="foot"><span>improducer.co</span>'
@@ -376,7 +376,7 @@ PLANS = {
 PLAN_TABS = [("individual", "Для себя"), ("team", "Команды"), ("api", "API")]
 
 
-def plan_card(p, cta_href="/test/login/", cta="Попробовать"):
+def plan_card(p, cta_href="/login/", cta="Попробовать"):
     main = " is-main" if p.get("main") else ""
     price = (f'<p class="pp{" tbd" if p["price"] == TBD else ""}">{p["price"]}</p>' if p["price"] else "")
     plus = f'<p class="small"><b>{p["plus"]}</b></p>' if p["plus"] else ""
@@ -425,7 +425,7 @@ def two_ways():
     return ('<div class="grid2 mt-s">'
             '<div class="card stack"><h3>Здесь, в чате</h3>'
             '<p>Пишите на improducer.co, как в обычном чате: «что дальше по каналу?». Ответ — с результатом рядом.</p>'
-            f'<div class="btn-row">{a_btn("/test/login/", TRY, True)}</div></div>'
+            f'<div class="btn-row">{a_btn("/login/", TRY, True)}</div></div>'
             '<div class="card stack"><h3>В своём Claude</h3>'
             '<p>Подключите коннектор improducer в своём Claude — на сайте или в приложении. Те же функции.</p>'
             f'<div class="btn-row">{a_btn("/test/download/", OWN_CLAUDE)}</div></div></div>'
@@ -435,7 +435,7 @@ def two_ways():
 # ── Страницы сайта ──────────────────────────────────────────────────────────
 
 def page_home():
-    page_login("/test/")
+    """/test/ — переадресация на вход /login/ (её кладёт page_login)."""
 
 
 def page_product():
@@ -446,7 +446,7 @@ def page_product():
                  f'<p>{d}</p></div>' for t, d, s in PLATFORMS)
     body = ('<section class="center" style="padding-top:var(--space-64)"><h1>Познакомьтесь с improducer</h1>'
             '<p class="lede">Чат, который ведёт ваши площадки: от анкеты и концепции до выпуска и разбора роликов.</p>'
-            f'<div class="btn-row mt-s" style="justify-content:center">{a_btn("/test/login/", TRY, True)}'
+            f'<div class="btn-row mt-s" style="justify-content:center">{a_btn("/login/", TRY, True)}'
             f'{a_btn("/test/pricing/", "Цены")}</div></section>'
             '<section class="mt"><h2>Что умеет на YouTube</h2>'
             '<p class="muted">Каждая функция — в чате словами и страницей результата в кабинете.</p>'
@@ -454,7 +454,7 @@ def page_product():
             f'<section class="mt"><h2>Площадки</h2><div class="grid3">{pl}</div></section>'
             f'<section class="mt"><h2>Где работать</h2>{two_ways()}</section>'
             '<section class="center mt"><h2>Начните бесплатно</h2>'
-            f'<div class="btn-row mt-s" style="justify-content:center">{a_btn("/test/login/", TRY, True)}</div></section>')
+            f'<div class="btn-row mt-s" style="justify-content:center">{a_btn("/login/", TRY, True)}</div></section>')
     site_page("/test/product/", "Продукт", "Что умеет improducer по площадкам и функциям.", body, crumb="Продукт")
 
 
@@ -479,7 +479,7 @@ def compare_table():
             return '<td><span class="badge">×</span></td>'
         return f'<td>{E(v)}</td>'
     tb = "".join(f'<tr><td>{E(r[0])}</td>{"".join(cell(v) for v in r[1:])}</tr>' for r in COMPARE)
-    heads = "".join(f'<th>{n}<br>{a_btn("/test/login/", "Попробовать")}</th>' for n in ("Бесплатно", "Про", "Макс"))
+    heads = "".join(f'<th>{n}<br>{a_btn("/login/", "Попробовать")}</th>' for n in ("Бесплатно", "Про", "Макс"))
     return ('<div class="field" style="max-width:var(--tile-min)"><label class="visually-hidden" for="cs">Поиск</label>'
             '<input id="cs" type="search" placeholder="Поиск по возможностям"></div>'
             f'<div class="scroll mt-s"><table class="compare"><thead><tr><th>Возможности</th>{heads}</tr></thead>'
@@ -524,7 +524,7 @@ def connector_addr():
 
 def page_download():
     rows = ('<div class="row"><div class="row-top"><div class="rhead"><p class="rtitle">В браузере</p>'
-            f'<p class="rmeta">Ничего ставить не нужно</p></div>{a_btn("/test/login/", "Открыть", True)}</div></div>'
+            f'<p class="rmeta">Ничего ставить не нужно</p></div>{a_btn("/login/", "Открыть", True)}</div></div>'
             '<div class="row" id="claude"><div class="row-top"><div class="rhead"><p class="rtitle">В своём Claude</p>'
             f'<p class="rmeta">Сайт и приложение Claude · коннектор improducer</p></div>{a_btn("#steps", "Подключить коннектор")}</div>'
             f'<div class="row-body">{connector_addr()}</div></div>'
@@ -533,7 +533,7 @@ def page_download():
     body = ('<section class="center" style="padding-top:var(--space-48)"><h1>Где работать с improducer</h1>'
             '<p class="lede">В браузере на improducer.co или в своём Claude. Результаты — в одном кабинете.</p>'
             '<div class="btn-row mt-s" style="justify-content:center">'
-            f'{a_btn("/test/login/", "Открыть в браузере", True)}{a_btn("#steps", "Подключить в Claude")}</div></section>'
+            f'{a_btn("/login/", "Открыть в браузере", True)}{a_btn("#steps", "Подключить в Claude")}</div></section>'
             '<section class="mt split"><div><h2>Все способы</h2>'
             '<p class="muted">Вход тот же — Google. Чаты, площадки и кабинет общие.</p></div>'
             f'<div class="card ways">{rows}</div></section>'
@@ -666,7 +666,7 @@ def login_form():
 
 
 def login_states():
-    """Все состояния формы входа — одни на /test/login/ и на вариантах /test/vhod/NN/.
+    """Все состояния формы входа — одни на /login/ и на вариантах /test/vhod/NN/.
     Вход только через Google (владелец 17.10): почты, письма и кода нет — Google автору нужен всё равно для канала."""
     return (st("full", login_form())
             + st("loading", '<div class="auth auth--login">' + skel(3) + "</div>")
@@ -678,12 +678,27 @@ def login_states():
 LOGIN_STATES = ("full", "loading", "error")
 
 
-def page_login(path="/test/login/"):
-    # Владелец 17.10: из своих вариантов /test/vhod/ пока взят 06 «Горизонт» — временно, остальные варианты остаются.
-    # Разметка и вид — те же, что у варианта (vx_horizon, vhod.css), чтобы не разъехались.
+def page_login():
+    # Владелец 18.10: вход зафиксирован — постоянный адрес improducer.co/login/, без /test/ и без плашки прототипа.
+    # Вид — вариант 06 «Горизонт» (vx_horizon, vhod.css); варианты /test/vhod/ остаются. Состояние «ошибка» (#s=error)
+    # ставит сервер входа после «Отмены» в Google — его показывает test.js.
     cls, body = vx_horizon()
-    PAGES[path] = (vx_head("Вход", "Вход в improducer через Google.")
-                   + f'<body class="vx vx-06 {cls}">{body}{proto(list(LOGIN_STATES))}{SCRIPT}</body></html>\n')
+    page = (vx_head("Вход", "Вход в improducer через Google.")
+            .replace('<meta name="robots" content="noindex, nofollow">\n', "")
+            .replace("<title>Вход — прототип improducer</title>", "<title>Вход — improducer</title>")
+            .replace('<a class="wordmark" href="/test/">', '<a class="wordmark" href="/">'))
+    body = body.replace('<a class="wordmark" href="/test/">', '<a class="wordmark" href="/">')
+    PAGES["/login/"] = page + f'<body class="vx vx-06 {cls}">{body}{SCRIPT}</body></html>\n'
+    # Прежний адрес прототипа ведёт на постоянный — со своим состоянием (#s=…).
+    for path in ("/test/", "/test/login/"):
+        PAGES[path] = REDIRECT_LOGIN
+
+
+REDIRECT_LOGIN = ('<!doctype html><html lang="ru"><head><meta charset="utf-8">'
+                  '<meta name="robots" content="noindex"><link rel="canonical" href="https://improducer.co/login/">'
+                  '<meta http-equiv="refresh" content="0; url=/login/"><title>Вход — improducer</title>'
+                  '<script>location.replace("/login/" + location.hash)</script></head>'
+                  '<body><a href="/login/">Вход</a></body></html>\n')
 
 
 def page_connect():
@@ -1314,7 +1329,7 @@ def page_upgrade():
 def page_logout():
     body = ('<div class="centered"><div class="box"><div class="card stack">'
             '<h1 class="screen-title">Вы вышли</h1><p>Чаты и проекты на месте. Войти снова — тем же способом.</p>'
-            f'<div class="btn-row">{a_btn("/test/login/", "Войти", True)}{a_btn("/test/", "На главную")}</div>'
+            f'<div class="btn-row">{a_btn("/login/", "Войти", True)}{a_btn("/test/", "На главную")}</div>'
             "</div></div></div>")
     bare_page("/test/logout/", "Вы вышли", "Выход из аккаунта.", body)
 
@@ -1327,7 +1342,7 @@ OPIS_SCREENS = [
      "—", "Без аналога: выдача — чужая страница, в прототип не входит.", "—"),
     ("S02", "Главная", "claude.com/", "/test/",
      "Ничего: главная — это вход (владелец 17.10: на главной только вход, остальное — вода)",
-     "Та же страница, что /test/login/: вариант 06 «Горизонт», вход через Google. Героя, планов, вопросов и "
+     "Переадресация на /login/: вариант 06 «Горизонт», вход через Google. Героя, планов, вопросов и "
      "примера чата нет; Продукт, Цены, Помощь — по своим адресам.", "заполнено · загрузка · ошибка"),
     ("S03", "Продукт", "claude.com/product/overview", "/test/product/",
      "Полоса раздела, заголовок по центру с двумя кнопками, блоки ниже",
@@ -1345,7 +1360,7 @@ OPIS_SCREENS = [
     ("S06", "Помощь", "support.claude.com/en/", "/test/help/",
      "Поиск с ⌘K, частые статьи строками, коллекции плитками", "Бокового меню разделов нет; открывается одна статья",
      "заполнено · пусто · загрузка"),
-    ("S07", "Вход", "claude.ai/login", "/test/login/",
+    ("S07", "Вход", "claude.ai/login", "/login/",
      "Ничего: свой вход, не копия (владелец 17.10 — копии чужих входов выглядят как скам)",
      "Пока взят вариант 06 «Горизонт» из /test/vhod/ (временно, владелец 17.10): линия во всю ширину посередине, над ней "
      "знак со словом, под ней «Продолжить с Google» и согласие. Своего текста нет, почты нет", "заполнено · загрузка · ошибка"),
@@ -1429,7 +1444,7 @@ OPIS_SCREENS = [
 OPIS_PATHS = [
     ("F01", "Найти, войти, начать",
      "S01 → S07 → Google → S11 (телефон, 18+, имя) → S12 · ≈7 кликов (через сайт +2)",
-     "/test/ → «Попробовать improducer» → /test/login/ → «Продолжить с Google» → настоящий вход Google (как у "
+     "/test/ → «Попробовать improducer» → /login/ → «Продолжить с Google» → настоящий вход Google (как у "
      "кабинета) → /test/new/ · 2 клика + Google. Шагов «имя», «возраст», «первая площадка» нет, входа почтой нет "
      "(владелец 17.10). YouTube — потом в приложении: Кабинет → «Подключить YouTube через Google» → /test/connect/",
      "/test/", "Решение: настоящий вход Google — и сразу приложение. Телефона нет"),
@@ -1449,7 +1464,7 @@ OPIS_PATHS = [
      "/test/new/#s=limit", "Оплата — макет; суммы нет: цены не заданы"),
     ("F06", "Настройки и выход", "S25 → S18 → S20 → S21 → S26 → «Выйти» → S07 · 5 кликов",
      "меню аккаунта → /test/settings/general/ → «Использование» → «Возможности» → «Аккаунт» → меню → «Выйти» → "
-     "/test/logout/ → «Войти» → /test/login/ · 6 кликов",
+     "/test/logout/ → «Войти» → /login/ · 6 кликов",
      "/test/settings/general/", "Экран «Вы вышли» между выходом и входом"),
     ("F07", "Помощь", "S02 → S06 → S10 · 2 клика",
      "/test/new/ → меню аккаунта → «Помощь» → /test/help/ → статья → /test/help/start/ · 3 клика",
@@ -1481,7 +1496,7 @@ DECISIONS = [
      "Голос — только диктовка, без голосового режима (владелец 17.10)."),
     ("Боковая панель — как у Claude", "Пункты «Артефакты», «Расписание», «Настроить» остаются как в образце "
      "(владелец 17.10)."),
-    ("Главная — только вход", "На /test/ та же страница, что /test/login/: пока вариант 06 «Горизонт» (временно), вход "
+    ("Главная — только вход", "/test/ и /test/login/ ведут на постоянный вход /login/: вариант 06 «Горизонт», зафиксирован 18.10, вход "
      "только Google. Своего текста, ссылки на свой Claude и Apple нет (владелец 17.10)."),
 ]
 
@@ -1797,7 +1812,8 @@ def main():
         if d.is_dir() and d.name not in KEEP:
             shutil.rmtree(d)
     for path, text in PAGES.items():
-        out = TEST / path.removeprefix("/test/") / "index.html"
+        # Страницы прототипа — в test/; постоянные (вход /login/) — в корне сайта.
+        out = (TEST / path.removeprefix("/test/") if path.startswith("/test/") else TEST.parent / path.strip("/")) / "index.html"
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(text, encoding="utf-8")
     print(f"страниц: {len(PAGES)}")
