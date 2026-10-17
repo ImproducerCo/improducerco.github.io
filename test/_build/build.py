@@ -1700,7 +1700,9 @@ git pull --rebase &amp;&amp; git push</pre>
 # 17.10 владелец: нынешний вход не нравится, нужны 15–20 вариантов с чистого листа по входам сильных площадок;
 # выберет один. Из первых двадцати понравился только 01 (Google), 02–20 сняты (история — git, сайт 7456592).
 # Правила владельца 17.10: только Google; знак и название вместе (wordmark) и один раз на странице; своего текста нет —
-# ни заголовка, ни подзаголовка; по центру, не слева. Новые варианты — 21 и дальше. Каждый вариант — своя раскладка и подача, форма и её состояния общие (login_states()).
+# ни заголовка, ни подзаголовка; по центру, не слева. Потом владелец снял и 01, 21–26: раскладки «как у Google, Apple…»
+# выглядят как скам или копия — никого не копировать (сайт e450026 — история). Сейчас 10 своих страниц: идея у каждой
+# своя (пропуск, кадр, объектив…), из общего — только правила выше. Каждый вариант — своя раскладка и подача, форма и её состояния общие (login_states()).
 # Разбор образцов — ~/Desktop/improducer/работа/2026-10-17_vhod/разбор.md. Свой вид — vhod.css (только на этих
 # страницах), превью для каталога — _build/vhod/NN.jpg (снимок 1728×1080), копирует сборка.
 VHOD_CSS = HERE / "vhod.css"
@@ -1755,76 +1757,94 @@ def page_vhod():
                      f'<span class="vxc-took">{E(took)}</span><span class="vxc-go">Открыть →</span></a>')
     body = (f'<header class="bare-head">{wordmark()}</header><main class="vxcat">'
             f'<h1>Вход: {n_all} вариантов</h1>'
-            '<p class="lede">01 — доработанный вариант по Google, 21–26 — новые. У всех одно и то же: знак со словом '
-            'один раз, кнопка Google, согласие и ссылки; своего текста нет, всё по центру. Отметки ✓ · ✕ · ⊘ и '
+            f'<p class="lede">{n_all} своих страниц входа, придуманных под improducer, — без копий чужих входов. У всех '
+            'одно и то же: знак со словом один раз, кнопка Google, согласие и ссылки; своего текста нет, всё по центру. '
+            'Отметки ✓ · ✕ · ⊘ и '
             'комментарий — на <a href="https://pult.improducer.co/#front/vhod">пульте, вкладка «Фронтенд»</a>.</p>'
             f'<div class="vxgrid">{"".join(cards)}</div></main>')
     PAGES["/test/vhod/"] = (vx_head("Вход: варианты", "Варианты страницы входа improducer на выбор.")
                             + f'<body class="site">{body}{SCRIPT}</body></html>\n')
 
 
-def vx_foot(lang=False, cls="vx-foot"):
-    """Нижняя строка: язык (как у Google) и ссылки. Своего текста нет."""
-    lang_html = (f'<span class="g-lang">{ic("globe")}Русский</span>' if lang else "")
-    return f'<footer class="{cls}">{lang_html}<nav class="vx-links">{vx_legal()}</nav></footer>'
+def vx_foot(cls="vx-foot"):
+    """Нижняя строка — только ссылки. Своего текста нет."""
+    return f'<footer class="{cls}"><nav class="vx-links">{vx_legal()}</nav></footer>'
 
 
 VX_H1 = '<h1 class="visually-hidden">Вход в improducer</h1>'
 
 
-@vhod("01", "Google", "Широкая карточка в две колонки: слева знак со словом, справа кнопка Google и согласие; "
-                      "язык и ссылки — строкой под карточкой")
-def vx_google():
-    return "", ('<main class="g-main"><div class="g-card">'
-                f'<div class="g-left">{VX_H1}{wordmark()}</div>'
-                f'<div class="g-right vx-incard">{login_states()}</div></div>'
-                f'{vx_foot(lang=True, cls="g-foot")}</main>')
+def vx_form(cls="vx-form"):
+    return f'<div class="{cls}">{login_states()}</div>'
 
 
-@vhod("21", "Google, одна колонка", "Узкая карточка по центру: сверху знак со словом, под ним кнопка и согласие; "
-                                   "язык и ссылки — строкой под карточкой")
-def vx_google_col():
-    return "", ('<main class="c1-main"><div class="card c1-card vx-incard">'
-                f'{VX_H1}{wordmark()}{login_states()}</div>'
-                f'{vx_foot(lang=True, cls="c1-foot")}</main>')
+@vhod("01", "Пропуск", "Вход — это пропуск: карточка-билет, сверху знак со словом, линия отрыва с вырезами по краям, "
+                       "под ней кнопка Google")
+def vx_pass():
+    return "", ('<main class="ps-main"><div class="ps-ticket">'
+                f'<div class="ps-top">{VX_H1}{wordmark()}</div><div class="ps-cut" aria-hidden="true"></div>'
+                f'{vx_form("ps-bot")}</div>{vx_foot()}</main>')
 
 
-@vhod("22", "Apple ID", "Без карточки: крупный знак со словом по центру, под ним кнопка и согласие; "
-                        "ссылки внизу через тонкую линию")
-def vx_apple():
-    return "", (f'<main class="ap-main">{VX_H1}{wordmark()}<div class="ap-form">{login_states()}</div></main>'
-                f'{vx_foot(cls="ap-foot")}')
+@vhod("02", "Видоискатель", "Авторы снимают — страница как кадр в видоискателе: уголки рамки 16:9, внутри знак со словом "
+                            "и кнопка")
+def vx_viewfinder():
+    corners = "".join(f'<i class="vf-c vf-{c}"></i>' for c in ("tl", "tr", "bl", "br"))
+    return "", ('<main class="vf-main"><div class="vf-frame">'
+                f'<span aria-hidden="true">{corners}</span>'
+                f'<div class="vf-in">{VX_H1}{wordmark()}{vx_form()}</div></div>{vx_foot()}</main>')
 
 
-@vhod("23", "Linear", "Три яруса: знак со словом наверху по центру, кнопка ровно в центре экрана, ссылки внизу")
-def vx_linear():
-    return "", (f'<header class="ln-head">{wordmark()}</header>'
-                f'<main class="ln-main">{VX_H1}<div class="ln-form">{login_states()}</div></main>'
-                f'{vx_foot(cls="ln-foot")}')
+@vhod("03", "Кадр 9:16", "Вертикальная карточка в формате коротких роликов: знак со словом посередине, кнопка внизу")
+def vx_vertical():
+    return "", ('<main class="vt-main"><div class="vt-card">'
+                f'<div class="vt-mark">{VX_H1}{wordmark()}</div>{vx_form()}</div>{vx_foot()}</main>')
 
 
-@vhod("24", "Vercel", "Карточка по центру: знак со словом и кнопка, а ссылки — полосой в подвале самой карточки")
-def vx_vercel():
-    return "", ('<main class="vc-main"><div class="vc-card vx-incard">'
-                f'<div class="vc-body">{VX_H1}{wordmark()}{login_states()}</div>'
-                f'<div class="vc-strip"><nav class="vx-links">{vx_legal()}</nav></div></div></main>')
+@vhod("04", "Объектив", "Круг с тонким вторым кольцом, как линза: знак со словом в центре круга, кнопка под ним")
+def vx_lens():
+    return "", (f'<main class="ob-main"><div class="ob-ring">{VX_H1}{wordmark()}</div>{vx_form()}{vx_foot()}</main>')
 
 
-@vhod("25", "Stripe", "Фон в два тона с границей посередине экрана: знак со словом на светлой половине, "
-                      "карточка с кнопкой ровно на границе, ссылки под ней")
-def vx_stripe_split():
-    return "", ('<main class="sp2-main">'
-                f'<div class="sp2-top">{VX_H1}{wordmark()}</div>'
-                f'<div class="card sp2-card vx-incard">{login_states()}</div>'
-                f'{vx_foot(cls="sp2-foot")}</main>')
+@vhod("05", "Ось", "Тонкая вертикальная линия через весь экран; знак со словом и кнопка стоят на ней, линия уходит "
+                   "вверх и вниз")
+def vx_axis():
+    return "", (f'<main class="ax-main"><div class="ax-mark">{VX_H1}{wordmark()}</div>{vx_form("vx-form ax-form")}'
+                f'</main>{vx_foot()}')
 
 
-@vhod("26", "Квадрат", "Квадратная карточка по центру: знак со словом в её середине, кнопка и согласие "
-                       "прижаты к низу; ссылки под карточкой")
-def vx_square():
-    return "", ('<main class="sq-main"><div class="card sq-card vx-incard">'
-                f'<div class="sq-mark">{VX_H1}{wordmark()}</div>{login_states()}</div>'
-                f'{vx_foot(cls="sq-foot")}</main>')
+@vhod("06", "Горизонт", "Тонкая линия во всю ширину ровно по середине экрана: над ней крупный знак со словом, под ней кнопка")
+def vx_horizon():
+    return "", ('<main class="hz-main">'
+                f'<div class="hz-top">{VX_H1}{wordmark()}</div><div class="hz-line" aria-hidden="true"></div>'
+                f'<div class="hz-bot">{vx_form()}</div></main>{vx_foot()}')
+
+
+@vhod("07", "Паспарту", "Белое поле в рамке по краю экрана, как фото в паспарту; знак со словом и кнопка в центре, "
+                        "ссылки — в разрыве нижней линии рамки")
+def vx_mat():
+    return "", ('<main class="pp-main"><div class="pp-frame">'
+                f'{VX_H1}{wordmark()}{vx_form()}{vx_foot("pp-foot")}</div></main>')
+
+
+@vhod("08", "Сетка", "Тонкая сетка на фоне, гаснущая к краям; по центру белый блок ровно по клеткам — знак со словом "
+                     "и кнопка")
+def vx_grid():
+    return "", ('<main class="gd-main"><div class="gd-block">'
+                f'{VX_H1}{wordmark()}{vx_form()}</div></main>{vx_foot()}')
+
+
+@vhod("09", "Плакат", "Только знак со словом очень крупно, как афиша, и спокойная кнопка под ним")
+def vx_poster():
+    return "", (f'<main class="pt-main">{VX_H1}{wordmark()}{vx_form()}</main>{vx_foot()}')
+
+
+@vhod("10", "Монтаж", "Под знаком со словом — тонкая монтажная линейка с делениями и красной меткой воспроизведения; "
+                      "под линейкой кнопка")
+def vx_timeline():
+    return "", (f'<main class="tl-main">{VX_H1}{wordmark()}'
+                '<div class="tl-ruler" aria-hidden="true"><i class="tl-head"></i></div>'
+                f'{vx_form()}</main>{vx_foot()}')
 
 
 def main():
