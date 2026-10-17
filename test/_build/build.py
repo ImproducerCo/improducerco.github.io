@@ -591,53 +591,16 @@ def page_help_start():
               states=("full", "long"))
 
 
-# Волна площадок — геометрия и цвета из _design/ideas/platforms-wave.html (идея владельца 08.10):
-# 9 полосок знака, площадки на своих местах и в своих цветах, общий пульс 2.4 с. Остальные — серые, как в идее.
-WAVE_CX = [18, 26, 34, 42, 50, 58, 66, 74, 82]
-WAVE_HT = [12, 24, 36, 50, 64, 50, 36, 24, 12]
-WAVE_NETS = {2: ("ig", ["#FEDA75", "#FA7E1E", "#D62976", "#962FBF", "#4F5BD5"], True),
-             4: ("yt", ["#FF0000"], False),
-             6: ("tg", ["#2AABEE", "#229ED9"], False)}
-WAVE_LABELS = [("yt", "YouTube", "ролики, статистика, выпуск", "#FF0000"),
-               ("tg", "Telegram", "канал и посты", "#2AABEE"),
-               ("ig", "Instagram", "профиль и рилсы", "#D62976")]
-
-
-def platform_wave():
-    bw, r = 4.5, 2.25
-    defs, bars = [], []
-    for i, (cx, h) in enumerate(zip(WAVE_CX, WAVE_HT)):
-        x, y = cx - bw / 2, 50 - h / 2
-        net = WAVE_NETS.get(i)
-        if not net:
-            bars.append(f'<rect x="{x}" y="{y}" width="{bw}" height="{h}" rx="{r}" fill="#C9D1DC"/>')
-            continue
-        nid, grad, up = net
-        if len(grad) > 1:
-            stops = "".join(f'<stop offset="{k / (len(grad) - 1):.2f}" stop-color="{c}"/>' for k, c in enumerate(grad))
-            defs.append(f'<linearGradient id="w{nid}" x1="0" y1="{1 if up else 0}" x2="0" y2="{0 if up else 1}">{stops}</linearGradient>')
-            paint = f"url(#w{nid})"
-        else:
-            paint = grad[0]
-        bars.append(f'<rect class="wave-pulse" x="{x}" y="{y}" width="{bw}" height="{h}" rx="{r}" stroke="{paint}" stroke-width=".9"/>'
-                    f'<rect x="{x}" y="{y}" width="{bw}" height="{h}" rx="{r}" fill="{paint}"/>')
-    return (f'<svg class="wave" viewBox="0 0 100 100" role="img" aria-label="Площадки: YouTube, Telegram, Instagram">'
-            f'<defs>{"".join(defs)}</defs>{"".join(bars)}</svg>')
-
-
-def wave_labels():
-    return "".join(f'<li><i style="background:{c}"></i><b>{t}</b><span>{d}</span></li>' for _, t, d, c in WAVE_LABELS)
-
-
 # ── Вход и первый запуск ─────────────────────────────────────────────────────
 
 def login_form():
+    """Стандартный вход: Google, «или», почта → «Продолжить», согласие."""
     return ('<div class="auth auth--login">'
-            f'{gbtn("/test/onboarding/")}'
-            '<div class="or">или почтой</div>'
-            '<div class="field"><label for="em">Почта</label>'
-            '<input id="em" type="email" placeholder="you@example.com" autocomplete="email"></div>'
-            f'{a_btn("#s=sent", "Получить код на почту")}'
+            f'{gbtn("/test/onboarding/", "Войти через Google")}'
+            '<div class="or">или</div>'
+            '<div class="field"><label class="visually-hidden" for="em">Почта</label>'
+            '<input id="em" type="email" placeholder="Электронная почта" autocomplete="email" data-next="#s=sent"></div>'
+            f'{a_btn("#s=sent", "Продолжить", True)}'
             '<p class="small muted">Продолжая, вы принимаете <a href="/terms.html">условия</a> и '
             '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
 
@@ -665,17 +628,10 @@ def page_login(path="/test/login/"):
             + st("loading", '<div class="auth auth--login">' + skel(3) + "</div>")
             + st("error", '<div class="auth auth--login">' + warn("Вход не завершён",
                                                                  "Окно Google закрыли или вход отменён. Попробуйте ещё раз.")
-                 + gbtn("/test/onboarding/") + "</div>")
+                 + gbtn("/test/onboarding/", "Войти через Google") + "</div>")
             + st("sent", sent) + st("code", code_card()) + st("badcode", code_card(True)))
     h1 = st("full loading error sent code badcode", "<h1>Вход</h1>") + st("long", f"<h1>{LONG}</h1>")
-    body = ('<div class="signin">'
-            '<section class="signin-stage" aria-label="Площадки">'
-            f'{platform_wave()}<ul class="wave-labels">{wave_labels()}</ul>'
-            '<p class="signin-claim">Один вход — все ваши площадки.</p></section>'
-            '<section class="signin-form">'
-            f'{h1}<p class="lede">Google или почта. Дальше всё делает система.</p>{form}'
-            '<p class="small signin-own">Работаете в своём Claude? '
-            '<a href="/test/download/#claude">Подключить коннектор →</a></p></section></div>')
+    body = f'<div class="signin"><section class="signin-form">{h1}{form}</section></div>'
     bare_page(path, "Вход", "Вход в improducer: Google или почта.", body,
               states=("full", "loading", "error", "sent", "code", "badcode", "long"))
 
@@ -1375,7 +1331,7 @@ OPIS_SCREENS = [
      "—", "Без аналога: выдача — чужая страница, в прототип не входит.", "—"),
     ("S02", "Главная", "claude.com/", "/test/",
      "Ничего: главная — это вход (владелец 17.10: на главной только вход, остальное — вода)",
-     "Та же страница, что /test/login/: волна площадок и вход через Google или почту. Героя, планов, вопросов и "
+     "Та же страница, что /test/login/: только вход через Google или почту. Героя, планов, вопросов и "
      "примера чата нет; Продукт, Цены, Помощь — по своим адресам.", "заполнено · загрузка · ошибка · длинный"),
     ("S03", "Продукт", "claude.com/product/overview", "/test/product/",
      "Полоса раздела, заголовок по центру с двумя кнопками, блоки ниже",
@@ -1395,8 +1351,8 @@ OPIS_SCREENS = [
      "заполнено · пусто · загрузка"),
     ("S07", "Вход", "claude.ai/login", "/test/login/",
      "Ничего: вход свой (владелец 17.10 — раскладка образца слишком похожа на Claude)",
-     "Своя страница: слева волна площадок из _design/ideas/platforms-wave.html с подписями YouTube · Telegram · "
-     "Instagram, справа «Вход» — Google и код на почту; Apple убран", "заполнено · загрузка · ошибка · длинный"),
+     "Своя страница: знак, «Вход», «Войти через Google», «или», почта → «Продолжить», согласие. Больше ничего — ни волны, ни подписей, "
+     "ни ссылки на свой Claude (владелец 17.10); Apple убран", "заполнено · загрузка · ошибка · длинный"),
     ("S08", "Письмо и код", "claude.ai/login (шаг 2)", "/test/login/#s=sent",
      "Письмо отправлено → ввод кода → неверный код; «письмо не пришло» и «отправить ещё раз»",
      "Ссылки из письма нет: письма не уходят", "письмо отправлено · ввод кода · неверный код"),
@@ -1507,7 +1463,7 @@ OPIS_PATHS = [
      "/test/new/ → меню аккаунта → «Помощь» → /test/help/ → статья → /test/help/start/ · 3 клика",
      "/test/help/", "—"),
     ("F08", "Работать в своём Claude", "S02 → S05 → файл · 2 клика",
-     "/test/ → «Подключить коннектор →» → /test/download/#claude → 3 шага и адрес · 1 клик",
+     "/test/download/ по прямой ссылке → 3 шага и адрес · 0 кликов; на входе ссылки нет (владелец 17.10)",
      "/test/download/", "Вместо файла приложения — адрес коннектора"),
     ("F09", "Кабинет → результат", "без аналога (свой путь)",
      "любая страница приложения → «Кабинет» → /test/cabinet/ → YouTube → /test/cabinet/youtube/ → «Концепция» → "
@@ -1533,8 +1489,8 @@ DECISIONS = [
      "Голос — только диктовка, без голосового режима (владелец 17.10)."),
     ("Боковая панель — как у Claude", "Пункты «Артефакты», «Расписание», «Настроить» остаются как в образце "
      "(владелец 17.10)."),
-    ("Главная — только вход", "На /test/ та же страница, что /test/login/: Google или почта. Apple нет: Google "
-     "покрывает авторов YouTube, почта — остальных (владелец 17.10)."),
+    ("Главная — только вход", "На /test/ та же страница, что /test/login/: «Вход», Google или почта, согласие — и всё. "
+     "Apple нет: Google покрывает авторов YouTube, почта — остальных (владелец 17.10)."),
 ]
 
 DESIGN_TODO = [
