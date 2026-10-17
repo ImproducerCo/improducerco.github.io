@@ -60,8 +60,11 @@ def copy_assets():
             shutil.copy2(f, out / "fonts" / f.name)
     for name in ("mark.svg", "favicon.svg", "google-g.svg"):
         shutil.copy2(DESIGN / "logo" / name, out / "logo" / name)
-    for name in ("test.css", "test.js"):
+    for name in ("test.css", "test.js", "vhod.css"):
         shutil.copy2(HERE / name, out / name)
+    (out / "vhod").mkdir(exist_ok=True)
+    for f in VHOD_PREV.glob("*.jpg"):
+        shutil.copy2(f, out / "vhod" / f.name)
     # Geologica — шрифт строки площадок на входе (владелец 17.10, выбран из шести); в _design/ его пока нет.
     for f in (HERE / "fonts").iterdir():
         shutil.copy2(f, out / "fonts" / f.name)
@@ -661,7 +664,8 @@ def login_form():
             '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
 
 
-def page_login(path="/test/login/"):
+def login_states():
+    """Все состояния формы входа — одни на /test/login/ и на вариантах /test/vhod/NN/."""
     sent = ('<div class="card auth"><span class="badge badge--ok">письмо отправлено</span>'
             '<h2 class="screen-title">Проверьте почту</h2>'
             '<p>Отправили ссылку для входа и код на <b>test@example.com</b>. Откройте ссылку на этом устройстве '
@@ -680,12 +684,19 @@ def page_login(path="/test/login/"):
                 f'placeholder="6 цифр" data-next="/test/onboarding/">{err}</div>'
                 f'{a_btn("/test/onboarding/", "Подтвердить", True)}'
                 '<p class="small muted"><a href="#s=sent">Отправить код ещё раз</a></p></div>')
-    form = (st("full", login_form())
+    return (st("full", login_form())
             + st("loading", '<div class="auth auth--login">' + skel(3) + "</div>")
             + st("error", '<div class="auth auth--login">' + warn("Вход не завершён",
                                                                  "Окно Google закрыли или вход отменён. Попробуйте ещё раз.")
                  + gbtn("/test/onboarding/") + "</div>")
             + st("sent", sent) + st("code", code_card()) + st("badcode", code_card(True)))
+
+
+LOGIN_STATES = ("full", "loading", "error", "sent", "code", "badcode")
+
+
+def page_login(path="/test/login/"):
+    form = login_states()
     # Пропорции claude.ai/login (владелец 17.10), половины зеркально: слева на месте их фото — волна площадок и
     # названия, справа заголовок и форма в карточке. Слова «Вход» на экране нет (владелец 17.10), H1 — только для
     # экранных чтецов; обещание — абзацем, у штатного H1 черта слева, а здесь текст по центру.
@@ -697,8 +708,7 @@ def page_login(path="/test/login/"):
             '<p class="signin-claim">Снимайте то, что работает</p>'
             '<p class="signin-sub">Система каждый день разбирает ваши ролики и собирает план и сценарии вашим голосом.</p>'
             f'{form}</section></div>')
-    bare_page(path, "Вход", "Вход в improducer: Google или почта.", body,
-              states=("full", "loading", "error", "sent", "code", "badcode"))
+    bare_page(path, "Вход", "Вход в improducer: Google или почта.", body, states=LOGIN_STATES)
 
 
 def onboarding_shell(path, n, blocks, states):
@@ -1711,13 +1721,358 @@ git pull --rebase &amp;&amp; git push</pre>
                             + f"{SCRIPT}</body></html>\n")
 
 
+# ── Варианты входа /test/vhod/ ───────────────────────────────────────────────
+# 17.10 владелец: нынешний вход не нравится, нужны 15–20 вариантов с чистого листа по входам сильных площадок;
+# выберет один. Каждый вариант — своя раскладка и подача, форма и её состояния общие (login_states()).
+# Разбор образцов — ~/Desktop/improducer/работа/2026-10-17_vhod/разбор.md. Свой вид — vhod.css (только на этих
+# страницах), превью для каталога — _build/vhod/NN.jpg (снимок 1728×1080), копирует сборка.
+VHOD_CSS = HERE / "vhod.css"
+VHOD_PREV = HERE / "vhod"
+VHOD = []  # (номер, образец, что взято, функция → (класс body, разметка))
+
+
+def vhod(ref, took):
+    def reg(fn):
+        VHOD.append((f"{len(VHOD) + 1:02d}", ref, took, fn))
+        return fn
+    return reg
+
+
+def vx_head(title, desc):
+    css = f'<link rel="stylesheet" href="/test/assets/vhod.css?v={ver(VHOD_CSS)}">\n</head>'
+    return head(title, desc).replace("</head>", css, 1)
+
+
+def vx_mark(cls="vx-mark"):
+    """Основной знак как есть: mark.svg без перекраски, только размер."""
+    return f'<img class="{cls}" src="/test/assets/logo/mark.svg" alt="improducer">'
+
+
+def vx_legal(sep=""):
+    links = ['<a href="/test/help/">Помощь</a>', '<a href="/privacy.html">Конфиденциальность</a>',
+             '<a href="/terms.html">Условия</a>']
+    return sep.join(links)
+
+
+def vx_title(text, cls="vx-title"):
+    """Заголовок без красной черты (по центру ей не место): для экранных чтецов — H1, на экране — абзац."""
+    return f'<h1 class="visually-hidden">Вход в improducer</h1><p class="{cls}">{text}</p>'
+
+
+def page_vhod():
+    n_all = len(VHOD)
+    for i, (n, ref, took, fn) in enumerate(VHOD):
+        cls, body = fn()
+        prev, nxt = VHOD[i - 1][0], VHOD[(i + 1) % n_all][0]
+        nav = (f'<a href="/test/vhod/">Все варианты</a><a href="/test/vhod/{prev}/">← Вариант {prev}</a>'
+               f'<a href="/test/vhod/{nxt}/">Вариант {nxt} →</a>')
+        pr = proto(list(LOGIN_STATES)).replace('<a href="/test/opis/">Опись и инструкция</a>', nav)
+        PAGES[f"/test/vhod/{n}/"] = (vx_head(f"Вход · вариант {n}", f"Вариант входа {n}: по образцу {ref}.")
+                                     + f'<body class="vx vx-{n} {cls}">{body}{pr}{SCRIPT}</body></html>\n')
+    cards = []
+    for n, ref, took, _ in VHOD:
+        img = (f'<img src="/test/assets/vhod/{n}.jpg?v={ver(VHOD_PREV / f"{n}.jpg")}" alt="" loading="lazy">'
+               if (VHOD_PREV / f"{n}.jpg").exists() else '<span class="vxc-none">снимка ещё нет</span>')
+        cards.append(f'<a class="vxc" href="/test/vhod/{n}/"><span class="vxc-img">{img}</span>'
+                     f'<span class="vxc-top"><span class="meta">{n}</span><b>{E(ref)}</b></span>'
+                     f'<span class="vxc-took">{E(took)}</span><span class="vxc-go">Открыть →</span></a>')
+    body = (f'<header class="bare-head">{wordmark()}</header><main class="vxcat">'
+            f'<h1>Вход: {n_all} вариантов</h1>'
+            '<p class="lede">Каждый вариант опирается на вход одной сильной площадки и собран в дизайн-системе '
+            'improducer. Форма и её состояния у всех общие: Google, почта, письмо, код. Отметки ✓ · ✕ · ⊘ и '
+            'комментарий — на <a href="https://pult.improducer.co/#front/vhod">пульте, вкладка «Фронтенд»</a>.</p>'
+            f'<div class="vxgrid">{"".join(cards)}</div></main>')
+    PAGES["/test/vhod/"] = (vx_head("Вход: варианты", "Варианты страницы входа improducer на выбор.")
+                            + f'<body class="site">{body}{SCRIPT}</body></html>\n')
+
+
+# Общие строки вариантов: только то, что верно про продукт (ПУТЬ_АВТОРА.md §2, ФРОНТЕНД_И_ФОРМАТЫ.md §4.1).
+VX_NEW = "Нет аккаунта? Он появится после первого входа."
+VX_SECTIONS = [(f[1], f[3]) for f in FUNCS if f[0] not in ("channel", "photos")]
+
+
+@vhod("Google", "Широкая карточка, внутри две колонки: слева знак и заголовок с красной чертой, справа форма; "
+                "язык и ссылки — строкой под карточкой")
+def vx_google():
+    return "", ('<main class="g-main"><div class="g-card">'
+                f'<div class="g-left">{vx_mark()}<h1 class="g-h">Войдите в improducer</h1>'
+                '<p class="vx-sub">Кабинет вашего канала: разбор роликов, концепция, план и сценарии вашим голосом.</p>'
+                f'</div><div class="g-right vx-incard">{login_states()}</div></div>'
+                f'<div class="g-foot"><span class="g-lang">{ic("globe")}Русский</span>'
+                f'<nav class="vx-links">{vx_legal()}</nav></div></main>')
+
+
+@vhod("Microsoft", "Узкая карточка по центру со знаком внутри и вторая карточка под ней — у нас «что будет после "
+                   "входа» в три шага; ссылки внизу экрана")
+def vx_microsoft():
+    steps = "".join(f"<li><b>{t}</b> {d}</li>" for t, d in (
+        ("Разрешите доступ к каналу", "в Google — система увидит его статистику."),
+        ("Ответьте на анкету:", "о чём канал, для кого и куда звать зрителя."),
+        ("Получите основу канала:", "концепцию, план на 8 роликов и сценарии вашим голосом.")))
+    return "", ('<main class="ms-main"><div class="ms-stack">'
+                f'<div class="card ms-card vx-incard"><div class="ms-logo">{wordmark(co=False)}</div>'
+                f'{vx_title("Войдите в improducer", "ms-t")}'
+                '<p class="ms-s">Вход и регистрация — один шаг.</p>'
+                f'{login_states()}</div>'
+                f'<div class="card ms-next"><p class="ms-k">После входа</p><ol>{steps}</ol></div>'
+                f'</div></main><footer class="ms-foot"><nav class="vx-links">{vx_legal()}</nav></footer>')
+
+
+@vhod("Netflix", "Шапка во всю ширину с линией, колонка с заголовком по левому краю, почта первой; "
+                 "подвал полосой через линию")
+def vx_netflix():
+    return "", (f'<header class="nf-head"><div class="nf-in">{wordmark()}</div></header>'
+                '<main class="nf-main"><div class="nf-col">'
+                '<h1 class="nf-h">Войдите, чтобы продолжить</h1>'
+                '<p class="vx-sub">Или начните: аккаунт появится после первого входа.</p>'
+                f'{login_states()}'
+                '<p class="nf-help"><a href="/test/help/">Нужна помощь со входом →</a></p></div></main>'
+                '<footer class="nf-foot"><div class="nf-in"><p>Вопросы? <a href="/test/help/">Помощь</a></p>'
+                f'<nav class="vx-links">{vx_legal()}</nav></div></footer>')
+
+
+@vhod("Airbnb", "Окно входа поверх стены — у Airbnb это постеры городов, у нас разделы, которые собирает система: "
+                "ДНК, ниша, концепция, план, сценарии")
+def vx_airbnb():
+    secs = VX_SECTIONS + VX_SECTIONS[:8]
+    wall = "".join(f'<div class="ab-tile"><span class="meta">{(i % len(VX_SECTIONS)) + 1:02d}</span>'
+                   f'<b>{E(t)}</b><span class="ab-w">{E(w)}</span></div>' for i, (t, w) in enumerate(secs))
+    return "", (f'<header class="ab-head">{wordmark()}<nav class="ab-nav"><a href="/test/product/">Как это работает</a>'
+                f'<a class="ab-help" href="/test/help/" aria-label="Помощь">{ic("help")}</a></nav></header>'
+                f'<main class="ab-stage"><div class="ab-wall" aria-hidden="true">{wall}</div>'
+                '<div class="ab-dlg vx-incard" role="dialog" aria-modal="false" aria-labelledby="ab-t">'
+                f'{vx_mark()}<h1 class="visually-hidden">Вход в improducer</h1>'
+                '<p class="vx-title ab-t" id="ab-t">Войдите или зарегистрируйтесь</p>'
+                f'{login_states()}</div></main>')
+
+
+@vhod("Instagram", "Две половины через тонкую линию: слева крупная фраза и экран-пример разбора ролика, справа "
+                   "короткая подпись и форма без карточки; ссылки подвалом")
+def vx_instagram():
+    rows = [("Показы", "в норме", "ok"), ("CTR", "в норме", "ok"), ("Первые 30 с", "сломан", "no"),
+            ("Удержание", "в норме", "ok")]
+    lines = "".join(f'<li><span>{a}</span><span class="badge badge--{c}">{b}</span></li>' for a, b, c in rows)
+    phone = ('<figure class="ig-phone" aria-label="Пример: разбор одного ролика">'
+             '<div class="ig-scr"><span class="badge badge--wait">пример</span>'
+             '<p class="ig-pt">Разбор ролика</p><p class="ig-pm">против нормы вашего канала</p>'
+             f'<ul>{lines}</ul>'
+             '<div class="ig-next"><p class="meta">Что поменять</p><p>Хук — до 45 секунд, суть ролика — сразу.</p></div>'
+             '</div></figure>')
+    return "", ('<main class="ig-main">'
+                f'<section class="ig-left" aria-label="Что делает система">{wordmark()}'
+                '<p class="ig-h">Узнайте, какой шаг ролика тянет вниз, — и что снимать дальше</p>'
+                f'{phone}</section>'
+                f'<section class="ig-right"><div class="ig-form">{wordmark(co=False)}'
+                '<h1 class="ig-label">Войти в improducer</h1>'
+                f'{login_states()}<p class="vx-note">{VX_NEW}</p></div></section></main>'
+                f'<footer class="ig-foot"><nav class="vx-links">{vx_legal()}<span>© 2026 improducer</span></nav></footer>')
+
+
+@vhod("TikTok", "Шапка со знаком и «Помощь», способы входа строками со значком у левого края; "
+                "полоса «нет аккаунта» через линию и подвал")
+def vx_tiktok():
+    return "", (f'<header class="tt-head">{wordmark()}<a class="tt-help" href="/test/help/">{ic("help")}Помощь</a></header>'
+                '<main class="tt-main"><div class="tt-col">'
+                f'{vx_title("Войдите в improducer", "vx-title tt-t")}'
+                '<p class="tt-s">Разбирайте ролики, утверждайте концепцию и план, получайте сценарии вашим голосом.</p>'
+                f'{login_states()}</div></main>'
+                '<div class="tt-band">Ещё нет аккаунта? <b>Он появится после первого входа.</b></div>'
+                f'<footer class="tt-foot"><span class="g-lang">{ic("globe")}Русский</span><span>© 2026 improducer</span></footer>')
+
+
+@vhod("Notion", "Заголовок в два тона: строка о продукте чёрным, «войдите» серым; почта первой, с подписью над полем "
+                "и подсказкой под ним; язык внизу экрана")
+def vx_notion():
+    return "", ('<main class="nt-main"><div class="nt-col">'
+                f'{vx_mark()}<h1 class="visually-hidden">Вход в improducer</h1>'
+                '<p class="nt-h"><span>Основа канала, который приводит клиентов.</span>'
+                '<span class="nt-h2">Войдите в аккаунт improducer</span></p>'
+                f'{login_states()}<p class="vx-note nt-new">{VX_NEW}</p></div></main>'
+                f'<footer class="nt-foot"><span class="g-lang">{ic("globe")}Язык: русский</span></footer>')
+
+
+@vhod("Linear", "Почти ничего: знак, одна строка обычным весом, кнопки и строка про аккаунт — всё точно посередине экрана")
+def vx_linear():
+    return "", ('<main class="ln-main"><div class="ln-col">'
+                f'{vx_mark()}{vx_title("Войдите в improducer", "ln-t")}{login_states()}'
+                f'<p class="vx-note">{VX_NEW} <a href="/test/product/">Что это</a></p></div></main>')
+
+
+@vhod("Stripe", "Тонкие направляющие сетки во весь экран и линия под шапкой; карточка с заголовком по левому краю "
+                "и полосой-подвалом внутри")
+def vx_stripe():
+    return "", ('<div class="st-guides" aria-hidden="true"><span></span><span></span><span></span><span></span></div>'
+                f'<header class="st-head"><div class="st-in">{wordmark()}</div></header>'
+                '<main class="st-main"><div class="st-card vx-incard"><div class="st-body">'
+                f'<h1 class="st-h">Войдите в аккаунт</h1>{login_states()}</div>'
+                '<div class="st-strip">Впервые в improducer? <b>Аккаунт появится после первого входа.</b></div></div>'
+                f'<nav class="vx-links st-links"><span>© improducer</span>{vx_legal()}</nav></main>')
+
+
+@vhod("Slack", "Крупный заголовок-инструкция «введите почту», почта первой, Google — после «или»; "
+               "знак по центру шапки, справа «впервые здесь?»")
+def vx_slack():
+    return "", ('<header class="sl-head"><span></span>'
+                f'<div class="sl-logo">{wordmark()}</div>'
+                '<p class="sl-new">Впервые здесь?<br><a href="/test/product/">Как это работает</a></p></header>'
+                '<main class="sl-main"><div class="sl-col">'
+                f'{vx_title("Введите почту, чтобы войти", "sl-t")}'
+                '<p class="sl-s">Или войдите через Google — ниже.</p>'
+                f'{login_states()}'
+                '<p class="vx-note sl-trouble">Не получается войти? <a href="/test/help/">Помощь со входом</a></p>'
+                '</div></main>')
+
+
+@vhod("ChatGPT", "Простой заголовок обычным весом в две строки, ссылка «сначала узнать», знак внизу у юридических "
+                 "ссылок, а не над формой")
+def vx_chatgpt():
+    return "", (f'<header class="cg-head">{wordmark(small=True)}</header>'
+                '<main class="cg-main"><div class="cg-col">'
+                f'{vx_title("Войти или создать аккаунт", "cg-t")}{login_states()}'
+                '<a class="cg-try" href="/test/product/">Сначала узнать, как это работает</a></div></main>'
+                f'<footer class="cg-foot">{vx_mark()}<nav class="vx-links">{vx_legal(sep="<i>|</i>")}</nav></footer>')
+
+
+@vhod("Perplexity", "Знак в одной строке с приветствием, карточка по центру, ссылка «вернуться на главную» под формой")
+def vx_perplexity():
+    return "", ('<main class="px-main"><div class="card px-card vx-incard">'
+                f'<div class="px-hello">{vx_mark()}<h1 class="visually-hidden">Вход в improducer</h1>'
+                '<p class="vx-title px-t">Добро пожаловать в improducer</p></div>'
+                '<p class="px-s">Войдите или зарегистрируйтесь — это один шаг.</p>'
+                f'{login_states()}<a class="px-home" href="/test/product/">Вернуться на главную</a></div></main>')
+
+
+@vhod("Descript", "Вместо заголовка — крупный знак со словом в карточке, под ним только форма; ссылки внизу экрана")
+def vx_descript():
+    return "", ('<main class="ds-main"><div class="card ds-card vx-incard">'
+                '<h1 class="ds-h"><span class="wordmark ds-lock"><span>improducer</span></span>'
+                '<span class="visually-hidden">: вход</span></h1>'
+                f'{login_states()}</div></main>'
+                f'<footer class="ds-foot"><nav class="vx-links">{vx_legal(sep="<i>•</i>")}</nav></footer>')
+
+
+@vhod("CapCut", "Экран пополам: слева панель-показ, которая сама листает, что делает система (разбор, ДНК, концепция, "
+                "план, сценарии), с полосками хода; справа знак, приветствие и форма")
+def vx_capcut():
+    slides = [("Разбор роликов", "Каждый день: какой шаг ролика сломан — показы, CTR, первые 30 секунд или удержание — "
+                                 "против нормы вашего канала."),
+              ("ДНК", "Кто вы, во что верите, что продаёте и чего не делаете. Собирается из вашей речи и текстов."),
+              ("Концепция", "О чём канал, для кого и чем он отличается. Решение — за вами: от него зависят все темы."),
+              ("Контент-план", "Темы по датам съёмки и выхода — план на 8 роликов. Видно, что снимать и когда."),
+              ("Сценарии", "Хук, части, призыв и описание — вашими словами. Сдачу проверяет код, а не модель.")]
+    sl = "".join(f'<div class="cc-slide" style="--i:{i}"><span class="meta">{i + 1:02d} / {len(slides):02d}</span>'
+                 f'<p class="cc-st">{t}</p><p class="cc-sd">{d}</p></div>' for i, (t, d) in enumerate(slides))
+    tabs = "".join(f'<li style="--i:{i}"><span class="cc-bar"><i></i></span>{t}</li>' for i, (t, _) in enumerate(slides))
+    return "", ('<main class="cc-main">'
+                f'<section class="cc-show" aria-label="Что делает система">{sl}<ol class="cc-tabs">{tabs}</ol></section>'
+                f'<section class="cc-side"><div class="cc-top">{wordmark()}</div><div class="cc-form">'
+                f'{vx_title("Добро пожаловать в improducer", "vx-title cc-t")}'
+                '<p class="cc-s">Войдите, чтобы открыть кабинет своего канала</p>'
+                f'{login_states()}</div></section></main>')
+
+
+@vhod("Substack", "Короткая форма, почта первой, а под ней карточка-предложение — у Substack приложение, у нас "
+                  "сценарий, готовый к съёмке: из чего он состоит")
+def vx_substack():
+    parts = [("Хук", "до 45 с"), ("Части", "3–5"), ("Призыв", "не раньше 30 с"), ("Названия", "5–10 на выбор"),
+             ("Описание", "к выходу")]
+    doc = "".join(f'<li><span>{a}</span><span class="meta">{b}</span></li>' for a, b in parts)
+    return "", (f'<a class="ss-back" href="/test/" aria-label="На главную">{ic("right")}</a>'
+                '<main class="ss-main"><div class="ss-col">'
+                f'{vx_mark()}{vx_title("Войдите в improducer", "vx-title ss-t")}{login_states()}'
+                f'<p class="vx-note ss-new">{VX_NEW}</p></div>'
+                '<section class="card ss-promo"><div class="ss-pt">'
+                '<p class="ss-ph">Сценарий, готовый к съёмке</p>'
+                '<p class="ss-pd">Вашими словами, по плану канала. Длину, хук и призыв проверяет код, а не модель.</p></div>'
+                f'<div class="ss-doc" aria-label="Из чего состоит сценарий"><p class="meta">Сценарий · ролик из плана</p>'
+                f'<ul>{doc}</ul></div></section></main>')
+
+
+@vhod("Spotify", "Крупная фраза по центру и всё в одну колонку: почта с подписью, «или», Google; "
+                 "внизу «нет аккаунта?» серым и ответ жирным")
+def vx_spotify():
+    return "", ('<main class="sp-main"><div class="sp-col">'
+                f'{vx_mark()}{vx_title("Канал, который приводит клиентов", "sp-t")}'
+                f'<div class="sp-form">{login_states()}</div>'
+                '<p class="sp-new"><span>Нет аккаунта?</span><b>Он появится после первого входа</b></p>'
+                '</div></main>')
+
+
+@vhod("Supabase", "Форма слева на белой панели с линией, справа на просторе одна крупная мысль о том, как устроен "
+                  "продукт, и кнопка «как это работает» в углу")
+def vx_supabase():
+    return "", ('<main class="sb-main"><section class="sb-panel">'
+                f'<div class="sb-top">{wordmark()}</div><div class="sb-form">'
+                '<h1 class="sb-h">С возвращением</h1>'
+                '<p class="vx-sub sb-s">Войдите в аккаунт или создайте его тем же шагом.</p>'
+                f'{login_states()}</div></section>'
+                '<section class="sb-aside" aria-label="Как устроен improducer">'
+                '<a class="btn sb-doc" href="/test/product/">Как это работает</a>'
+                '<figure class="sb-q"><span class="sb-mark" aria-hidden="true">“</span>'
+                '<blockquote>Числа о вашем канале считает сервер, а не модель. У каждого — источник.</blockquote>'
+                '<figcaption>Так устроен improducer: сдачу сценария проверяет код, правило канала включаете вы.'
+                '</figcaption></figure></section></main>')
+
+
+@vhod("Gumroad", "Левая половина: шапка со знаком и крупная фраза, под ней линия во всю половину и широкая форма; "
+                 "правая — сетка квадратов, у Gumroad рисунки, у нас девять шагов системы словами")
+def vx_gumroad():
+    words = ["Разбор", "ДНК", "Ниша", "Концепция", "Идеи", "План", "Сценарии", "Обложки", "Выпуск"]
+    grid = "".join(f'<div><span class="meta">{i + 1:02d}</span><b>{w}</b></div>' for i, w in enumerate(words))
+    return "", ('<main class="gr-main"><section class="gr-left">'
+                f'<div class="gr-head"><div class="gr-row">{wordmark()}<a href="/test/product/">Что это</a></div>'
+                '<h1 class="visually-hidden">Вход в improducer</h1><p class="gr-t">Снимайте по плану, а не наугад</p></div>'
+                f'<div class="gr-form">{login_states()}<p class="vx-note">{VX_NEW}</p></div></section>'
+                f'<section class="gr-grid" aria-label="Что делает система">{grid}</section></main>')
+
+
+@vhod("Lovable", "Форма слева по левому краю, справа большая панель, в которой сама набирается просьба к системе — "
+                 "как её задаёт автор; красная стрелка отправки — одно из разрешённых мест #FF0000")
+def vx_lovable():
+    asks = ["Разбери мой последний ролик", "Что снимать на этой неделе?", "Напиши сценарий следующего ролика"]
+    typed = "".join(f'<span class="lv-ask" style="--i:{i}">{a}</span>' for i, a in enumerate(asks))
+    return "", ('<main class="lv-main"><section class="lv-side"><div class="lv-form">'
+                f'{vx_mark()}{vx_title("Войдите в improducer", "vx-title lv-t")}{login_states()}'
+                f'<p class="vx-note lv-new">{VX_NEW}</p></div></section>'
+                '<section class="lv-show" aria-label="Пример просьбы к системе">'
+                '<p class="lv-cap">Спросите систему о своём канале</p>'
+                f'<div class="lv-box"><span class="lv-text">{typed}</span>'
+                '<span class="lv-send" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" '
+                'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5"/>'
+                '</svg></span></div></section></main>')
+
+
+@vhod("Kit", "Переключатель «Войти · Создать аккаунт» с чертой под активным, форма слева; справа вместо фото автора — "
+             "чем система отличается от промта в чате")
+def vx_kit():
+    rows = [("Данные канала", "Нет", "Закрытые данные вашего канала: показы, CTR, удержание"),
+            ("Числа", "Пишет модель", "Считает сервер, у каждого — источник"),
+            ("Проверка", "Модель хвалит свой текст", "Сдачу проверяет код: хук, части, длина"),
+            ("Память", "Каждый раз с нуля", "Правило канала — после проверки на вышедших роликах")]
+    tr = "".join(f'<tr><th scope="row">{a}</th><td>{b}</td><td>{c}</td></tr>' for a, b, c in rows)
+    return "", ('<main class="kt-main"><section class="kt-side">'
+                f'<div class="kt-top">{wordmark()}</div><div class="kt-form">'
+                '<h1 class="visually-hidden">Вход в improducer</h1>'
+                '<div class="kt-tabs" role="tablist">'
+                '<input type="radio" name="kt" id="kt-in" checked><label for="kt-in">Войти</label>'
+                '<input type="radio" name="kt" id="kt-up"><label for="kt-up">Создать аккаунт</label>'
+                '<p class="kt-say kt-say-in">С возвращением. Google или почта — как в прошлый раз.</p>'
+                '<p class="kt-say kt-say-up">Тот же шаг: аккаунт появится сразу после входа, без заявок и ожидания.</p>'
+                f'</div>{login_states()}</div></section>'
+                '<section class="kt-aside" aria-label="Чем отличается от промта"><div class="kt-cmp">'
+                '<p class="kt-ct">Чем это отличается от промта в чате</p>'
+                '<table><thead><tr><th></th><th scope="col">Промт в чате</th><th scope="col">improducer</th></tr></thead>'
+                f'<tbody>{tr}</tbody></table></div></section></main>')
+
+
+
 def main():
     check_labels()
     copy_assets()
     for fn in (page_home, page_product, page_pricing, page_download, page_help, page_help_start,
                page_login, page_onboarding, page_connect, page_new, page_chat, page_chat_youtube, page_recents,
                page_projects, page_project, page_cabinet, page_cabinet_youtube, page_concept,
-               page_settings, page_upgrade, page_logout, page_opis):
+               page_settings, page_upgrade, page_logout, page_opis, page_vhod):
         fn()
     # Старое не остаётся: всё, кроме исходника и общего вида, собирается заново.
     for d in TEST.iterdir():
