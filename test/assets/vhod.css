@@ -156,9 +156,12 @@
   border-radius:calc(var(--radius-card) * 2)}
 .pp-frame .wordmark{zoom:1.6}
 /* Ссылки сидят в разрыве нижней линии рамки. */
-.pp-foot{position:absolute;left:50%;bottom:0;transform:translate(-50%,50%);padding:0 var(--space-16);background:var(--color-bg-page)}
+/* Без transform: дробный сдвиг translate(-50%) мылит текст на экранах 1×. Полоса нулевой высоты на линии рамки,
+   ссылки по центру её — раскладка ставит их на целые пиксели. */
+.pp-foot{position:absolute;left:0;right:0;bottom:0;height:0;display:flex;justify-content:center;align-items:center}
+.pp-foot .vx-links{padding:0 var(--space-16);background:var(--color-bg-page)}
 @media (max-width:640px){.pp-main{padding:var(--space-12) var(--space-12) var(--space-24)}.pp-frame .wordmark{zoom:1.25}
-  .pp-foot{width:max-content;max-width:calc(100% - var(--space-24))}}
+  .pp-foot .vx-links{max-width:calc(100% - var(--space-24))}}
 
 /* ── 08 Сетка ──────────────────────────────────────────────────────────── */
 .gd-main{flex:1;position:relative;display:grid;grid-template-columns:minmax(0,1fr);place-items:center;padding:var(--space-64) var(--space-page-gutter)}
