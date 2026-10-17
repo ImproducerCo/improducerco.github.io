@@ -109,14 +109,15 @@ const DONE={tt:'42 ролика',ig:'87 рилсов',yt:'128 роликов',tg
 const css=n=>n.grad.length>1?`linear-gradient(${n.up?'to top,':''}${n.grad.join(',')})`:n.grad[0];
 const phase=()=>`-${(performance.now()%2400)/1000}s`;
 
-function wave(sts,uid){
+// bare — без серых: только полоски площадок, на местах полосок знака (владелец 17.10).
+function wave(sts,uid,bare){
   let o=`<svg viewBox="0 0 100 100" role="img" aria-label="Площадки"><defs>`;
   NETS.forEach(n=>{if(n.grad.length>1)o+=`<linearGradient id="${uid}${n.id}" x1="0" y1="${n.up?1:0}" x2="0" y2="${n.up?0:1}">${n.grad.map((c,i)=>`<stop offset="${i/(n.grad.length-1)}" stop-color="${c}"/>`).join('')}</linearGradient>`});
   o+='</defs>';
   const paint=n=>n.grad.length>1?`url(#${uid}${n.id})`:n.grad[0];
   const d=phase();
   CX.forEach((cx,i)=>{const h=HT[i],x=cx-BW/2,y=50-h/2,n=NETS.find(m=>m.at===i);
-    if(!n){o+=`<rect x="${x}" y="${y}" width="${BW}" height="${h}" rx="${R}" fill="#C9D1DC"/>`;return}
+    if(!n){if(!bare)o+=`<rect x="${x}" y="${y}" width="${BW}" height="${h}" rx="${R}" fill="#C9D1DC"/>`;return}
     const on=sts[n.id]==='on',p=paint(n);
     // пульс — контур того же цвета, расходится и гаснет
     o+=`<rect class="pulse" x="${x}" y="${y}" width="${BW}" height="${h}" rx="${R}" stroke="${p}" stroke-width="${SW}" style="animation-delay:${d}"/>`;
@@ -152,6 +153,7 @@ const CASES=[
   {t:'Три площадки',s:{yt:'on',tg:'on',ig:'on'}},
   {t:'Четыре площадки',s:{yt:'on',tg:'on',ig:'on',tt:'on'}},
   {t:'Все пять',s:{yt:'on',tg:'on',ig:'on',tt:'on',x:'on'}},
+  {t:'Все пять — без серых',s:{yt:'on',tg:'on',ig:'on',tt:'on',x:'on'},bare:true},
   {t:'Только Telegram',s:{tg:'on'}},
   {t:'Без YouTube',s:{tg:'on',ig:'on'}},
   {t:'YouTube и Instagram',s:{yt:'on',ig:'on'}},
@@ -160,7 +162,7 @@ document.getElementById('states').innerHTML=CASES.map((c,ci)=>{
   const on=NETS.filter(n=>c.s[n.id]==='on').length;
   const chips=NETS.map(n=>{const v=c.s[n.id]==='on';const mid=n.grad[Math.floor(n.grad.length/2)];
     return `<span class="chip ${v?'on':''}"><i style="background:${v?css(n):'#C9D1DC'}"></i>${n.name}</span>`}).join('');
-  return `<div class="card"><div class="pic">${wave(c.s,'s'+ci)}</div><div class="cap"><span class="cnt">подключено ${on} из 5</span>
+  return `<div class="card"><div class="pic">${wave(c.s,'s'+ci,c.bare)}</div><div class="cap"><span class="cnt">подключено ${on} из 5</span>
 <span class="ttl">${c.t}</span><span class="who">${chips}</span><span class="head">${headMark(c.s,22)}improducer</span></div></div>`;
 }).join('');
 </script>
