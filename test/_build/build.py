@@ -62,6 +62,9 @@ def copy_assets():
         shutil.copy2(DESIGN / "logo" / name, out / "logo" / name)
     for name in ("test.css", "test.js"):
         shutil.copy2(HERE / name, out / name)
+    # Geologica — шрифт строки площадок на входе (владелец 17.10, выбран из шести); в _design/ его пока нет.
+    for f in (HERE / "fonts").iterdir():
+        shutil.copy2(f, out / "fonts" / f.name)
 
 
 # ── Общие куски ─────────────────────────────────────────────────────────────
@@ -597,76 +600,33 @@ def page_help_start():
               states=("full", "long"))
 
 
-# Волна площадок — строго по _design/ideas/platforms-wave.html (владелец 17.10: форму знака и его эффекты не менять,
-# даже когда полосок больше). Геометрия знака _design/logo/mark.svg: девять полосок с шагом 8; чётные — ровно полоски
-# знака (площадки), нечётные — серые между ними, высотой среднее соседей. Пульс — контур цвета площадки расходится
-# и гаснет, 2.4 с, у всех одна фаза (test.css .wave-pulse).
-WAVE_CX = [18, 26, 34, 42, 50, 58, 66, 74, 82]
-WAVE_H = [12, 24, 36, 50, 64, 50, 36, 24, 12]
-WAVE_BW, WAVE_SW, WAVE_REST = 4.5, .9, "#C9D1DC"
-# Место на волне → (название, цвета сверху вниз, градиент снизу вверх).
-WAVE_NETS = {0: ("TikTok", ["#25F4EE", "#FE2C55"], False),
-             2: ("Instagram", ["#FEDA75", "#FA7E1E", "#D62976", "#962FBF", "#4F5BD5"], True),
-             4: ("YouTube", ["#FF0000"], False),
-             6: ("Telegram", ["#2AABEE", "#229ED9"], False),
-             8: ("X", ["#1B2230"], False)}
-# Залита только средняя — красная черта знака; остальные площадки серые с пульсом своего цвета. Владелец 17.10:
-# так (первая из трёх версий) знак выглядел лучше, чем со всеми залитыми.
-WAVE_FILLED = {"YouTube"}
-# Строка названий под волной — вразнобой (владелец 17.10); RedNote убран 17.10.
+# Знак площадок — сам знак _design/logo/mark.svg (владелец 17.10: «оставь только полоски, которые залиты, без серых»):
+# пять его полосок, каждая залита цветом своей площадки — состояние «Все пять» знака в шапке из
+# _design/ideas/platforms-wave.html (headMark), цвета оттуда же. Пульс — как в идее: контур цвета полоски расходится
+# и гаснет, 2.4 с, одна фаза (test.css .wave-pulse). Форму и цвета знака не менять (владелец 17.10).
+# Поля: название, x и высота полоски знака, цвет.
+MARK_BARS = [("TikTok", 13.5, 12, "#FE2C55"),
+             ("Instagram", 29.5, 36, "#D62976"),
+             ("YouTube", 45.5, 64, "#FF0000"),
+             ("Telegram", 61.5, 36, "#2AABEE"),
+             ("X", 77.5, 12, "#1B2230")]
+MARK_BAR_W, MARK_PULSE_W = 9, 1.8  # толщина контура пульса — как в идее (0.9 при полоске 4.5)
+# Строка названий под знаком — вразнобой (владелец 17.10); RedNote убран 17.10.
 PLATFORM_CLOUD = ["TikTok", "YouTube", "Threads", "Telegram", "Facebook", "Instagram", "X"]
 
 
-def platform_wave(uid="w"):
-    defs, bars = [], []
-    for i, (cx, h) in enumerate(zip(WAVE_CX, WAVE_H)):
-        x, y = cx - WAVE_BW / 2, 50 - h / 2
-        box = f'x="{x:g}" y="{y:g}" width="{WAVE_BW}" height="{h}" rx="{WAVE_BW / 2:g}"'
-        if i not in WAVE_NETS:
-            bars.append(f'<rect {box} fill="{WAVE_REST}"/>')
-            continue
-        name, colors, up = WAVE_NETS[i]
-        if len(colors) > 1:
-            stops = "".join(f'<stop offset="{k / (len(colors) - 1):g}" stop-color="{c}"/>' for k, c in enumerate(colors))
-            defs.append(f'<linearGradient id="{uid}{i}" x1="0" y1="{1 if up else 0}" x2="0" y2="{0 if up else 1}">'
-                        f'{stops}</linearGradient>')
-            paint = f"url(#{uid}{i})"
-        else:
-            paint = colors[0]
-        bars.append(f'<rect class="wave-pulse" {box} fill="none" stroke="{paint}" stroke-width="{WAVE_SW}"/>'
-                    f'<rect {box} fill="{paint if name in WAVE_FILLED else WAVE_REST}"><title>{name}</title></rect>')
-    names = ", ".join(n for n, _, _ in WAVE_NETS.values())
-    return (f'<svg class="wave" viewBox="0 0 100 100" role="img" aria-label="Площадки: {names}">'
-            f'<defs>{"".join(defs)}</defs>{"".join(bars)}</svg>')
+def platform_wave():
+    bars = []
+    for name, x, h, color in MARK_BARS:
+        box = f'x="{x:g}" y="{50 - h / 2:g}" width="{MARK_BAR_W}" height="{h}" rx="{MARK_BAR_W / 2:g}"'
+        bars.append(f'<rect class="wave-pulse" {box} fill="none" stroke="{color}" stroke-width="{MARK_PULSE_W}"/>'
+                    f'<rect {box} fill="{color}"><title>{name}</title></rect>')
+    names = ", ".join(n for n, _, _, _ in MARK_BARS)
+    return f'<svg class="wave" viewBox="0 0 100 100" role="img" aria-label="Площадки: {names}">{"".join(bars)}</svg>'
 
 
 def platform_cloud():
     return "".join(f"<li>{t}</li>" for t in PLATFORM_CLOUD)
-
-
-# Выбор шрифта для строки названий (владелец 17.10: «подумай, каким шрифтом»). Временная страница: системные Golos и
-# моноширинный заглавными владелец отверг, остальные — свободные (OFL) из test/assets/try-fonts/. После выбора
-# выбранный идёт в _design/fonts/, страница и try-fonts убираются.
-FONT_TRY = [("JetBrains Mono", None, "сейчас на входе"),
-            ("Manrope", "manrope", "геометрический, мягкий"),
-            ("Space Grotesk", "space-grotesk", "гротеск с характером"),
-            ("Unbounded", "unbounded", "широкий, плакатный"),
-            ("Onest", "onest", "спокойный, близок к Golos"),
-            ("Geologica", "geologica", "строгий, технический")]
-
-
-def page_fonts():
-    faces = "".join(f'@font-face{{font-family:"{n}";font-weight:500;font-display:block;'
-                    f'src:url("/test/assets/try-fonts/{f}-latin-500-normal.woff2") format("woff2")}}'
-                    for n, f, _ in FONT_TRY if f)
-    cards = "".join(
-        f'<section class="ftry-card"><p class="ftry-cap"><b>{k}</b> · {n} · {note}</p>'
-        f'<div class="signin-stage">{platform_wave(f"f{k}w")}'
-        f'<ul class="pcloud" style="font-family:\'{n}\',var(--font-mono)">{platform_cloud()}</ul></div></section>'
-        for k, (n, _, note) in enumerate(FONT_TRY, 1))
-    body = (f'<style>{faces}</style><div class="ftry"><p class="ftry-lede">Строка названий под волной на входе — шесть '
-            'шрифтов в настоящем размере. Назовите номер.</p><div class="ftry-grid">' + cards + '</div></div>')
-    bare_page("/test/shrifty/", "Шрифт названий", "Выбор шрифта для строки площадок на входе.", body)
 
 
 # ── Вход и первый запуск ─────────────────────────────────────────────────────
@@ -1435,10 +1395,11 @@ OPIS_SCREENS = [
      "Поиск с ⌘K, частые статьи строками, коллекции плитками", "Бокового меню разделов нет; открывается одна статья",
      "заполнено · пусто · загрузка"),
     ("S07", "Вход", "claude.ai/login", "/test/login/",
-     "Пропорции образца, половины зеркально (владелец 17.10): слева волна и названия, справа заголовок и форма в карточке; "
-     "на телефоне панели нет",
-     "Вместо фото — волна площадок строго по _design/ideas/platforms-wave.html (форма знака, 9 полосок, площадки "
-     "серые, YouTube залита красным, пульс цвета площадки 2.4 с одной фазой) и названия TikTok, YouTube, Threads, Telegram, Facebook, Instagram, X. "
+     "Пропорции образца, половины зеркально (владелец 17.10): слева знак площадок и названия, справа заголовок и форма "
+     "в карточке; на телефоне знака нет, как фото у образца",
+     "Вместо фото — знак _design/logo/mark.svg, пять полосок залиты цветами TikTok, Instagram, YouTube, Telegram, X "
+     "(как знак в шапке из _design/ideas/platforms-wave.html), пульс 2.4 с; под ним названия TikTok, YouTube, Threads, "
+     "Telegram, Facebook, Instagram, X шрифтом Geologica. "
      "Заголовок «Один вход — все ваши площадки.», без слова «Вход»; форма — Google, «или», почта → «Продолжить»; "
      "Apple и «скачать приложение» убраны", "заполнено · загрузка · ошибка"),
     ("S08", "Письмо и код", "claude.ai/login (шаг 2)", "/test/login/#s=sent",
@@ -1736,7 +1697,7 @@ def main():
     for fn in (page_home, page_product, page_pricing, page_download, page_help, page_help_start,
                page_login, page_onboarding, page_connect, page_new, page_chat, page_chat_youtube, page_recents,
                page_projects, page_project, page_cabinet, page_cabinet_youtube, page_concept,
-               page_settings, page_upgrade, page_logout, page_opis, page_fonts):
+               page_settings, page_upgrade, page_logout, page_opis):
         fn()
     # Старое не остаётся: всё, кроме исходника и общего вида, собирается заново.
     for d in TEST.iterdir():
