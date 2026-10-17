@@ -7,7 +7,7 @@
 ~/Desktop/improducer/работа/2026-10-16_claude/, разбор.md: экраны S01–S27, пути F01–F08, компоненты C01–C28).
 Вид — только дизайн-система improducer (_design/: tokens.css, components.css, шрифты, знак). Продукт —
 безымянный ИИ-ассистент «improducer»: чаты, проекты, артефакты, коннекторы, планы. Тексты свои.
-Пользователь — выдуманный «Тест». Формы ничего не отправляют, настоящих входа, OAuth и оплаты нет.
+Пользователь — выдуманный «Тест». Вход — настоящий Google (my.improducer.co/google), остальные формы ничего не отправляют, оплаты нет.
 
 Папка _build GitHub Pages не публикует (Jekyll пропускает папки с «_»): здесь исходник,
 снаружи — собранные test/<путь>/index.html и test/assets/.
@@ -653,9 +653,14 @@ def platform_cloud():
 
 # ── Вход и первый запуск ─────────────────────────────────────────────────────
 
+# Владелец 17.10: кнопка ведёт в настоящий вход Google — тот же, что у кабинета (Катя, Юля), без своего макета окна.
+# my.improducer.co/google ставит метку браузера, отправляет в Google и после входа возвращает в /test/new/.
+SIGNIN = "https://my.improducer.co/google"
+
+
 def login_form():
     return ('<div class="auth auth--login">'
-            f'{gbtn("/test/google/")}'
+            f'{gbtn(SIGNIN)}'
             '<p class="small muted">Продолжая, вы принимаете <a href="/terms.html">условия</a> и '
             '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
 
@@ -667,7 +672,7 @@ def login_states():
             + st("loading", '<div class="auth auth--login">' + skel(3) + "</div>")
             + st("error", '<div class="auth auth--login">' + warn("Вход не завершён",
                                                                  "Окно Google закрыли или вход отменён. Попробуйте ещё раз.")
-                 + gbtn("/test/google/") + "</div>"))
+                 + gbtn(SIGNIN) + "</div>"))
 
 
 LOGIN_STATES = ("full", "loading", "error")
@@ -679,25 +684,6 @@ def page_login(path="/test/login/"):
     cls, body = vx_horizon()
     PAGES[path] = (vx_head("Вход", "Вход в improducer через Google.")
                    + f'<body class="vx vx-06 {cls}">{body}{proto(list(LOGIN_STATES))}{SCRIPT}</body></html>\n')
-
-
-def page_google():
-    """Макет окна Google после «Продолжить с Google». Владелец 17.10: окно Google — и сразу приложение (/test/new/);
-    шагов «имя», «возраст и условия», «первая площадка» нет, имя автора — имя аккаунта Google. YouTube подключается
-    потом в приложении — окно /test/connect/."""
-    scopes = ('<ul class="ticks"><li>Имя, почта и фото профиля — имя станет вашим именем в improducer</li></ul>')
-    body = ('<div class="centered"><div class="box"><div class="card stack">'
-            '<p class="meta">accounts.google.com · Тест · test@example.com</p>'
-            + st("full", '<h1 class="screen-title">Вход в improducer</h1>'
-                 f'<p><b>improducer</b> получит:</p>{scopes}'
-                 f'<div class="btn-row mt-s">{a_btn("/test/new/", "Продолжить", True)}'
-                 f'{a_btn("/test/login/#s=error", "Отмена")}</div>')
-            + st("loading", skel(3))
-            + st("error", warn("Google не ответил", "Не удалось открыть окно Google. Попробуйте ещё раз.",
-                               a_btn("/test/google/", "Повторить", True)))
-            + "</div><p class=\"small muted center mt-s\">Макет: окно Google.</p></div></div>")
-    bare_page("/test/google/", "Вход через Google", "Окно Google после «Продолжить с Google»: имя аккаунта — и в приложение.",
-              body, states=("full", "loading", "error"))
 
 
 def page_connect():
@@ -1370,7 +1356,7 @@ OPIS_SCREENS = [
     ("S10", "Статья помощи", "support.claude.com/en/articles/8114491", "/test/help/start/",
      "Крошки, H1, разделы, оглавление справа, «помогла?»", "—", "заполнено · длинный"),
     ("S11", "Первый запуск", "claude.ai/onboarding (шаги)", None,
-     "—", "Убрано (владелец 17.10): после окна Google сразу приложение (/test/new/); имя — из аккаунта Google, шагов «имя», "
+     "—", "Убрано (владелец 17.10): после настоящего входа Google сразу приложение (/test/new/), шагов «имя», "
      "«возраст и условия», «первая площадка» нет", "—"),
     ("S12", "Новый чат", "claude.ai/new", "/test/new/",
      "Боковая панель C14; знак и приветствие по центру; поле ввода с «+» и выбором модели; подсказки под ним",
@@ -1417,10 +1403,6 @@ OPIS_SCREENS = [
      "лимит сессии"),
     ("S25", "Меню аккаунта и выход", "поповер внизу боковой панели", "/test/logout/",
      "Почта, Настройки, Язык, Помощь, Посмотреть планы, Выйти; экран после выхода", "Язык не переключается", "заполнено"),
-    ("—", "Окно Google при входе", "OAuth Google", "/test/google/",
-     "Аккаунт, что получит improducer, «Продолжить / Отмена»",
-     "Макет окна Google: имя, почта и фото. «Продолжить» → /test/new/ (приветствие по имени из Google), «Отмена» → вход с ошибкой",
-     "заполнено · загрузка · ошибка"),
     ("—", "Окно согласия Google (YouTube)", "OAuth стороннего сервиса", "/test/connect/",
      "Что запрашивается, «Разрешить / Отклонить»",
      "Макет окна Google: статистика канала; правки — только после «да» в чате. «Разрешить» → кабинет YouTube",
@@ -1447,10 +1429,10 @@ OPIS_SCREENS = [
 OPIS_PATHS = [
     ("F01", "Найти, войти, начать",
      "S01 → S07 → Google → S11 (телефон, 18+, имя) → S12 · ≈7 кликов (через сайт +2)",
-     "/test/ → «Попробовать improducer» → /test/login/ → «Продолжить с Google» → /test/google/ (окно Google) → "
-     "«Продолжить» → /test/new/ «Привет, Тест» · 3 клика. Шагов «имя», «возраст», «первая площадка» нет, входа почтой "
-     "нет (владелец 17.10). YouTube — потом в приложении: Кабинет → «Подключить YouTube через Google» → /test/connect/",
-     "/test/", "Решение: окно Google — и сразу приложение; имя — из аккаунта Google. Телефона нет"),
+     "/test/ → «Попробовать improducer» → /test/login/ → «Продолжить с Google» → настоящий вход Google (как у "
+     "кабинета) → /test/new/ · 2 клика + Google. Шагов «имя», «возраст», «первая площадка» нет, входа почтой нет "
+     "(владелец 17.10). YouTube — потом в приложении: Кабинет → «Подключить YouTube через Google» → /test/connect/",
+     "/test/", "Решение: настоящий вход Google — и сразу приложение. Телефона нет"),
     ("F02", "Первая работа", "S12 → ввод → S13 (идёт → готов) → S17 → S14 · 3 клика",
      "/test/new/ → подсказка «Что дальше по каналу?» → /test/chat/youtube/ (ответ и концепция в панели) → «Открыть в "
      "кабинете» → /test/cabinet/youtube/koncepciya/ → «Утвердить» → #s=decided · 3 клика",
@@ -1589,7 +1571,7 @@ def page_opis():
 <h1>Путь клиента: Claude → improducer</h1>
 <p class="lede">Первый прототип нашего фронтенда: путь клиента Claude — те же экраны, порядок, переходы, блоки и
 состояния — в дизайн-системе improducer, поверх — видение владельца: площадки, кабинет, два пути работы.
-Пользователь — выдуманный «Тест». Формы ничего не отправляют, входа, OAuth и оплаты нет.</p>
+Пользователь — выдуманный «Тест». Вход — настоящий Google, остальные формы ничего не отправляют, оплаты нет.</p>
 <div class="btn-row mt-s"><a class="btn btn--primary" href="/test/">Открыть прототип</a>
 <button class="btn" type="button" data-act="copy-marks">Скопировать отметки</button></div>
 <pre class="quote small" data-copy-out hidden></pre>
@@ -1806,7 +1788,7 @@ def main():
     check_labels()
     copy_assets()
     for fn in (page_home, page_product, page_pricing, page_download, page_help, page_help_start,
-               page_login, page_google, page_connect, page_new, page_chat, page_chat_youtube, page_recents,
+               page_login, page_connect, page_new, page_chat, page_chat_youtube, page_recents,
                page_projects, page_project, page_cabinet, page_cabinet_youtube, page_concept,
                page_settings, page_upgrade, page_logout, page_opis, page_vhod):
         fn()
