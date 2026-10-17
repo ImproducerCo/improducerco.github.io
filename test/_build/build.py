@@ -655,7 +655,7 @@ def platform_cloud():
 
 def login_form():
     return ('<div class="auth auth--login">'
-            f'{gbtn("/test/connect/")}'
+            f'{gbtn("/test/google/")}'
             '<p class="small muted">Продолжая, вы принимаете <a href="/terms.html">условия</a> и '
             '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
 
@@ -667,7 +667,7 @@ def login_states():
             + st("loading", '<div class="auth auth--login">' + skel(3) + "</div>")
             + st("error", '<div class="auth auth--login">' + warn("Вход не завершён",
                                                                  "Окно Google закрыли или вход отменён. Попробуйте ещё раз.")
-                 + gbtn("/test/connect/") + "</div>"))
+                 + gbtn("/test/google/") + "</div>"))
 
 
 LOGIN_STATES = ("full", "loading", "error")
@@ -681,24 +681,41 @@ def page_login(path="/test/login/"):
                    + f'<body class="vx vx-06 {cls}">{body}{proto(list(LOGIN_STATES))}{SCRIPT}</body></html>\n')
 
 
-def page_connect():
-    """Макет окна Google после «Продолжить с Google». Владелец 17.10: одно окно Google — и сразу кабинет; шагов «имя»,
-    «возраст и условия», «первая площадка» нет. Имя автора — имя аккаунта Google; доступ к YouTube — в том же согласии."""
-    scopes = ('<ul class="ticks"><li>Имя, почта и фото профиля — имя станет вашим именем в improducer</li>'
-              '<li>Статистика канала «Тест»: просмотры, удержание, ролики</li>'
-              '<li>Правки и выпуск роликов — только после вашего «да» в чате</li></ul>')
+def page_google():
+    """Макет окна Google после «Продолжить с Google». Владелец 17.10: окно Google — и сразу приложение (/test/new/);
+    шагов «имя», «возраст и условия», «первая площадка» нет, имя автора — имя аккаунта Google. YouTube подключается
+    потом в приложении — окно /test/connect/."""
+    scopes = ('<ul class="ticks"><li>Имя, почта и фото профиля — имя станет вашим именем в improducer</li></ul>')
     body = ('<div class="centered"><div class="box"><div class="card stack">'
             '<p class="meta">accounts.google.com · Тест · test@example.com</p>'
-            + st("full long", '<h1 class="screen-title">improducer запрашивает доступ к аккаунту Google</h1>'
+            + st("full", '<h1 class="screen-title">Вход в improducer</h1>'
+                 f'<p><b>improducer</b> получит:</p>{scopes}'
+                 f'<div class="btn-row mt-s">{a_btn("/test/new/", "Продолжить", True)}'
+                 f'{a_btn("/test/login/#s=error", "Отмена")}</div>')
+            + st("loading", skel(3))
+            + st("error", warn("Google не ответил", "Не удалось открыть окно Google. Попробуйте ещё раз.",
+                               a_btn("/test/google/", "Повторить", True)))
+            + "</div><p class=\"small muted center mt-s\">Макет: окно Google.</p></div></div>")
+    bare_page("/test/google/", "Вход через Google", "Окно Google после «Продолжить с Google»: имя аккаунта — и в приложение.",
+              body, states=("full", "loading", "error"))
+
+
+def page_connect():
+    """Макет окна согласия Google при подключении YouTube-канала."""
+    scopes = ('<ul class="ticks"><li>Статистика канала «Тест»: просмотры, удержание, ролики</li>'
+              '<li>Правки и выпуск роликов — только после вашего «да» в чате</li></ul>')
+    body = ('<div class="centered"><div class="box"><div class="card stack">'
+            '<p class="meta">accounts.google.com · test@example.com</p>'
+            + st("full long", '<h1 class="screen-title">improducer запрашивает доступ к YouTube</h1>'
                  f'<p><b>improducer</b> запрашивает:</p>{scopes}'
                  '<p class="small muted">Доступ можно отключить в Настройках → Коннекторы.</p>'
                  f'<div class="btn-row">{a_btn("/test/cabinet/youtube/", "Разрешить", True)}'
-                 f'{a_btn("/test/login/#s=error", "Отклонить")}</div>')
+                 f'{a_btn("/test/cabinet/", "Отклонить")}</div>')
             + st("loading", skel(4))
-            + st("error", warn("Google не ответил", "Не удалось открыть окно Google. Попробуйте ещё раз.",
+            + st("error", warn("Google не ответил", "Не удалось открыть окно согласия. Попробуйте ещё раз.",
                                a_btn("/test/connect/", "Повторить", True)))
             + "</div><p class=\"small muted center mt-s\">Макет: окно Google.</p></div></div>")
-    bare_page("/test/connect/", "Вход через Google", "Окно Google после «Продолжить с Google»: имя аккаунта и YouTube.",
+    bare_page("/test/connect/", "Доступ к YouTube", "Окно согласия Google при подключении YouTube-канала.",
               body, states=("full", "loading", "error"))
 
 
@@ -1353,7 +1370,7 @@ OPIS_SCREENS = [
     ("S10", "Статья помощи", "support.claude.com/en/articles/8114491", "/test/help/start/",
      "Крошки, H1, разделы, оглавление справа, «помогла?»", "—", "заполнено · длинный"),
     ("S11", "Первый запуск", "claude.ai/onboarding (шаги)", None,
-     "—", "Убрано (владелец 17.10): после окна Google сразу кабинет; имя — из аккаунта Google, шагов «имя», "
+     "—", "Убрано (владелец 17.10): после окна Google сразу приложение (/test/new/); имя — из аккаунта Google, шагов «имя», "
      "«возраст и условия», «первая площадка» нет", "—"),
     ("S12", "Новый чат", "claude.ai/new", "/test/new/",
      "Боковая панель C14; знак и приветствие по центру; поле ввода с «+» и выбором модели; подсказки под ним",
@@ -1400,10 +1417,13 @@ OPIS_SCREENS = [
      "лимит сессии"),
     ("S25", "Меню аккаунта и выход", "поповер внизу боковой панели", "/test/logout/",
      "Почта, Настройки, Язык, Помощь, Посмотреть планы, Выйти; экран после выхода", "Язык не переключается", "заполнено"),
-    ("—", "Окно Google (вход и YouTube)", "OAuth стороннего сервиса", "/test/connect/",
+    ("—", "Окно Google при входе", "OAuth Google", "/test/google/",
+     "Аккаунт, что получит improducer, «Продолжить / Отмена»",
+     "Макет окна Google: имя, почта и фото. «Продолжить» → /test/new/ (приветствие по имени из Google), «Отмена» → вход с ошибкой",
+     "заполнено · загрузка · ошибка"),
+    ("—", "Окно согласия Google (YouTube)", "OAuth стороннего сервиса", "/test/connect/",
      "Что запрашивается, «Разрешить / Отклонить»",
-     "Макет окна Google: имя и почта аккаунта, статистика канала; правки — только после «да» в чате. "
-     "«Разрешить» → кабинет YouTube, «Отклонить» → вход с ошибкой",
+     "Макет окна Google: статистика канала; правки — только после «да» в чате. «Разрешить» → кабинет YouTube",
      "заполнено · загрузка · ошибка"),
     ("—", "Кабинет", "без аналога (свой экран)", "/test/cabinet/",
      "Сетка плиток, как «Проекты» образца", "Свой экран: площадки YouTube (подключён, 6 из 12), Telegram и Instagram — "
@@ -1427,10 +1447,10 @@ OPIS_SCREENS = [
 OPIS_PATHS = [
     ("F01", "Найти, войти, начать",
      "S01 → S07 → Google → S11 (телефон, 18+, имя) → S12 · ≈7 кликов (через сайт +2)",
-     "/test/ → «Попробовать improducer» → /test/login/ → «Продолжить с Google» → /test/connect/ (окно Google: имя, "
-     "почта, YouTube) → «Разрешить» → /test/cabinet/youtube/ · 3 клика. Шагов «имя», «возраст», «первая площадка» нет, "
-     "входа почтой нет (владелец 17.10)",
-     "/test/", "Решение: одно окно Google — и сразу кабинет YouTube с именем из аккаунта Google. Телефона нет"),
+     "/test/ → «Попробовать improducer» → /test/login/ → «Продолжить с Google» → /test/google/ (окно Google) → "
+     "«Продолжить» → /test/new/ «Привет, Тест» · 3 клика. Шагов «имя», «возраст», «первая площадка» нет, входа почтой "
+     "нет (владелец 17.10). YouTube — потом в приложении: Кабинет → «Подключить YouTube через Google» → /test/connect/",
+     "/test/", "Решение: окно Google — и сразу приложение; имя — из аккаунта Google. Телефона нет"),
     ("F02", "Первая работа", "S12 → ввод → S13 (идёт → готов) → S17 → S14 · 3 клика",
      "/test/new/ → подсказка «Что дальше по каналу?» → /test/chat/youtube/ (ответ и концепция в панели) → «Открыть в "
      "кабинете» → /test/cabinet/youtube/koncepciya/ → «Утвердить» → #s=decided · 3 клика",
@@ -1440,7 +1460,7 @@ OPIS_PATHS = [
      "/test/projects/", "—"),
     ("F04", "Подключить инструмент", "S12 → S25 → S22 → «Добавить свой» (URL) → OAuth → S13 · 5 кликов",
      "/test/new/ → «＋» → «Коннекторы» → /test/settings/connectors/ → «Добавить свой» → «Добавить» → #s=saved · 4 клика",
-     "/test/settings/connectors/", "Каталога (S09) нет; окно Google /test/connect/ — только для входа и YouTube"),
+     "/test/settings/connectors/", "Каталога (S09) нет; окно согласия /test/connect/ теперь только для YouTube"),
     ("F05", "Упёрся в лимит → заплатил", "S13 → S24 → «Повысить» → S23 → оплата → S19 → S12 · 4 клика + оплата",
      "/test/new/#s=limit → «Повысить план» → /test/upgrade/ → «Перейти к оплате» → /test/upgrade/checkout/ → «Оплатить» → "
      "/test/settings/billing/#s=paid → «Новый чат» → /test/new/ · 4 клика",
@@ -1786,7 +1806,7 @@ def main():
     check_labels()
     copy_assets()
     for fn in (page_home, page_product, page_pricing, page_download, page_help, page_help_start,
-               page_login, page_connect, page_new, page_chat, page_chat_youtube, page_recents,
+               page_login, page_google, page_connect, page_new, page_chat, page_chat_youtube, page_recents,
                page_projects, page_project, page_cabinet, page_cabinet_youtube, page_concept,
                page_settings, page_upgrade, page_logout, page_opis, page_vhod):
         fn()
