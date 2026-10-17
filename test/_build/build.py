@@ -597,20 +597,22 @@ def page_help_start():
               states=("full", "long"))
 
 
-# Волна площадок — из _design/ideas/platforms-wave.html (идея владельца 08.10), 17.10 расширена: по полоске на каждую
-# площадку, все в своих цветах и пульсируют. Высоты неровные, как у звуковой волны; выше всех — YouTube
-# (как центральная красная черта знака). Поля: название, высота, цвета снизу вверх (градиент — если цветов несколько).
-WAVE = [("Threads", 18, ["#101010"]),
-        ("Facebook", 30, ["#0866FF"]),
-        ("Instagram", 48, ["#FEDA75", "#FA7E1E", "#D62976", "#962FBF", "#4F5BD5"]),
-        ("YouTube", 66, ["#FF0000"]),
-        ("Telegram", 56, ["#229ED9", "#2AABEE"]),
-        ("TikTok", 40, ["#FE2C55", "#25F4EE"]),
-        ("X", 28, ["#1B2230"]),
+# Волна площадок — из знака (_design/logo/mark.svg) и идеи _design/ideas/platforms-wave.html (владелец 08.10):
+# по тонкой полоске на площадку. В покое — серые, как в знаке, высокая середина — красная. По волне по очереди
+# пробегает цвет: полоска загорается цветом своей площадки, и одновременно подсвечивается её название в строке
+# под волной (17.10: прошлая радуга из восьми кислотных полосок с ореолами — безвкусица).
+# Поля: название, высота, цвета площадки снизу вверх (несколько — градиент).
+WAVE = [("Threads", 22, ["#101010"]),
+        ("Facebook", 36, ["#0866FF"]),
+        ("Instagram", 52, ["#FEDA75", "#FA7E1E", "#D62976", "#962FBF", "#4F5BD5"]),
+        ("YouTube", 76, ["#FF0000"]),
+        ("Telegram", 60, ["#229ED9", "#2AABEE"]),
+        ("TikTok", 44, ["#FE2C55", "#25F4EE"]),
+        ("X", 30, ["#101010"]),
         ("RedNote", 18, ["#FF2442"])]
-WAVE_STEP, WAVE_BAR = 9, 5
-# Площадки под волной — россыпью, вразнобой, одним стилем (владелец 17.10): наши три + площадки, где люди ведут
-# свои страницы: TikTok, Facebook, X, Threads и азиатская RedNote (Xiaohongshu). Pinterest и Snapchat убраны.
+WAVE_STEP, WAVE_BAR, WAVE_REST, WAVE_PEAK = 8.8, 4.4, "#C9D1DC", "YouTube"
+WAVE_TURN = 1.5  # секунд на площадку; полный круг — WAVE_TURN × число площадок, задаётся в test.css (--wave-cycle)
+# Строка названий под волной — вразнобой, одним стилем (владелец 17.10).
 PLATFORM_CLOUD = ["TikTok", "YouTube", "Threads", "Telegram", "Facebook", "Instagram", "X", "RedNote"]
 
 
@@ -626,17 +628,18 @@ def platform_wave():
             paint = f"url(#w{i})"
         else:
             paint = grad[0]
-        # Пульс вразнобой: у каждой полоски своя задержка, чтобы волна «дышала», а не мигала разом.
-        bars.append(f'<rect class="wave-pulse" style="animation-delay:{i * 0.3:.1f}s" x="{x}" y="{y}" width="{WAVE_BAR}" '
-                    f'height="{h}" rx="{r}" stroke="{paint}" stroke-width=".9"/>'
-                    f'<rect x="{x}" y="{y}" width="{WAVE_BAR}" height="{h}" rx="{r}" fill="{paint}"><title>{name}</title></rect>')
+        rest = grad[0] if name == WAVE_PEAK else WAVE_REST
+        bars.append(f'<rect x="{x:.1f}" y="{y}" width="{WAVE_BAR}" height="{h}" rx="{r}" fill="{rest}"/>'
+                    f'<rect class="wave-lit" style="animation-delay:{i * WAVE_TURN:.1f}s" x="{x:.1f}" y="{y}" '
+                    f'width="{WAVE_BAR}" height="{h}" rx="{r}" fill="{paint}"><title>{name}</title></rect>')
     names = ", ".join(n for n, _, _ in WAVE)
     return (f'<svg class="wave" viewBox="0 0 100 100" role="img" aria-label="Площадки: {names}">'
             f'<defs>{"".join(defs)}</defs>{"".join(bars)}</svg>')
 
 
 def platform_cloud():
-    return "".join(f'<li>{t}</li>' for t in PLATFORM_CLOUD)
+    turn = {n: i * WAVE_TURN for i, (n, _, _) in enumerate(WAVE)}
+    return "".join(f'<li style="animation-delay:{turn[t]:.1f}s">{t}</li>' for t in PLATFORM_CLOUD)
 
 
 # ── Вход и первый запуск ─────────────────────────────────────────────────────
