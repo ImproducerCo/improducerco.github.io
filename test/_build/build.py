@@ -13,6 +13,7 @@
 снаружи — собранные test/<путь>/index.html и test/assets/.
 """
 
+import hashlib
 import html
 import json
 import os
@@ -65,6 +66,11 @@ def copy_assets():
 
 # ── Общие куски ─────────────────────────────────────────────────────────────
 
+def ver(src):
+    """Метка версии файла в ссылке (?v=…): без неё браузер держит старый CSS/JS из кэша после выкладки."""
+    return hashlib.sha256(src.read_bytes()).hexdigest()[:10]
+
+
 def head(title, desc):
     return f"""<!doctype html>
 <html lang="ru">
@@ -76,9 +82,9 @@ def head(title, desc):
 <meta name="description" content="{E(desc)}">
 <meta name="theme-color" content="#F9FAFC">
 <link rel="icon" href="/test/assets/logo/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/test/assets/tokens.css">
-<link rel="stylesheet" href="/test/assets/components.css">
-<link rel="stylesheet" href="/test/assets/test.css">
+<link rel="stylesheet" href="/test/assets/tokens.css?v={ver(DESIGN / "tokens.css")}">
+<link rel="stylesheet" href="/test/assets/components.css?v={ver(DESIGN / "components.css")}">
+<link rel="stylesheet" href="/test/assets/test.css?v={ver(HERE / "test.css")}">
 </head>
 """
 
@@ -144,7 +150,7 @@ def off_btn(text, primary=False):
 
 LONG = ("Очень длинное название, которое не помещается в одну строку и проверяет перенос на телефоне "
         "и в узкой колонке без обрезки и наложения")
-SCRIPT = '<script src="/test/assets/test.js"></script>'
+SCRIPT = f'<script src="/test/assets/test.js?v={ver(HERE / "test.js")}"></script>'
 
 
 # ── Сайт ────────────────────────────────────────────────────────────────────
