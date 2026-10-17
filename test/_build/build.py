@@ -655,7 +655,7 @@ def platform_cloud():
 
 def login_form():
     return ('<div class="auth auth--login">'
-            f'{gbtn("/test/onboarding/")}'
+            f'{gbtn("/test/connect/")}'
             '<p class="small muted">Продолжая, вы принимаете <a href="/terms.html">условия</a> и '
             '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
 
@@ -667,7 +667,7 @@ def login_states():
             + st("loading", '<div class="auth auth--login">' + skel(3) + "</div>")
             + st("error", '<div class="auth auth--login">' + warn("Вход не завершён",
                                                                  "Окно Google закрыли или вход отменён. Попробуйте ещё раз.")
-                 + gbtn("/test/onboarding/") + "</div>"))
+                 + gbtn("/test/connect/") + "</div>"))
 
 
 LOGIN_STATES = ("full", "loading", "error")
@@ -681,76 +681,24 @@ def page_login(path="/test/login/"):
                    + f'<body class="vx vx-06 {cls}">{body}{proto(list(LOGIN_STATES))}{SCRIPT}</body></html>\n')
 
 
-def onboarding_shell(path, n, blocks, states):
-    """C13: карточка по центру, один вопрос, счёт шагов."""
-    prev = {2: "/test/onboarding/", 3: "/test/onboarding/age/"}.get(n)
-    pager = (f'<nav class="pager">{f"<a href=\"{prev}\">← Назад</a>" if prev else ""}'
-             f'<span class="pos">{n:02d} / 03</span></nav>')
-    body = ('<div class="centered"><div class="box"><div class="card stack">' + pager + "".join(blocks)
-            + "</div></div></div>")
-    bare_page(path, "Первый запуск", "Первый запуск: имя, возраст и условия, первая площадка.", body, states=states)
-
-
-def page_onboarding():
-    name = ('<div class="field"><label for="nm">Как к вам обращаться?</label>'
-            '<input id="nm" value="Тест" data-next="/test/onboarding/age/"{inv}>{err}'
-            '<p class="hint">Так система будет обращаться к вам в чате. Изменить — в Настройках.</p></div>')
-    onboarding_shell("/test/onboarding/", 1, [
-        st("full", '<h1 class="screen-title">Познакомимся</h1>' + name.format(inv="", err="")
-           + f'<div class="btn-row">{a_btn("/test/onboarding/age/", "Продолжить", True)}</div>'),
-        st("error", '<h1 class="screen-title">Познакомимся</h1>'
-           + name.format(inv=' aria-invalid="true"', err='<p class="err">Введите имя.</p>').replace('value="Тест"', 'value=""')
-           + f'<div class="btn-row">{a_btn("/test/onboarding/age/", "Продолжить", True)}</div>'),
-        st("loading", skel(3)),
-    ], states=("full", "error", "loading"))
-
-    terms = ('<label class="switch"><input type="checkbox" checked><span>Мне исполнилось 18 лет</span></label>'
-             '<label class="switch"><input type="checkbox" checked><span>Принимаю <a href="/terms.html">условия</a> и '
-             '<a href="/privacy.html">политику конфиденциальности</a></span></label>'
-             '<label class="switch"><input type="checkbox"><span>Присылать новости о продукте</span></label>')
-    onboarding_shell("/test/onboarding/age/", 2, [
-        st("full", '<h1 class="screen-title">Возраст и условия</h1>' + terms
-           + f'<div class="btn-row">{a_btn("/test/onboarding/platform/", "Продолжить", True)}</div>'),
-        st("denied", '<h1 class="screen-title">Пользоваться можно с 18 лет</h1>'
-           '<p>Аккаунт для младше 18 лет создать нельзя.</p>'
-           f'<div class="btn-row">{a_btn("/test/", "На главную")}</div>'),
-        st("error", '<h1 class="screen-title">Возраст и условия</h1>'
-           + warn("Отметьте обязательные пункты", "Без согласия с условиями продолжить нельзя.") + terms
-           + f'<div class="btn-row">{a_btn("/test/onboarding/platform/", "Продолжить", True)}</div>'),
-    ], states=("full", "denied", "error"))
-
-    soon = "".join(f'<div class="set-row"><div class="lbl"><b>{t}</b><span class="small muted">{d}</span></div>'
-                   '</div>' for t, d, st_ in PLATFORMS[1:])
-    yt = ('<div class="set-row"><div class="lbl"><b>YouTube</b><span class="small muted">Вход через Google: система '
-          'увидит статистику канала. Править канал — только после вашего «да» в чате.</span></div>'
-          f'<div class="val">{gbtn("/test/connect/", "Подключить YouTube через Google")}</div></div>')
-    skip = f'<div class="btn-row">{a_btn("/test/new/", "Пропустить")}</div>'
-    onboarding_shell("/test/onboarding/platform/", 3, [
-        st("full", '<h1 class="screen-title">Первая площадка</h1>'
-           '<p>С какой площадкой работаем? Подключить другие можно позже — в Кабинете.</p>' + yt + soon + skip),
-        st("error", '<h1 class="screen-title">Первая площадка</h1>'
-           + warn("Канал не подключён", "Доступ в окне Google не выдан. Попробуйте ещё раз или пропустите — "
-                  "подключить можно позже в Кабинете.") + yt + soon + skip),
-        st("loading", skel(4)),
-    ], states=("full", "error", "loading"))
-
-
 def page_connect():
-    """Макет окна согласия Google при подключении YouTube-канала."""
-    scopes = ('<ul class="ticks"><li>Статистика канала «Тест»: просмотры, удержание, ролики</li>'
+    """Макет окна Google после «Продолжить с Google». Владелец 17.10: одно окно Google — и сразу кабинет; шагов «имя»,
+    «возраст и условия», «первая площадка» нет. Имя автора — имя аккаунта Google; доступ к YouTube — в том же согласии."""
+    scopes = ('<ul class="ticks"><li>Имя, почта и фото профиля — имя станет вашим именем в improducer</li>'
+              '<li>Статистика канала «Тест»: просмотры, удержание, ролики</li>'
               '<li>Правки и выпуск роликов — только после вашего «да» в чате</li></ul>')
     body = ('<div class="centered"><div class="box"><div class="card stack">'
-            '<p class="meta">accounts.google.com · test@example.com</p>'
-            + st("full long", '<h1 class="screen-title">improducer запрашивает доступ к YouTube</h1>'
+            '<p class="meta">accounts.google.com · Тест · test@example.com</p>'
+            + st("full long", '<h1 class="screen-title">improducer запрашивает доступ к аккаунту Google</h1>'
                  f'<p><b>improducer</b> запрашивает:</p>{scopes}'
                  '<p class="small muted">Доступ можно отключить в Настройках → Коннекторы.</p>'
                  f'<div class="btn-row">{a_btn("/test/cabinet/youtube/", "Разрешить", True)}'
-                 f'{a_btn("/test/onboarding/platform/#s=error", "Отклонить")}</div>')
+                 f'{a_btn("/test/login/#s=error", "Отклонить")}</div>')
             + st("loading", skel(4))
-            + st("error", warn("Google не ответил", "Не удалось открыть окно согласия. Попробуйте ещё раз.",
+            + st("error", warn("Google не ответил", "Не удалось открыть окно Google. Попробуйте ещё раз.",
                                a_btn("/test/connect/", "Повторить", True)))
             + "</div><p class=\"small muted center mt-s\">Макет: окно Google.</p></div></div>")
-    bare_page("/test/connect/", "Доступ к YouTube", "Окно согласия Google при подключении YouTube-канала.",
+    bare_page("/test/connect/", "Вход через Google", "Окно Google после «Продолжить с Google»: имя аккаунта и YouTube.",
               body, states=("full", "loading", "error"))
 
 
@@ -1404,10 +1352,9 @@ OPIS_SCREENS = [
      "—", "Без аналога: каталога в прототипе нет; подключение — через «Добавить свой» в Настройках → Коннекторы", "—"),
     ("S10", "Статья помощи", "support.claude.com/en/articles/8114491", "/test/help/start/",
      "Крошки, H1, разделы, оглавление справа, «помогла?»", "—", "заполнено · длинный"),
-    ("S11", "Первый запуск", "claude.ai/onboarding (шаги)", "/test/onboarding/",
-     "Карточка по центру, один вопрос на экран, счёт шагов: имя → 18+ и условия → первая площадка",
-     "Телефона нет: вход через Google уже подтверждает человека. Третий шаг свой — YouTube через Google или «Пропустить»",
-     "имя: заполнено · ошибка · загрузка; возраст: младше 18 · ошибка; площадка: заполнено · не подключено · загрузка"),
+    ("S11", "Первый запуск", "claude.ai/onboarding (шаги)", None,
+     "—", "Убрано (владелец 17.10): после окна Google сразу кабинет; имя — из аккаунта Google, шагов «имя», "
+     "«возраст и условия», «первая площадка» нет", "—"),
     ("S12", "Новый чат", "claude.ai/new", "/test/new/",
      "Боковая панель C14; знак и приветствие по центру; поле ввода с «+» и выбором модели; подсказки под ним",
      "В панели свой пункт «Кабинет»; в «+» — «Файлы», «Площадки: YouTube ✓», «Коннекторы»; подсказки про канал. "
@@ -1453,9 +1400,10 @@ OPIS_SCREENS = [
      "лимит сессии"),
     ("S25", "Меню аккаунта и выход", "поповер внизу боковой панели", "/test/logout/",
      "Почта, Настройки, Язык, Помощь, Посмотреть планы, Выйти; экран после выхода", "Язык не переключается", "заполнено"),
-    ("—", "Окно согласия Google (YouTube)", "OAuth стороннего сервиса", "/test/connect/",
+    ("—", "Окно Google (вход и YouTube)", "OAuth стороннего сервиса", "/test/connect/",
      "Что запрашивается, «Разрешить / Отклонить»",
-     "Макет окна Google: статистика канала; правки — только после «да» в чате. «Разрешить» → кабинет YouTube",
+     "Макет окна Google: имя и почта аккаунта, статистика канала; правки — только после «да» в чате. "
+     "«Разрешить» → кабинет YouTube, «Отклонить» → вход с ошибкой",
      "заполнено · загрузка · ошибка"),
     ("—", "Кабинет", "без аналога (свой экран)", "/test/cabinet/",
      "Сетка плиток, как «Проекты» образца", "Свой экран: площадки YouTube (подключён, 6 из 12), Telegram и Instagram — "
@@ -1479,11 +1427,10 @@ OPIS_SCREENS = [
 OPIS_PATHS = [
     ("F01", "Найти, войти, начать",
      "S01 → S07 → Google → S11 (телефон, 18+, имя) → S12 · ≈7 кликов (через сайт +2)",
-     "/test/ → «Попробовать improducer» → /test/login/ → «Продолжить с Google» → /test/onboarding/ (имя, "
-     "«Продолжить») → age/ («Продолжить») → platform/ («Подключить YouTube через Google») → /test/connect/ "
-     "(«Разрешить») → /test/cabinet/youtube/ · 6 кликов. «Пропустить» на platform/ → /test/new/. Входа почтой нет (владелец 17.10)",
-     "/test/", "Решение: после «Разрешить» — кабинет YouTube: человек сразу видит, что система уже сделала с каналом. "
-     "Телефона нет"),
+     "/test/ → «Попробовать improducer» → /test/login/ → «Продолжить с Google» → /test/connect/ (окно Google: имя, "
+     "почта, YouTube) → «Разрешить» → /test/cabinet/youtube/ · 3 клика. Шагов «имя», «возраст», «первая площадка» нет, "
+     "входа почтой нет (владелец 17.10)",
+     "/test/", "Решение: одно окно Google — и сразу кабинет YouTube с именем из аккаунта Google. Телефона нет"),
     ("F02", "Первая работа", "S12 → ввод → S13 (идёт → готов) → S17 → S14 · 3 клика",
      "/test/new/ → подсказка «Что дальше по каналу?» → /test/chat/youtube/ (ответ и концепция в панели) → «Открыть в "
      "кабинете» → /test/cabinet/youtube/koncepciya/ → «Утвердить» → #s=decided · 3 клика",
@@ -1493,7 +1440,7 @@ OPIS_PATHS = [
      "/test/projects/", "—"),
     ("F04", "Подключить инструмент", "S12 → S25 → S22 → «Добавить свой» (URL) → OAuth → S13 · 5 кликов",
      "/test/new/ → «＋» → «Коннекторы» → /test/settings/connectors/ → «Добавить свой» → «Добавить» → #s=saved · 4 клика",
-     "/test/settings/connectors/", "Каталога (S09) нет; окно согласия /test/connect/ теперь только для YouTube"),
+     "/test/settings/connectors/", "Каталога (S09) нет; окно Google /test/connect/ — только для входа и YouTube"),
     ("F05", "Упёрся в лимит → заплатил", "S13 → S24 → «Повысить» → S23 → оплата → S19 → S12 · 4 клика + оплата",
      "/test/new/#s=limit → «Повысить план» → /test/upgrade/ → «Перейти к оплате» → /test/upgrade/checkout/ → «Оплатить» → "
      "/test/settings/billing/#s=paid → «Новый чат» → /test/new/ · 4 клика",
@@ -1839,7 +1786,7 @@ def main():
     check_labels()
     copy_assets()
     for fn in (page_home, page_product, page_pricing, page_download, page_help, page_help_start,
-               page_login, page_onboarding, page_connect, page_new, page_chat, page_chat_youtube, page_recents,
+               page_login, page_connect, page_new, page_chat, page_chat_youtube, page_recents,
                page_projects, page_project, page_cabinet, page_cabinet_youtube, page_concept,
                page_settings, page_upgrade, page_logout, page_opis, page_vhod):
         fn()
