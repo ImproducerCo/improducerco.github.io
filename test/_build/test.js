@@ -1,9 +1,7 @@
 // Прототип /test/: состояния экрана по адресу (#s=empty) и отметки описи.
 // Ничего никуда не отправляется: форм нет, отметки живут в localStorage этого браузера.
 (function () {
-  var LABEL = {full: 'Заполнено', empty: 'Пусто', loading: 'Загрузка', error: 'Ошибка',
-    denied: 'Нет доступа', long: 'Длинный текст', booked: 'Записан на разговор', saved: 'Сохранено',
-    confirm: 'Подтверждение', near: 'Близко к сроку'};
+  var LABEL = {full: 'Заполнено', empty: 'Пусто', loading: 'Загрузка', error: 'Ошибка', denied: 'Нет доступа', long: 'Длинный текст', saved: 'Сохранено', confirm: 'Подтверждение', sent: 'Письмо отправлено', code: 'Ввод кода', badcode: 'Неверный код', limit: 'Лимит исчерпан', streaming: 'Ответ идёт', paid: 'Оплачено', tool: 'С инструментом', month: 'Помесячно', canceled: 'Отменён', close: 'Близко к лимиту', notfound: 'Ничего не найдено', select: 'Выбор нескольких', kbfull: 'Знания почти заполнены', add: 'Добавить свой', exported: 'Экспорт запрошен', signout: 'Выйти везде', decided: 'Решение принято'};
 
   function current() {
     var m = location.hash.match(/s=([a-z]+)/);
@@ -40,9 +38,18 @@
     });
   });
 
+  // «Скопировать» у адреса коннектора.
+  document.querySelectorAll('[data-copy]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (!navigator.clipboard) { b.textContent = 'Выделите адрес'; return; }
+      navigator.clipboard.writeText(b.dataset.copy).then(function () { b.textContent = 'Скопировано'; },
+        function () { b.textContent = 'Выделите адрес'; });
+    });
+  });
+
   // Закрыть открытые меню кликом мимо.
   document.addEventListener('click', function (e) {
-    document.querySelectorAll('details[open].acct, details[open].site-menu, details[open].side-menu, details[open].proto')
+    document.querySelectorAll('details[open].acct, details[open].site-menu, details[open].side-menu, details[open].proto, details[open].cmenu')
       .forEach(function (d) { if (!d.contains(e.target)) d.open = false; });
   });
 

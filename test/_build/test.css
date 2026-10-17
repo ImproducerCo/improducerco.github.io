@@ -3,7 +3,7 @@
    в _design/ компонентами — список «на правку _design/» на /test/opis/. */
 
 /* Ширина боковой панели — существующее значение --tile-min (260); в _design/ — component.app.side-width. */
-:root{--app-side:var(--tile-min)}
+:root{--app-side:calc(var(--tile-min) + var(--space-32))}
 [hidden]{display:none!important}
 body{min-height:100vh}
 img{max-width:100%}
@@ -278,9 +278,10 @@ pre.quote{white-space:pre-wrap;overflow-wrap:anywhere}
   border:var(--border-width) solid var(--color-status-warn-line);border-bottom:0;border-radius:var(--radius-card) var(--radius-card) 0 0;
   font:var(--type-small-weight) var(--type-small-size)/var(--type-small-lh) var(--font-sans);text-align:left}
 .limit a{color:inherit;font-weight:var(--fw-600)}
-.limit+.composer{border-top-left-radius:0;border-top-right-radius:0}
+.limit+.composer-wrap>.composer,.limit+.composer{border-top-left-radius:0;border-top-right-radius:0}
 .dock-limit{width:100%}
-.greet-mark{display:inline-block;width:var(--space-32);height:var(--space-32);margin-right:var(--space-12);vertical-align:middle}
+/* Новый чат: приветствие и поле — в середине экрана, как у образца. */
+.greet{min-height:70vh;justify-content:center}
 /* Чат и панель артефакта: рядом на широком, друг под другом на узком. */
 .chat-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-24);align-items:start}
 .chat-col{min-width:0}
@@ -309,3 +310,196 @@ label.plan{cursor:pointer}
 .toc a{color:var(--color-text-body)}
 @media (max-width:1180px){.toc{position:static;order:-1}}
 .use{margin-bottom:var(--space-16)}
+.art .panel-h{flex-wrap:wrap}
+.compare th .btn{text-transform:none;letter-spacing:normal}
+/* Вход: колонки по центру экрана по высоте, как у образца. */
+@media (min-width:901px){.login{min-height:calc(100vh - var(--space-80))}}
+/* ── Наш фронтенд (16.10, второй проход): площадки, кабинет, свой Claude ── */
+/* Чат: на ≥820 поле ввода прижато к низу рабочей области (липкое), а не стоит сразу под сообщением.
+   Высота колонки — экран минус отступы рабочей области и строка заголовка чата. */
+@media (min-width:820px){
+  .chat-col{display:flex;flex-direction:column;
+    min-height:calc(100dvh - var(--space-page-top) - var(--space-page-bottom) - var(--space-80))}
+  .chat-col>.dock{margin-top:auto}
+}
+@media (min-width:820px) and (max-width:1180px){
+  /* Сверху ещё полоса приложения (знак и «Меню»). */
+  .chat-col{min-height:calc(100dvh - var(--space-page-top) - var(--space-page-bottom) - var(--space-80) - var(--space-64))}
+}
+/* Цены: «цена появится» — текстом, а не цифрой. */
+.plan .pp.tbd{font:var(--type-title-l-weight) var(--type-title-l-size)/var(--type-title-l-lh) var(--font-sans);color:var(--color-text-secondary)}
+/* Полоса площадок под героем. */
+.plat-strip{list-style:none;margin:0;padding:var(--space-16) 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-16);
+  border-top:var(--border-width) solid var(--color-border-default);border-bottom:var(--border-width) solid var(--color-border-default)}
+.plat-strip li{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-4) var(--space-12);min-width:0}
+.plat-strip li b{font:var(--type-title-m-weight) var(--type-title-m-size)/var(--type-title-m-lh) var(--font-sans)}
+.plat-strip li .small{flex:1 1 100%;order:3}
+@media (max-width:600px){.plat-strip{grid-template-columns:1fr}}
+/* Адрес коннектора с кнопкой «Скопировать». */
+.addr{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-8);min-width:0}
+.addr code{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;padding:var(--space-8) var(--space-12);border-radius:var(--radius-control);
+  background:var(--color-bg-sunken);font:var(--type-meta-weight) var(--type-meta-size)/var(--type-meta-lh) var(--font-mono)}
+.row-body{padding:0 var(--space-row-pad-x) var(--space-row-pad-y);min-width:0}
+.row-body>p{margin:0 0 var(--space-8)}
+.row-body .btn-row{margin:0}
+.steps .t code{overflow-wrap:anywhere}
+.set-row .val .addr{flex:1 1 100%}
+/* Кабинет: плитки площадок на всю ширину рабочей области. */
+.plats .tile.is-soon{background:var(--color-bg-surface);border-style:dashed;border-color:var(--color-border-control)}
+.plats .tile.is-soon .tt{color:var(--color-text-secondary)}
+.plats .tile .badge{align-self:flex-start}
+.plats .tile.is-add{border-style:dashed}
+a.tile.plat{color:inherit;text-decoration:none}
+/* Кабинет площадки: строка функции «ваше решение» выделена как активный пункт. */
+.row.fn.now{background:var(--nav-active-bg);border-color:var(--nav-active-border)}
+.row.fn .rtitle a{color:inherit}
+.own{position:sticky;top:var(--space-16)}
+@media (max-width:1180px){.own{position:static}}
+/* Кабинет площадки: справа карточка «свой Claude» чуть шире плитки — адрес помещается в строку;
+   на ≥1440 функции в две колонки, чтобы занять ширину. */
+.cab-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,calc(var(--tile-min) + var(--space-64)));gap:var(--space-24);align-items:start}
+.fn-list{display:grid;gap:var(--space-8)}
+@media (min-width:1440px){.fn-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1180px){.cab-split{grid-template-columns:minmax(0,1fr)}}
+/* Строки «платформа → действие»: на телефоне кнопка уходит под название, а не сжимает его. */
+.ways .row-top{flex-wrap:wrap}
+.ways .rhead{flex:1 1 calc(var(--space-80) * 2)}
+.set-row .val .gbtn{width:100%}
+
+/* ── Вход: пропорции claude.ai/login, половины зеркально (владелец 17.10) ─
+   Слева на месте их фото — знак площадок и названия, справа заголовок и форма в карточке.
+   Подложки у знака нет: серую панель владелец отверг 17.10. На телефоне знака нет, как фото у образца. */
+/* Geologica — шрифт строки площадок (владелец 17.10, выбран из шести); файл копирует сборка из _build/fonts/. */
+@font-face{font-family:"Geologica";font-weight:500;font-display:swap;
+  src:url("fonts/geologica-latin-500-normal.woff2") format("woff2")}
+.signin{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-40);max-width:var(--size-1440);
+  margin:0 auto;padding:var(--space-24) var(--space-page-gutter) var(--space-36);min-height:calc(100vh - var(--space-80))}
+.signin-form{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-16);min-width:0}
+/* Заголовок легче штатного H1 (800 владелец назвал уродливым 17.10): 600, как у образца — крупно и спокойно. */
+.signin-claim{margin:0;max-width:11ch;text-align:center;color:var(--color-text-primary);text-wrap:balance;
+  font:var(--fw-600) var(--fs-52)/1.08 var(--font-sans);letter-spacing:-.03em}
+.signin-sub{margin:0 0 var(--space-24);max-width:36ch;text-align:center;text-wrap:balance;color:var(--color-text-secondary);
+  font:var(--fw-400) var(--fs-19)/1.45 var(--font-sans)}
+.signin-form > [data-st]{display:flex;justify-content:center;width:100%}
+.signin-form .auth{width:100%;max-width:calc(var(--tile-min) * 1.75)}
+.signin .auth--login{gap:var(--space-16);padding:var(--space-32);background:var(--color-bg-surface);
+  border:1px solid var(--color-border-default);border-radius:var(--radius-card)}
+.signin .auth--login .small{text-align:center}
+/* «Всё крупнее» (владелец 17.10): кнопки и поле входа выше и крупнее штатных. */
+.signin .auth--login :is(.gbtn,.btn,.field input){min-height:var(--space-52);font-size:var(--fs-17)}
+
+/* Знак площадок — контур знака _design/logo/mark.svg, семь залитых полосок; пульс — из platforms-wave.html, 2.4 с. */
+/* Размер и зазор — как в первой из трёх версий 17.10, которая владельцу понравилась больше. */
+.signin-stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-40);min-width:0}
+.signin-stage .wave{display:block;width:auto;height:min(calc(var(--tile-min) * 1.4), 40vh);overflow:visible}
+.wave-pulse{transform-box:fill-box;transform-origin:center;opacity:0;
+  animation:wave-pulse 2.4s cubic-bezier(.2,.7,.3,1) infinite}
+@keyframes wave-pulse{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.9,1.14);opacity:0}}
+@media (prefers-reduced-motion:reduce){.wave-pulse{animation:none}}
+/* Названия — строчными блоками: если строка не влезает, text-wrap:balance делит её поровну; отрицательное поле
+   гасит поля крайних названий. */
+.pcloud{--pc-gap:var(--space-24);--pc-row:var(--space-12);list-style:none;padding:0;
+  margin:calc(var(--pc-row) / -2) calc(var(--pc-gap) / -2);text-align:center;text-wrap:balance;
+  color:var(--color-text-secondary);font:var(--fw-500) var(--fs-17)/1.2 "Geologica",var(--font-sans)}
+.pcloud li{display:inline-block;margin:calc(var(--pc-row) / 2) calc(var(--pc-gap) / 2)}
+
+@media (max-width:1180px){
+  .signin-claim{font-size:var(--fs-40)}
+  .signin-sub{font-size:var(--fs-17)}
+  .signin-stage .wave{height:min(var(--tile-min), 40vh)}
+  .pcloud{--pc-gap:var(--space-16);font-size:var(--fs-15)}
+}
+@media (max-width:900px){
+  .signin{grid-template-columns:minmax(0,1fr);padding-top:var(--space-40)}
+  .signin-stage{display:none}
+}
+@media (max-width:640px){
+  .signin{min-height:0}
+  .signin-form{justify-content:flex-start}
+  .signin-claim{font-size:var(--fs-32)}
+  .signin-sub{font-size:var(--fs-16);margin-bottom:var(--space-8)}
+  .signin .auth--login{padding:var(--space-24)}
+}
+
+/* ── Приложение по снимку claude.ai/new (владелец 17.10) ──────────────────
+   Боковая панель: свернуть · знак · переключатель «Чат | Кабинет», поиск, пункты с иконками, «Закреплённые»,
+   «Недавние», аккаунт внизу с меню (настройки, использование, подписка). Иконки — своё, на правку _design/. */
+.ic{width:var(--space-20);height:var(--space-20);flex:0 0 auto}
+.icon-btn{display:inline-grid;grid-auto-flow:column;place-items:center;gap:var(--space-4);min-width:var(--nav-height);height:var(--nav-height);
+  padding:0 var(--space-8);border:0;border-radius:var(--radius-control);background:transparent;color:var(--color-text-secondary);cursor:pointer;
+  list-style:none;text-decoration:none}
+.icon-btn::-webkit-details-marker{display:none}
+.icon-btn:hover{background:var(--color-bg-sunken);color:var(--color-text-primary)}
+.side{gap:var(--space-12)}
+.side-top .seg{margin-left:auto;display:inline-flex;padding:var(--space-4);gap:var(--space-4);border-radius:var(--radius-control);
+  background:var(--color-bg-sunken)}
+.seg a{display:inline-grid;place-items:center;padding:var(--space-4) var(--space-8);border-radius:var(--radius-8);color:var(--color-text-secondary)}
+.seg a[aria-current="page"]{background:var(--color-bg-surface);color:var(--color-text-primary);
+  box-shadow:0 0 0 var(--border-width) var(--color-border-default)}
+.side-top .wordmark{margin-right:var(--space-4)}
+.side-nav{display:flex;flex-direction:column;gap:var(--space-8);flex:1;min-height:0;overflow:auto}
+.side-search{display:flex;align-items:center;gap:var(--space-8);min-height:var(--nav-height);padding:0 var(--space-12);
+  border:var(--border-width) solid var(--color-border-default);border-radius:var(--radius-control);background:var(--color-bg-surface);
+  color:var(--color-text-secondary)}
+.side-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;color:var(--color-text-primary)}
+.snav{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.snav a,.snav .off,.snav summary{display:flex;align-items:center;gap:var(--space-12);min-height:var(--nav-height);padding:0 var(--space-12);
+  border-radius:var(--radius-control);color:var(--color-text-body);text-decoration:none;cursor:pointer;list-style:none}
+.snav summary::-webkit-details-marker{display:none}
+.snav a:hover,.snav summary:hover{background:var(--color-bg-sunken);color:var(--color-text-primary)}
+.snav a[aria-current="page"]{background:var(--color-bg-sunken);color:var(--color-text-primary);font-weight:var(--fw-600)}
+.snav .off{color:var(--color-text-secondary);cursor:default}
+.snav .ic{color:var(--color-text-secondary)}
+.snav .more[open] summary .ic{transform:rotate(90deg)}
+.snav .more summary{color:var(--color-text-secondary)}
+.more-in{display:flex;flex-direction:column;padding-left:calc(var(--space-12) * 2 + var(--space-20))}
+.more-in a{min-height:auto;padding:var(--space-8) var(--space-12)}
+.snav.recent a{gap:0}
+.snav.recent span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.side-k{margin-top:var(--space-12)}
+.side-k--row{display:flex;align-items:center;justify-content:space-between;padding-right:0}
+.side-k--row .icon-btn{min-width:0;height:auto;padding:var(--space-4)}
+.acct>summary{border-color:transparent}
+.acct>summary:hover{background:var(--color-bg-sunken);border-color:transparent}
+.acct>summary .ic{margin-left:auto;color:var(--color-text-secondary)}
+.acct-pop{left:0;right:0;min-width:0}
+.acct-pop a{display:flex;align-items:center;gap:var(--space-12)}
+.acct-pop a>span{display:flex;flex-direction:column;min-width:0;flex:1}
+.acct-pop a>.meta{flex:0 0 auto}
+.acct-pop .ic{color:var(--color-text-secondary)}
+.acct-pop .up{color:var(--color-text-primary);font-weight:var(--fw-600)}
+.bar-mini{display:block;height:var(--space-4);margin:var(--space-4) 0;border-radius:var(--radius-pill);background:var(--color-bg-sunken);overflow:hidden}
+.bar-mini i{display:block;height:100%;background:var(--color-text-primary);border-radius:inherit}
+
+/* Экран после входа */
+.home{position:relative;min-height:calc(100vh - var(--space-page-top) - var(--space-page-bottom));display:grid;place-items:center}
+.tmp-chat{position:absolute;top:0;right:0}
+.home-c{width:100%;max-width:var(--container-dialog);display:flex;flex-direction:column;align-items:center;gap:var(--space-24);
+  padding-bottom:10vh}
+.home-c [data-st]{width:100%;display:flex;flex-direction:column;align-items:center;gap:var(--space-24)}
+.home-c [data-st][hidden]{display:none}
+.hello{display:flex;align-items:center;gap:var(--space-12);margin:0;padding-left:0;text-align:center}
+.hello::before{display:none}
+.hello img{width:var(--space-40);height:var(--space-40);flex:0 0 auto}
+.composer-wrap{width:100%}
+.composer .tools{display:flex;align-items:center;gap:var(--space-8)}
+.tools-r{margin-left:auto;display:flex;align-items:center;gap:var(--space-4)}
+.composer .cmenu>summary{list-style:none}
+.composer .mic .ic+.ic{width:var(--space-12);height:var(--space-12)}
+.composer .send{margin-left:0;color:var(--color-brand-red)}
+.composer:has(textarea:placeholder-shown) .send{border-color:var(--color-border-disabled);background:var(--button-disabled-bg);cursor:not-allowed}
+.composer:has(textarea:placeholder-shown) .send path{stroke:var(--color-text-disabled)}
+.composer .cmenu .pop a{display:flex;align-items:center;gap:var(--space-12)}
+.composer .cmenu .pop a .meta{margin-left:auto}
+.under{display:flex;align-items:center;gap:var(--space-16);padding:var(--space-8) var(--space-16) 0;color:var(--color-text-body)}
+.umenu{position:relative}
+.umenu>summary{list-style:none;display:inline-flex;align-items:center;gap:var(--space-4);cursor:pointer}
+.umenu>summary::-webkit-details-marker{display:none}
+.umenu>summary .ic{width:var(--space-12);height:var(--space-12)}
+.umenu--r{margin-left:auto}
+.umenu .pop{top:calc(100% + var(--space-8));bottom:auto;min-width:calc(var(--tile-min) * .8)}
+.umenu--r .pop{left:auto;right:0}
+.side-top{gap:var(--space-4)}
+.side-top>.icon-btn{min-width:0;padding:0 var(--space-4);margin-right:var(--space-8)}
+.seg a{padding:var(--space-4)}
+@media (max-width:1180px){.side-top .seg,.side-nav{display:none}}
