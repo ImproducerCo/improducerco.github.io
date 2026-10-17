@@ -603,11 +603,12 @@ def page_help_start():
 # Знак площадок — контур знака _design/logo/mark.svg, по полоске на каждую площадку из строки названий, все залиты
 # (владелец 17.10: «7 полосок на все площадки», «без серых пустых»). Как в _design/ideas/platforms-wave.html, контур
 # тот же ромб: полоски на том же размахе (центры 18…82), высота — по контуру знака (12 · 36 · 64 · 36 · 12 в его
-# полосках, между ними по прямой), толщина к шагу — как у знака (9 к 16). Цвета симметрично: по краям тёмные,
+# полосках, между ними по прямой), толщина 3 (владелец 17.10 дважды: «уже»). Цвета симметрично: по краям тёмные,
 # дальше розовые, у центра синие, в центре красная YouTube. Пульс — из идеи, 2.4 с, одна фаза (test.css .wave-pulse).
 MARK_PLATFORMS = [("Threads", "#1B2230"), ("Instagram", "#D62976"), ("Facebook", "#0866FF"), ("YouTube", "#FF0000"),
                   ("Telegram", "#2AABEE"), ("TikTok", "#FE2C55"), ("X", "#1B2230")]
 MARK_CONTOUR = [(18, 12), (34, 36), (50, 64), (66, 36), (82, 12)]  # центр полоски знака → её высота
+MARK_PLATFORM_W = 3
 
 
 def mark_height(cx):
@@ -620,7 +621,7 @@ def mark_height(cx):
 def mark_bars():
     n = len(MARK_PLATFORMS)
     step = (MARK_CONTOUR[-1][0] - MARK_CONTOUR[0][0]) / (n - 1)
-    w = step * 9 / 16
+    w = MARK_PLATFORM_W
     return [(name, MARK_CONTOUR[0][0] + step * i, mark_height(MARK_CONTOUR[0][0] + step * i), w, color)
             for i, (name, color) in enumerate(MARK_PLATFORMS)]
 
