@@ -373,11 +373,14 @@ a.tile.plat{color:inherit;text-decoration:none}
   padding:var(--space-16) var(--space-page-gutter) var(--space-64);min-height:calc(100vh - var(--space-80))}
 .signin-stage{display:flex;flex-direction:column;align-items:center;gap:var(--space-32);text-align:center}
 .signin-stage .wave{width:calc(var(--tile-min) * 1.2);height:auto}
-/* Строка площадок: тихая, одним стилем; название загорается вместе со своей полоской волны. */
-.pcloud{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;
-  gap:var(--space-12) var(--space-24);color:var(--color-text-secondary);
+/* Строка площадок: тихая, одним стилем; название загорается вместе со своей полоской волны.
+   Строчные блоки, а не flex: если строка не влезает, text-wrap:balance делит её поровну, без сироты в конце;
+   отрицательное поле гасит поля крайних названий, чтобы строка не стала шире и отступы до волны и подписи не выросли. */
+.pcloud{--pc-gap:var(--space-24);list-style:none;margin:calc(var(--space-12) / -2) calc(var(--pc-gap) / -2);padding:0;text-align:center;text-wrap:balance;
+  color:var(--color-text-secondary);
   font:var(--type-meta-weight) var(--fs-13)/1 var(--font-mono);text-transform:uppercase;letter-spacing:.12em}
-.pcloud li{animation:pcloud-lit var(--wave-cycle) ease-in-out infinite both}
+.pcloud li{display:inline-block;margin:calc(var(--space-12) / 2) calc(var(--pc-gap) / 2);
+  animation:pcloud-lit var(--wave-cycle) ease-in-out infinite both}
 .signin-claim{margin:0;color:var(--color-text-primary);
   font:var(--type-title-l-weight) var(--type-title-l-size)/var(--type-title-l-lh) var(--font-sans)}
 .signin-form{display:flex;flex-direction:column;justify-content:center;gap:var(--space-16);width:100%}
@@ -391,13 +394,17 @@ a.tile.plat{color:inherit;text-decoration:none}
 @keyframes pcloud-lit{0%{color:var(--color-text-secondary)}3%{color:var(--color-text-primary)}
   11%{color:var(--color-text-primary)}15%{color:var(--color-text-secondary)}100%{color:var(--color-text-secondary)}}
 @media (prefers-reduced-motion:reduce){.wave-lit,.pcloud li{animation:none}}
-@media (max-width:1180px){.signin{gap:var(--space-40)}.signin-stage .wave{width:calc(var(--tile-min) * 1.1)}}
+/* ≤1180 колонка волны уже строки названий: форма чуть уже, названия мельче — восемь площадок идут одной строкой. */
+@media (max-width:1180px){
+  .signin{grid-template-columns:minmax(0,1fr) minmax(0,calc(var(--tile-min) * 1.35));gap:var(--space-40)}
+  .signin-stage .wave{width:calc(var(--tile-min) * 1.1)}
+  .pcloud{--pc-gap:var(--space-16);font-size:var(--fs-12);letter-spacing:.1em}}
 @media (max-width:900px){
   .signin{grid-template-columns:minmax(0,1fr);justify-items:center;min-height:0;gap:var(--space-32);padding-top:var(--space-24)}
   .signin-stage,.signin-form{width:100%;max-width:calc(var(--tile-min) * 1.5)}
   .signin-stage{gap:var(--space-20)}
   .signin-stage .wave{width:calc(var(--tile-min) * .6)}
-  .pcloud{gap:var(--space-12) var(--space-20);font-size:var(--fs-12)}
+  .pcloud{--pc-gap:var(--space-20);font-size:var(--fs-12)}
   .signin-claim{font:var(--type-title-m-weight) var(--type-title-m-size)/var(--type-title-m-lh) var(--font-sans)}
 }
 
