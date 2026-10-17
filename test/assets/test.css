@@ -366,9 +366,9 @@ a.tile.plat{color:inherit;text-decoration:none}
 .ways .rhead{flex:1 1 calc(var(--space-80) * 2)}
 .set-row .val .gbtn{width:100%}
 
-/* ── Вход: пропорции claude.ai/login (владелец 17.10) ────────────────────
-   Слева заголовок и форма в карточке, справа на месте их фото — волна площадок и названия, на всю высоту.
-   Подложки у правой половины нет: серую панель за волной владелец отверг 17.10. На телефоне правой половины нет. */
+/* ── Вход: пропорции claude.ai/login, половины зеркально (владелец 17.10) ─
+   Слева на месте их фото — волна площадок и названия, справа заголовок и форма в карточке.
+   Подложки у волны нет: серую панель за волной владелец отверг 17.10. На телефоне волны нет, как фото у образца. */
 .signin{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-40);max-width:var(--size-1440);
   margin:0 auto;padding:var(--space-24) var(--space-page-gutter) var(--space-36);min-height:calc(100vh - var(--space-80))}
 .signin-form{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-32);min-width:0}
@@ -383,9 +383,9 @@ a.tile.plat{color:inherit;text-decoration:none}
 .signin .auth--login :is(.gbtn,.btn,.field input){min-height:var(--space-52);font-size:var(--fs-17)}
 
 /* Волна — строго _design/ideas/platforms-wave.html: форма знака, пульс цвета площадки 2.4 с одной фазой. */
-/* Зазора нет: в SVG знака над и под полосками и так 18% пустого поля. */
-.signin-stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:0}
-.signin-stage .wave{display:block;width:min(100%, calc(var(--tile-min) * 2), 58vh);height:auto;overflow:visible}
+/* Размер и зазор — как в первой из трёх версий 17.10, которая владельцу понравилась больше. */
+.signin-stage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-40);min-width:0}
+.signin-stage .wave{display:block;width:min(100%, calc(var(--tile-min) * 1.75));height:auto;overflow:visible}
 .wave-pulse{transform-box:fill-box;transform-origin:center;opacity:0;
   animation:wave-pulse 2.4s cubic-bezier(.2,.7,.3,1) infinite}
 @keyframes wave-pulse{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.9,1.14);opacity:0}}
@@ -399,6 +399,7 @@ a.tile.plat{color:inherit;text-decoration:none}
 
 @media (max-width:1180px){
   .signin-claim{font-size:var(--fs-40)}
+  .signin-stage .wave{width:min(100%, calc(var(--tile-min) * 1.3))}
   .pcloud{--pc-gap:var(--space-16);font-size:var(--fs-15)}
 }
 @media (max-width:900px){
@@ -411,6 +412,17 @@ a.tile.plat{color:inherit;text-decoration:none}
   .signin-claim{font-size:var(--fs-32)}
   .signin .auth--login{padding:var(--space-24)}
 }
+
+/* Временная страница выбора шрифта названий (/test/shrifty/, 17.10) — убирается после выбора. */
+.ftry{max-width:var(--size-1440);margin:0 auto;padding:var(--space-24) var(--space-page-gutter) var(--space-64)}
+.ftry-lede{margin:0 0 var(--space-20);font-size:var(--fs-17);color:var(--color-text-primary)}
+.ftry-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,calc(var(--tile-min) * 2.6)),1fr));gap:var(--space-24)}
+.ftry-card{background:var(--color-bg-surface);border:1px solid var(--color-border-default);border-radius:var(--radius-card);
+  margin:0;padding:var(--space-20) var(--space-32) var(--space-32);min-width:0}
+.ftry-cap{margin:0 0 var(--space-8);color:var(--color-text-secondary);font-size:var(--fs-14)}
+.ftry-cap b{color:var(--color-text-primary);font-size:var(--fs-17)}
+.ftry-card .signin-stage{display:flex;gap:var(--space-8)}  /* на входе на телефоне волна скрыта, здесь — нет */
+.ftry-card .signin-stage .wave{width:calc(var(--tile-min) * .6)}
 
 /* ── Приложение по снимку claude.ai/new (владелец 17.10) ──────────────────
    Боковая панель: свернуть · знак · переключатель «Чат | Кабинет», поиск, пункты с иконками, «Закреплённые»,
