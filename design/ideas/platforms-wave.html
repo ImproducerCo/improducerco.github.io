@@ -90,6 +90,11 @@ li[data-s="on"] .act:hover{border-color:var(--line)}
 <h2 class="h2">Все состояния</h2>
 <p class="lede lede--s">Слева направо: TikTok · Instagram · YouTube · Telegram · X. Маленький знак под каждой карточкой — как он будет в шапке.</p>
 <div class="states" id="states"></div>
+
+<h2 class="h2">Все девять в цвете</h2>
+<p class="lede lede--s">Серых нет: каждая из девяти полосок — своя площадка, залита её цветом и пульсирует. Форма та же — ромб
+знака. К семи площадкам входа добавлены LinkedIn и Twitch. Три варианта расстановки (владелец 17.10).</p>
+<div class="states" id="nine"></div>
 </div>
 
 <script>
@@ -165,6 +170,40 @@ document.getElementById('states').innerHTML=CASES.map((c,ci)=>{
   return `<div class="card"><div class="pic">${wave(c.s,'s'+ci,c.bare)}</div><div class="cap"><span class="cnt">подключено ${on} из 5</span>
 <span class="ttl">${c.t}</span><span class="who">${chips}</span><span class="head">${headMark(c.s,22)}improducer</span></div></div>`;
 }).join('');
+
+// Все девять в цвете: та же геометрия CX/HT, у каждой полоски своя площадка. Цвета — знаков площадок,
+// переходы снизу вверх (up) или сверху вниз, как у NETS выше.
+const P9={
+  yt:{name:'YouTube',grad:['#FF0000']},
+  ig:{name:'Instagram',grad:['#FEDA75','#FA7E1E','#D62976','#962FBF','#4F5BD5'],up:true},
+  tt:{name:'TikTok',grad:['#25F4EE','#FE2C55']},
+  tg:{name:'Telegram',grad:['#2AABEE','#229ED9']},
+  x:{name:'X',grad:['#000000']},
+  th:{name:'Threads',grad:['#000000']},
+  fb:{name:'Facebook',grad:['#0866FF']},
+  li:{name:'LinkedIn',grad:['#0A66C2']},
+  tw:{name:'Twitch',grad:['#9146FF']},
+};
+const NINE=[
+  {t:'A · Симметрия',about:'По краям чёрные, дальше фиолетовый и синий, переходы, у центра синие, в центре YouTube',
+   order:['th','tw','ig','fb','yt','tg','tt','li','x']},
+  {t:'B · От центра по популярности',about:'YouTube в центре, рядом Instagram и TikTok, дальше Facebook и Telegram, X и LinkedIn, по краям Threads и Twitch',
+   order:['th','x','fb','ig','yt','tt','tg','li','tw']},
+  {t:'C · Прежние пять на местах',about:'TikTok, Instagram, YouTube, Telegram, X — там же, где в знаке; вместо серых — Threads, Facebook, LinkedIn, Twitch',
+   order:['tt','th','ig','fb','yt','li','tg','tw','x']},
+];
+function wave9(order,uid){
+  let defs='',bars='';
+  order.forEach((id,i)=>{const n=P9[id],h=HT[i],x=CX[i]-BW/2,y=50-h/2;let p=n.grad[0];
+    if(n.grad.length>1){defs+=`<linearGradient id="${uid}${i}" x1="0" y1="${n.up?1:0}" x2="0" y2="${n.up?0:1}">${n.grad.map((c,k)=>`<stop offset="${k/(n.grad.length-1)}" stop-color="${c}"/>`).join('')}</linearGradient>`;p=`url(#${uid}${i})`}
+    bars+=`<rect class="pulse" x="${x}" y="${y}" width="${BW}" height="${h}" rx="${R}" stroke="${p}" stroke-width="${SW}"/>`+
+          `<rect x="${x}" y="${y}" width="${BW}" height="${h}" rx="${R}" fill="${p}"><title>${n.name}</title></rect>`;});
+  return `<svg viewBox="0 0 100 100" role="img" aria-label="${order.map(id=>P9[id].name).join(', ')}"><defs>${defs}</defs>${bars}</svg>`;
+}
+const css9=n=>n.grad.length>1?`linear-gradient(${n.up?'to top,':''}${n.grad.join(',')})`:n.grad[0];
+document.getElementById('nine').innerHTML=NINE.map((v,vi)=>`<div class="card"><div class="pic">${wave9(v.order,'n'+vi)}</div>
+<div class="cap"><span class="cnt">подключено 9 из 9</span><span class="ttl">${v.t}</span><span class="st">${v.about}</span>
+<span class="who">${v.order.map(id=>`<span class="chip on"><i style="background:${css9(P9[id])}"></i>${P9[id].name}</span>`).join('')}</span></div></div>`).join('');
 </script>
 </body>
 </html>
