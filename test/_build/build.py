@@ -404,39 +404,8 @@ def faq(items):
         f'<details><summary>{E(q)}</summary><p>{E(a)}</p></details>' for q, a in items) + "</div>"
 
 
-def auth_card(email_href="/test/login/#s=sent"):
-    """C12: Google, Apple, «или», почта, согласие."""
-    return ('<div class="card auth">'
-            f'{gbtn("/test/onboarding/")}'
-            '<a class="gbtn" href="/test/onboarding/">Продолжить через Apple</a>'
-            '<div class="or">или</div>'
-            '<div class="field"><label class="visually-hidden" for="em">Почта</label>'
-            f'<input id="em" type="email" placeholder="Введите электронную почту" data-next="{email_href}"></div>'
-            f'{a_btn(email_href, "Продолжить через почту", True)}'
-            '<p class="small muted">Продолжая, вы принимаете <a href="/terms.html">условия</a> и '
-            '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
-
-
-def preview_card():
-    """Пример чата про канал «Тест» на сайте и на входе — вместо картинки образца."""
-    return ('<div class="preview" aria-label="Пример чата">'
-            '<p class="meta">Пример чата · канал «Тест»</p>'
-            '<div class="card stack"><div class="thread">'
-            '<div class="msg-u">Что дальше по каналу?</div>'
-            '<div class="msg-a"><p>Готово 6 из 12. Сейчас нужен ваш выбор — концепция канала.</p>'
-            '<p>Система предложила два варианта; второй ближе к вашей анкете и ДНК: разборы реальных задач, '
-            'один случай — один ролик.</p>'
-            '<p class="small muted">Открыть концепцию в кабинете?</p></div></div></div></div>')
-
-
 PLATFORMS = [("YouTube", "Канал: статистика, идеи, сценарии, выпуск", "есть"),
              ("Telegram", "Канал и посты", ""), ("Instagram", "Профиль и рилсы", "")]
-
-
-def platform_strip():
-    """Полоса площадок под героем: название и описание сбоку, без отметок «есть / скоро»."""
-    items = "".join(f'<li><b>{t}</b><span class="small">{d}</span></li>' for t, d, s in PLATFORMS)
-    return f'<ul class="plat-strip" aria-label="Площадки">{items}</ul>'
 
 
 def two_ways():
@@ -453,26 +422,8 @@ def two_ways():
 
 # ── Страницы сайта ──────────────────────────────────────────────────────────
 
-HERO_H1 = "Ваши площадки — в одном чате"
-HERO_LEDE = "YouTube, Telegram, Instagram — в одном месте. Работайте здесь или в своём Claude."
-
-
 def page_home():
-    body = ('<section class="hero"><div class="hero-text">'
-            f'<h1>{HERO_H1}</h1>'
-            f'<p class="lede">{HERO_LEDE}</p>'
-            f'{auth_card()}'
-            f'{a_btn("/test/download/", OWN_CLAUDE)}'
-            f'</div>{preview_card()}</section>'
-            f'{platform_strip()}'
-            f'<section class="mt"><h2>Здесь или в своём Claude</h2>{two_ways()}</section>'
-            '<section class="center mt"><h2>Посмотреть планы</h2></section>'
-            f'{plan_tabs("individual")}'
-            f'<div class="plans">{"".join(plan_card(p) for p in PLANS["individual"])}</div>'
-            '<p class="center small muted mt-s">Действуют лимиты использования. Цены платных планов появятся здесь.</p>'
-            '<section class="center mt"><h2>Вопросы</h2></section>'
-            f'{faq(FAQ_SITE)}')
-    site_page("/test/", "Главная", "improducer: ваши площадки в одном чате — прототип пути клиента.", body)
+    page_login("/test/")
 
 
 def page_product():
@@ -586,7 +537,7 @@ def page_download():
 
 
 HELP_TOPICS = [("Начало работы", "Вход, первый чат, подсказки"), ("Площадки и кабинет", "YouTube, функции, результаты"),
-               ("Свой Claude", "Коннектор improducer, адрес, вход"), ("Аккаунт и вход", "Почта, Google, Apple, выход"),
+               ("Свой Claude", "Коннектор improducer, адрес, вход"), ("Аккаунт и вход", "Почта, Google, выход"),
                ("Планы и оплата", "Про, Макс, отмена, счета"), ("Приватность", "Экспорт, удаление, хранение")]
 
 
@@ -691,7 +642,7 @@ def login_form():
             '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
 
 
-def page_login():
+def page_login(path="/test/login/"):
     sent = ('<div class="card auth"><span class="badge badge--ok">письмо отправлено</span>'
             '<h2 class="screen-title">Проверьте почту</h2>'
             '<p>Отправили ссылку для входа и код на <b>test@example.com</b>. Откройте ссылку на этом устройстве '
@@ -725,7 +676,7 @@ def page_login():
             f'{h1}<p class="lede">Google или почта. Дальше всё делает система.</p>{form}'
             '<p class="small signin-own">Работаете в своём Claude? '
             '<a href="/test/download/#claude">Подключить коннектор →</a></p></section></div>')
-    bare_page("/test/login/", "Вход", "Вход в improducer: Google или почта.", body,
+    bare_page(path, "Вход", "Вход в improducer: Google или почта.", body,
               states=("full", "loading", "error", "sent", "code", "badcode", "long"))
 
 
@@ -1423,11 +1374,9 @@ OPIS_SCREENS = [
     ("S01", "Выдача поиска", "google.com/search?q=claude", None,
      "—", "Без аналога: выдача — чужая страница, в прототип не входит.", "—"),
     ("S02", "Главная", "claude.com/", "/test/",
-     "Герой: слева заголовок, карточка входа (Google, Apple, почта) и вторая кнопка, справа картинка; "
-     "ниже «Посмотреть планы» с вкладками и тремя карточками; вопросы",
-     "Вместо фотографии — пример чата про канал «Тест». Своё: заголовок про площадки, полоса площадок под героем "
-     "(YouTube · Telegram · Instagram — названия с описанием сбоку), блок «Здесь или в своём Claude». «Скачать приложение» → "
-     "«Подключить в своём Claude». Тоста «Новости» (C27) нет.", "заполнено"),
+     "Ничего: главная — это вход (владелец 17.10: на главной только вход, остальное — вода)",
+     "Та же страница, что /test/login/: волна площадок и вход через Google или почту. Героя, планов, вопросов и "
+     "примера чата нет; Продукт, Цены, Помощь — по своим адресам.", "заполнено · загрузка · ошибка · длинный"),
     ("S03", "Продукт", "claude.com/product/overview", "/test/product/",
      "Полоса раздела, заголовок по центру с двумя кнопками, блоки ниже",
      "Россыпи картинок и видео нет: функции YouTube — плитками, площадки — карточками, два пути работы", "заполнено"),
@@ -1554,10 +1503,11 @@ OPIS_PATHS = [
      "меню аккаунта → /test/settings/general/ → «Использование» → «Возможности» → «Аккаунт» → меню → «Выйти» → "
      "/test/logout/ → «Войти» → /test/login/ · 6 кликов",
      "/test/settings/general/", "Экран «Вы вышли» между выходом и входом"),
-    ("F07", "Помощь", "S02 → S06 → S10 · 2 клика", "/test/ → «Помощь» → /test/help/ → статья → /test/help/start/ · 2 клика",
+    ("F07", "Помощь", "S02 → S06 → S10 · 2 клика",
+     "/test/new/ → меню аккаунта → «Помощь» → /test/help/ → статья → /test/help/start/ · 3 клика",
      "/test/help/", "—"),
     ("F08", "Работать в своём Claude", "S02 → S05 → файл · 2 клика",
-     "/test/ → «Подключить в своём Claude» → /test/download/ → «Подключить коннектор» → 3 шага и адрес · 2 клика",
+     "/test/ → «Подключить коннектор →» → /test/download/#claude → 3 шага и адрес · 1 клик",
      "/test/download/", "Вместо файла приложения — адрес коннектора"),
     ("F09", "Кабинет → результат", "без аналога (свой путь)",
      "любая страница приложения → «Кабинет» → /test/cabinet/ → YouTube → /test/cabinet/youtube/ → «Концепция» → "
@@ -1581,8 +1531,10 @@ DECISIONS = [
      "уже вышедших роликов; концепция ждёт решения."),
     ("Поле ввода без названий моделей", "Под полем — «Проект» и глубина (Быстро · Средне · Глубоко); модель выбирает система. "
      "Голос — только диктовка, без голосового режима (владелец 17.10)."),
-    ("Боковая панель и вход — как у Claude", "Пункты «Артефакты», «Расписание», «Настроить» и карточка входа на главной "
-     "(Google, Apple, почта) остаются как в образце (владелец 17.10)."),
+    ("Боковая панель — как у Claude", "Пункты «Артефакты», «Расписание», «Настроить» остаются как в образце "
+     "(владелец 17.10)."),
+    ("Главная — только вход", "На /test/ та же страница, что /test/login/: Google или почта. Apple нет: Google "
+     "покрывает авторов YouTube, почта — остальных (владелец 17.10)."),
 ]
 
 DESIGN_TODO = [
