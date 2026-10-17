@@ -598,9 +598,11 @@ WAVE_HT = [12, 24, 36, 50, 64, 50, 36, 24, 12]
 WAVE_NETS = {2: ("ig", ["#FEDA75", "#FA7E1E", "#D62976", "#962FBF", "#4F5BD5"], True),
              4: ("yt", ["#FF0000"], False),
              6: ("tg", ["#2AABEE", "#229ED9"], False)}
-WAVE_LABELS = [("yt", "YouTube", "ролики, статистика, выпуск", "#FF0000"),
-               ("tg", "Telegram", "канал и посты", "#2AABEE"),
-               ("ig", "Instagram", "профиль и рилсы", "#D62976")]
+# Площадки под волной — россыпью, вразнобой (владелец 17.10): наши три + площадки, где люди ведут свои страницы,
+# из восьмёрки крупнейших соцсетей мира по аудитории (мессенджеры WhatsApp, WeChat, Messenger не в счёт).
+# Второе поле — размер в россыпи: l · m · s.
+PLATFORM_CLOUD = [("TikTok", "m"), ("YouTube", "l"), ("Pinterest", "s"), ("Telegram", "l"),
+                  ("Facebook", "s"), ("Instagram", "l"), ("X", "m"), ("Snapchat", "s")]
 
 
 def platform_wave():
@@ -625,8 +627,8 @@ def platform_wave():
             f'<defs>{"".join(defs)}</defs>{"".join(bars)}</svg>')
 
 
-def wave_labels():
-    return "".join(f'<li><i style="background:{c}"></i><b>{t}</b><span>{d}</span></li>' for _, t, d, c in WAVE_LABELS)
+def platform_cloud():
+    return "".join(f'<li class="pc-{z}">{t}</li>' for t, z in PLATFORM_CLOUD)
 
 
 # ── Вход и первый запуск ─────────────────────────────────────────────────────
@@ -670,7 +672,7 @@ def page_login(path="/test/login/"):
     h1 = st("full loading error sent code badcode", "<h1>Вход</h1>") + st("long", f"<h1>{LONG}</h1>")
     body = ('<div class="signin">'
             '<section class="signin-stage" aria-label="Площадки">'
-            f'{platform_wave()}<ul class="wave-labels">{wave_labels()}</ul>'
+            f'{platform_wave()}<ul class="pcloud">{platform_cloud()}</ul>'
             '<p class="signin-claim">Один вход — все ваши площадки.</p></section>'
             '<section class="signin-form">'
             f'{h1}{form}</section></div>')
@@ -1394,7 +1396,8 @@ OPIS_SCREENS = [
     ("S07", "Вход", "claude.ai/login", "/test/login/",
      "Ничего: вход свой (владелец 17.10 — раскладка образца слишком похожа на Claude)",
      "Своя страница: слева волна площадок из _design/ideas/platforms-wave.html с подписями YouTube · Telegram · "
-     "Instagram, справа «Вход» — Google, «или», почта → «Продолжить». Без пояснений и ссылки на свой Claude; Apple убран", "заполнено · загрузка · ошибка · длинный"),
+     "Instagram, справа «Вход» — Google, «или», почта → «Продолжить». Без пояснений и ссылки на свой Claude; Apple убран. "
+     "Под волной — россыпь площадок: YouTube, Telegram, Instagram, TikTok, Facebook, X, Snapchat, Pinterest, без фона и полосок", "заполнено · загрузка · ошибка · длинный"),
     ("S08", "Письмо и код", "claude.ai/login (шаг 2)", "/test/login/#s=sent",
      "Письмо отправлено → ввод кода → неверный код; «письмо не пришло» и «отправить ещё раз»",
      "Ссылки из письма нет: письма не уходят", "письмо отправлено · ввод кода · неверный код"),
