@@ -600,38 +600,19 @@ def page_help_start():
               states=("full", "long"))
 
 
-# Знак площадок — контур знака _design/logo/mark.svg, по полоске на каждую площадку из строки названий, все залиты
-# (владелец 17.10: «7 полосок на все площадки», «без серых пустых»). Как в _design/ideas/platforms-wave.html, контур
-# тот же ромб: полоски на том же размахе (центры 18…82), высота — по контуру знака (12 · 36 · 64 · 36 · 12 в его
-# полосках, между ними по прямой), толщина 3 (владелец 17.10 дважды: «уже»). Цвета симметрично: по краям тёмные,
-# дальше розовые, у центра синие, в центре красная YouTube. Пульс — из идеи, 2.4 с, одна фаза (test.css .wave-pulse).
-# Цвета — знаков самих площадок (владелец 17.10: «не соответствуют цветам их логотипов»); переходы — снизу вверх,
-# как в _design/ideas/platforms-wave.html.
-MARK_PLATFORMS = [("Threads", ["#000000"]),
-                  ("Instagram", ["#FEDA75", "#FA7E1E", "#D62976", "#962FBF", "#4F5BD5"]),
-                  ("Facebook", ["#0866FF"]),
-                  ("YouTube", ["#FF0000"]),
-                  ("Telegram", ["#229ED9", "#2AABEE"]),
-                  ("TikTok", ["#FE2C55", "#25F4EE"]),
-                  ("X", ["#000000"])]
-MARK_CONTOUR = [(18, 12), (34, 36), (50, 64), (66, 36), (82, 12)]  # центр полоски знака → её высота
-MARK_PLATFORM_W = 3
-MARK_PLATFORM_STEP = 6  # просвет между полосками равен их толщине (владелец 17.10: «поближе»)
+# Знак площадок — один в один состояние «Все пять» из _design/ideas/platforms-wave.html (владелец 17.10: «возьми
+# вариант 5 из 5 с серыми колонками»): девять полосок с шагом 8, чётные — площадки на местах полосок знака, залиты
+# их цветом, нечётные — серые, высотой среднее соседей. Пульс — из идеи, 2.4 с, одна фаза (test.css .wave-pulse).
+WAVE_CX = [18, 26, 34, 42, 50, 58, 66, 74, 82]
+WAVE_H = [12, 24, 36, 50, 64, 50, 36, 24, 12]
+WAVE_BW, WAVE_SW, WAVE_REST = 4.5, .9, "#C9D1DC"
+# Место на волне → (название, цвета, переход снизу вверх) — как NETS в идее.
+WAVE_NETS = {0: ("TikTok", ["#25F4EE", "#FE2C55"], False),
+             2: ("Instagram", ["#FEDA75", "#FA7E1E", "#D62976", "#962FBF", "#4F5BD5"], True),
+             4: ("YouTube", ["#FF0000"], False),
+             6: ("Telegram", ["#2AABEE", "#229ED9"], False),
+             8: ("X", ["#1B2230"], False)}
 
-
-def mark_height(cx):
-    for (x0, h0), (x1, h1) in zip(MARK_CONTOUR, MARK_CONTOUR[1:]):
-        if x0 <= cx <= x1:
-            return h0 + (h1 - h0) * (cx - x0) / (x1 - x0)
-    raise ValueError(cx)
-
-
-def mark_bars():
-    """Высоты — по контуру знака на его размахе; полоски стоят теснее, с шагом MARK_PLATFORM_STEP вокруг центра."""
-    n = len(MARK_PLATFORMS)
-    x0, x1 = MARK_CONTOUR[0][0], MARK_CONTOUR[-1][0]
-    return [(name, 50 + (i - (n - 1) / 2) * MARK_PLATFORM_STEP, mark_height(x0 + (x1 - x0) * i / (n - 1)),
-             MARK_PLATFORM_W, color) for i, (name, color) in enumerate(MARK_PLATFORMS)]
 
 # Строка названий под знаком — вразнобой (владелец 17.10); RedNote убран 17.10.
 PLATFORM_CLOUD = ["TikTok", "YouTube", "Threads", "Telegram", "Facebook", "Instagram", "X"]
@@ -639,23 +620,26 @@ PLATFORM_CLOUD = ["TikTok", "YouTube", "Threads", "Telegram", "Facebook", "Insta
 
 def platform_wave():
     defs, bars = [], []
-    for i, (name, cx, h, w, colors) in enumerate(mark_bars()):
-        box = f'x="{cx - w / 2:.2f}" y="{50 - h / 2:.2f}" width="{w:.2f}" height="{h:.2f}" rx="{w / 2:.2f}"'
+    for i, (cx, h) in enumerate(zip(WAVE_CX, WAVE_H)):
+        box = f'x="{cx - WAVE_BW / 2:g}" y="{50 - h / 2:g}" width="{WAVE_BW}" height="{h}" rx="{WAVE_BW / 2:g}"'
+        if i not in WAVE_NETS:
+            bars.append(f'<rect {box} fill="{WAVE_REST}"/>')
+            continue
+        name, colors, up = WAVE_NETS[i]
         if len(colors) > 1:
             stops = "".join(f'<stop offset="{k / (len(colors) - 1):g}" stop-color="{c}"/>' for k, c in enumerate(colors))
-            defs.append(f'<linearGradient id="mp{i}" x1="0" y1="1" x2="0" y2="0">{stops}</linearGradient>')
-            paint = f"url(#mp{i})"
+            defs.append(f'<linearGradient id="w{i}" x1="0" y1="{1 if up else 0}" x2="0" y2="{0 if up else 1}">'
+                        f'{stops}</linearGradient>')
+            paint = f"url(#w{i})"
         else:
             paint = colors[0]
-        # контур пульса к толщине полоски — как в идее (0.9 при 4.5)
-        bars.append(f'<rect class="wave-pulse" {box} fill="none" stroke="{paint}" stroke-width="{w * .2:.2f}"/>'
+        bars.append(f'<rect class="wave-pulse" {box} fill="none" stroke="{paint}" stroke-width="{WAVE_SW}"/>'
                     f'<rect {box} fill="{paint}"><title>{name}</title></rect>')
-    names = ", ".join(n for n, _ in MARK_PLATFORMS)
+    names = ", ".join(n for n, _, _ in WAVE_NETS.values())
     # Рамка — по полоскам, с запасом на пульс (контур растёт в 1.9 раза вширь и в 1.14 ввысь): без пустых полей
     # SVG знак не отрывается от строки названий.
-    xs = [cx for _, cx, _, _, _ in mark_bars()]
-    left, right = min(xs) - 2.5 * MARK_PLATFORM_W, max(xs) + 2.5 * MARK_PLATFORM_W
-    top, height = MARK_CONTOUR[2][1] * -.57 + 50, MARK_CONTOUR[2][1] * 1.14
+    left, right = WAVE_CX[0] - 2.5 * WAVE_BW, WAVE_CX[-1] + 2.5 * WAVE_BW
+    top, height = 50 - max(WAVE_H) * .57, max(WAVE_H) * 1.14
     return (f'<svg class="wave" viewBox="{left:g} {top:g} {right - left:g} {height:g}" role="img" '
             f'aria-label="Площадки: {names}"><defs>{"".join(defs)}</defs>{"".join(bars)}</svg>')
 
@@ -1433,8 +1417,8 @@ OPIS_SCREENS = [
     ("S07", "Вход", "claude.ai/login", "/test/login/",
      "Пропорции образца, половины зеркально (владелец 17.10): слева знак площадок и названия, справа заголовок и форма "
      "в карточке; на телефоне знака нет, как фото у образца",
-     "Вместо фото — знак площадок: контур знака _design/logo/mark.svg, семь полосок — по одной на площадку, все "
-     "залиты её цветом, пульс 2.4 с из _design/ideas/platforms-wave.html; под ним названия TikTok, YouTube, Threads, "
+     "Вместо фото — знак площадок в состоянии «Все пять» из _design/ideas/platforms-wave.html (9 полосок, 5 площадок "
+     "залиты, 4 серые между, пульс 2.4 с); под ним названия TikTok, YouTube, Threads, "
      "Telegram, Facebook, Instagram, X шрифтом Geologica. "
      "Заголовок «Снимайте то, что работает» и строка о том, что делает система, без слова «Вход»; форма — Google, «или», почта → «Продолжить»; "
      "Apple и «скачать приложение» убраны", "заполнено · загрузка · ошибка"),
