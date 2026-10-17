@@ -656,43 +656,21 @@ def platform_cloud():
 def login_form():
     return ('<div class="auth auth--login">'
             f'{gbtn("/test/onboarding/")}'
-            '<div class="or">или</div>'
-            '<div class="field"><label class="visually-hidden" for="em">Почта</label>'
-            '<input id="em" type="email" placeholder="Электронная почта" autocomplete="email" data-next="#s=sent"></div>'
-            f'{a_btn("#s=sent", "Продолжить")}'
             '<p class="small muted">Продолжая, вы принимаете <a href="/terms.html">условия</a> и '
             '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
 
 
 def login_states():
-    """Все состояния формы входа — одни на /test/login/ и на вариантах /test/vhod/NN/."""
-    sent = ('<div class="card auth"><span class="badge badge--ok">письмо отправлено</span>'
-            '<h2 class="screen-title">Проверьте почту</h2>'
-            '<p>Отправили ссылку для входа и код на <b>test@example.com</b>. Откройте ссылку на этом устройстве '
-            'или введите код.</p>'
-            f'{a_btn("#s=code", "Ввести код", True)}'
-            '<p class="small muted">Письмо не пришло? Проверьте «Спам» и «Промоакции». '
-            '<a href="#s=sent">Отправить ещё раз</a> · <a href="#s=full">Другая почта</a></p></div>')
-
-    def code_card(bad=False):
-        inv = ' aria-invalid="true"' if bad else ""
-        err = '<p class="err">Код неверный или устарел. Проверьте последнее письмо.</p>' if bad else ""
-        val = ' value="000000"' if bad else ""
-        return ('<div class="card auth"><h2 class="screen-title">Введите код</h2>'
-                '<p class="small muted">Код из письма на test@example.com</p>'
-                f'<div class="field"><label for="cd">Код</label><input id="cd" inputmode="numeric"{val}{inv} '
-                f'placeholder="6 цифр" data-next="/test/onboarding/">{err}</div>'
-                f'{a_btn("/test/onboarding/", "Подтвердить", True)}'
-                '<p class="small muted"><a href="#s=sent">Отправить код ещё раз</a></p></div>')
+    """Все состояния формы входа — одни на /test/login/ и на вариантах /test/vhod/NN/.
+    Вход только через Google (владелец 17.10): почты, письма и кода нет — Google автору нужен всё равно для канала."""
     return (st("full", login_form())
             + st("loading", '<div class="auth auth--login">' + skel(3) + "</div>")
             + st("error", '<div class="auth auth--login">' + warn("Вход не завершён",
                                                                  "Окно Google закрыли или вход отменён. Попробуйте ещё раз.")
-                 + gbtn("/test/onboarding/") + "</div>")
-            + st("sent", sent) + st("code", code_card()) + st("badcode", code_card(True)))
+                 + gbtn("/test/onboarding/") + "</div>"))
 
 
-LOGIN_STATES = ("full", "loading", "error", "sent", "code", "badcode")
+LOGIN_STATES = ("full", "loading", "error")
 
 
 def page_login(path="/test/login/"):
@@ -708,7 +686,7 @@ def page_login(path="/test/login/"):
             '<p class="signin-claim">Снимайте то, что работает</p>'
             '<p class="signin-sub">Система каждый день разбирает ваши ролики и собирает план и сценарии вашим голосом.</p>'
             f'{form}</section></div>')
-    bare_page(path, "Вход", "Вход в improducer: Google или почта.", body, states=LOGIN_STATES)
+    bare_page(path, "Вход", "Вход в improducer через Google.", body, states=LOGIN_STATES)
 
 
 def onboarding_shell(path, n, blocks, states):
@@ -1406,7 +1384,7 @@ OPIS_SCREENS = [
      "—", "Без аналога: выдача — чужая страница, в прототип не входит.", "—"),
     ("S02", "Главная", "claude.com/", "/test/",
      "Ничего: главная — это вход (владелец 17.10: на главной только вход, остальное — вода)",
-     "Та же страница, что /test/login/: волна площадок и вход через Google или почту. Героя, планов, вопросов и "
+     "Та же страница, что /test/login/: волна площадок и вход через Google. Героя, планов, вопросов и "
      "примера чата нет; Продукт, Цены, Помощь — по своим адресам.", "заполнено · загрузка · ошибка"),
     ("S03", "Продукт", "claude.com/product/overview", "/test/product/",
      "Полоса раздела, заголовок по центру с двумя кнопками, блоки ниже",
@@ -1430,11 +1408,10 @@ OPIS_SCREENS = [
      "Вместо фото — знак площадок в состоянии «Все пять» из _design/ideas/platforms-wave.html (9 полосок, 5 площадок "
      "залиты, 4 серые между, пульс 2.4 с); под ним названия TikTok, YouTube, Threads, "
      "Telegram, Facebook, Instagram, X шрифтом Geologica. "
-     "Заголовок «Снимайте то, что работает» и строка о том, что делает система, без слова «Вход»; форма — Google, «или», почта → «Продолжить»; "
+     "Заголовок «Снимайте то, что работает» и строка о том, что делает система, без слова «Вход»; форма — только Google и согласие (почту убрал владелец 17.10); "
      "Apple и «скачать приложение» убраны", "заполнено · загрузка · ошибка"),
-    ("S08", "Письмо и код", "claude.ai/login (шаг 2)", "/test/login/#s=sent",
-     "Письмо отправлено → ввод кода → неверный код; «письмо не пришло» и «отправить ещё раз»",
-     "Ссылки из письма нет: письма не уходят", "письмо отправлено · ввод кода · неверный код"),
+    ("S08", "Письмо и код", "claude.ai/login (шаг 2)", None,
+     "—", "Убрано (владелец 17.10): вход только через Google, писем и кодов нет.", "—"),
     ("S09", "Каталог коннекторов", "claude.com/marketplace/connectors-plugins", None,
      "—", "Без аналога: каталога в прототипе нет; подключение — через «Добавить свой» в Настройках → Коннекторы", "—"),
     ("S10", "Статья помощи", "support.claude.com/en/articles/8114491", "/test/help/start/",
@@ -1516,8 +1493,7 @@ OPIS_PATHS = [
      "S01 → S07 → Google → S11 (телефон, 18+, имя) → S12 · ≈7 кликов (через сайт +2)",
      "/test/ → «Попробовать improducer» → /test/login/ → «Продолжить через Google» → /test/onboarding/ (имя, "
      "«Продолжить») → age/ («Продолжить») → platform/ («Подключить YouTube через Google») → /test/connect/ "
-     "(«Разрешить») → /test/cabinet/youtube/ · 6 кликов. «Пропустить» на platform/ → /test/new/. "
-     "Почтой: «Продолжить через почту» → #s=sent → «Ввести код» → «Подтвердить» → /test/onboarding/",
+     "(«Разрешить») → /test/cabinet/youtube/ · 6 кликов. «Пропустить» на platform/ → /test/new/. Входа почтой нет (владелец 17.10)",
      "/test/", "Решение: после «Разрешить» — кабинет YouTube: человек сразу видит, что система уже сделала с каналом. "
      "Телефона нет"),
     ("F02", "Первая работа", "S12 → ввод → S13 (идёт → готов) → S17 → S14 · 3 клика",
@@ -1568,8 +1544,8 @@ DECISIONS = [
      "Голос — только диктовка, без голосового режима (владелец 17.10)."),
     ("Боковая панель — как у Claude", "Пункты «Артефакты», «Расписание», «Настроить» остаются как в образце "
      "(владелец 17.10)."),
-    ("Главная — только вход", "На /test/ та же страница, что /test/login/: слева волна площадок, справа «Вход» — Google "
-     "или почта. Пояснений, ссылки на свой Claude и Apple нет (владелец 17.10)."),
+    ("Главная — только вход", "На /test/ та же страница, что /test/login/: слева волна площадок, справа вход — "
+     "только Google (почту убрал владелец 17.10). Пояснений, ссылки на свой Claude и Apple нет (владелец 17.10)."),
 ]
 
 DESIGN_TODO = [
@@ -1632,7 +1608,6 @@ def page_opis():
         ("Экраны claude.ai после входа (S11–S27)",
          "Claude in Chrome не открывает claude.ai («Navigation to this domain is not allowed»). Восстановлены по статьям "
          "помощи и устройству образца; совпадение раскладки для них не мерено."),
-        ("Ошибка кода и письмо со ссылкой (S08)", "нужен ввод почты — ушло бы письмо; восстановлено по статье 13189465"),
         ("Первый запуск нового аккаунта (S11)", "новых аккаунтов не заводим; по статьям 8287232, 8114491, 13117299"),
         ("«Лимит исчерпан» (S24)", "не вызвать без расхода лимита владельца; по статье 11647753"),
         ("Оплата Stripe", "платить нельзя; по статье 8325609"),
@@ -1779,7 +1754,7 @@ def page_vhod():
     body = (f'<header class="bare-head">{wordmark()}</header><main class="vxcat">'
             f'<h1>Вход: {n_all} вариантов</h1>'
             '<p class="lede">Каждый вариант опирается на вход одной сильной площадки и собран в дизайн-системе '
-            'improducer. Форма и её состояния у всех общие: Google, почта, письмо, код. Отметки ✓ · ✕ · ⊘ и '
+            'improducer. Форма у всех общая — вход только через Google. Отметки ✓ · ✕ · ⊘ и '
             'комментарий — на <a href="https://pult.improducer.co/#front/vhod">пульте, вкладка «Фронтенд»</a>.</p>'
             f'<div class="vxgrid">{"".join(cards)}</div></main>')
     PAGES["/test/vhod/"] = (vx_head("Вход: варианты", "Варианты страницы входа improducer на выбор.")
