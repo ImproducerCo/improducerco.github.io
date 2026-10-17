@@ -3,7 +3,7 @@
    в _design/ компонентами — список «на правку _design/» на /test/opis/. */
 
 /* Ширина боковой панели — существующее значение --tile-min (260); в _design/ — component.app.side-width. */
-:root{--app-side:var(--tile-min)}
+:root{--app-side:calc(var(--tile-min) + var(--space-32))}
 [hidden]{display:none!important}
 body{min-height:100vh}
 img{max-width:100%}
@@ -482,6 +482,6 @@ a.tile.plat{color:inherit;text-decoration:none}
 .umenu--r .pop{left:auto;right:0}
 .ubtn{border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;padding:0}
 .side-top{gap:var(--space-4)}
-.side-top>.icon-btn{min-width:0;padding:0 var(--space-4)}
+.side-top>.icon-btn{min-width:0;padding:0 var(--space-4);margin-right:var(--space-8)}
 .seg a{padding:var(--space-4)}
 @media (max-width:1180px){.side-top .seg,.side-nav{display:none}}
