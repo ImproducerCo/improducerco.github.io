@@ -1,0 +1,202 @@
+/* Варианты входа /test/vhod/NN/ и каталог /test/vhod/ (владелец 17.10: 15–20 вариантов на выбор).
+   Подключается после tokens.css, components.css и test.css только на этих страницах. Своих цветов, теней и
+   кеглей нет — переменные tokens.css; тень — только у всплывающего (диалог), как велит README.
+   Каждый вариант — свой блок .vx-NN; форма общая (login_states() в build.py). */
+
+/* ── Общее ─────────────────────────────────────────────────────────────── */
+.vx{min-height:100vh;display:flex;flex-direction:column;background:var(--color-bg-page)}
+.vx-mark{display:block;width:var(--space-48);height:var(--space-48)}
+.vx .auth{max-width:none}
+/* components.css даёт section{margin-top:52px} — в вариантах section это колонка раскладки, отступ сверху не нужен. */
+:where(.vx) section{margin:0}
+.vx .auth .small{text-align:center}
+.vx [data-st]>.card.auth{width:100%}
+.vx-title{margin:0;color:var(--color-text-primary);text-wrap:balance;
+  font:var(--fw-600) var(--fs-32)/1.15 var(--font-sans);letter-spacing:var(--ls-neg2)}
+.vx-sub{margin:0;color:var(--color-text-secondary);text-wrap:pretty;font:var(--type-lede-weight) var(--type-lede-size)/var(--type-lede-lh) var(--font-sans)}
+.vx-links{display:flex;flex-wrap:wrap;gap:var(--space-8) var(--space-24);color:var(--color-text-secondary);
+  font:var(--type-small-weight) var(--type-small-size)/var(--type-small-lh) var(--font-sans)}
+.vx-links a{color:inherit;text-decoration:none}
+.vx-links a:hover{color:var(--color-text-primary);text-decoration:underline}
+.vx-col{width:100%;max-width:calc(var(--tile-min) * 1.6);margin-inline:auto}
+.vx-note{margin:0;color:var(--color-text-secondary);font:var(--type-small-weight) var(--type-small-size)/var(--type-small-lh) var(--font-sans)}
+.vx-note a{color:var(--color-text-primary)}
+
+/* ── Каталог /test/vhod/ ─────────────────────────────────────────────────── */
+.vxcat{max-width:var(--container-tool);margin:0 auto;padding:var(--space-24) var(--space-page-gutter) var(--space-page-bottom)}
+.vxcat .lede{max-width:68ch;margin:0 0 var(--space-32)}
+.vxgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:var(--space-20)}
+.vxc{display:flex;flex-direction:column;gap:var(--space-8);padding:var(--space-12) var(--space-12) var(--space-16);
+  background:var(--color-bg-surface);border:var(--border-width) solid var(--color-border-default);
+  border-radius:var(--radius-card);color:var(--color-text-body);text-decoration:none;
+  transition:border-color var(--motion-base) var(--motion-ease)}
+.vxc:hover{border-color:var(--color-border-button-hover)}
+.vxc-img{display:block;aspect-ratio:16/10;overflow:hidden;border-radius:var(--radius-12);
+  border:var(--border-width) solid var(--color-border-subtle);background:var(--color-bg-page)}
+.vxc-img img{display:block;width:100%;height:100%;object-fit:cover;object-position:top center}
+.vxc-none{display:grid;place-items:center;height:100%;color:var(--color-text-secondary);font:var(--type-meta-weight) var(--type-meta-size)/1 var(--font-mono)}
+.vxc-top{display:flex;align-items:baseline;gap:var(--space-8);padding:var(--space-4) var(--space-4) 0}
+.vxc-top b{color:var(--color-text-primary);font:var(--type-title-m-weight) var(--type-title-m-size)/var(--type-title-m-lh) var(--font-sans)}
+.vxc-took{padding:0 var(--space-4);font:var(--type-small-weight) var(--type-small-size)/var(--type-small-lh) var(--font-sans)}
+.vxc-go{margin-top:auto;padding:0 var(--space-4);color:var(--color-text-secondary);font:var(--type-control-s-weight) var(--type-control-s-size)/1.4 var(--font-sans)}
+
+/* Форма внутри карточки варианта: у писем и кода своей рамки нет — иначе карточка в карточке. */
+.vx-incard [data-st]>.card.auth{border:0;padding:0;background:none;border-radius:0}
+/* ── Каталог /test/vhod/ ─────────────────────────────────────────────────── */
+.vxcat{max-width:var(--container-tool);margin:0 auto;padding:var(--space-24) var(--space-page-gutter) var(--space-page-bottom)}
+.vxcat .lede{max-width:68ch;margin:0 0 var(--space-32)}
+.vxgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:var(--space-20)}
+.vxc{display:flex;flex-direction:column;gap:var(--space-8);padding:var(--space-12) var(--space-12) var(--space-16);
+  background:var(--color-bg-surface);border:var(--border-width) solid var(--color-border-default);
+  border-radius:var(--radius-card);color:var(--color-text-body);text-decoration:none;
+  transition:border-color var(--motion-base) var(--motion-ease)}
+.vxc:hover{border-color:var(--color-border-button-hover)}
+.vxc-img{display:block;aspect-ratio:16/10;overflow:hidden;border-radius:var(--radius-12);
+  border:var(--border-width) solid var(--color-border-subtle);background:var(--color-bg-page)}
+.vxc-img img{display:block;width:100%;height:100%;object-fit:cover;object-position:top center}
+.vxc-none{display:grid;place-items:center;height:100%;color:var(--color-text-secondary);font:var(--type-meta-weight) var(--type-meta-size)/1 var(--font-mono)}
+.vxc-top{display:flex;align-items:baseline;gap:var(--space-8);padding:var(--space-4) var(--space-4) 0}
+.vxc-top b{color:var(--color-text-primary);font:var(--type-title-m-weight) var(--type-title-m-size)/var(--type-title-m-lh) var(--font-sans)}
+.vxc-took{padding:0 var(--space-4);font:var(--type-small-weight) var(--type-small-size)/var(--type-small-lh) var(--font-sans)}
+.vxc-go{margin-top:auto;padding:0 var(--space-4);color:var(--color-text-secondary);font:var(--type-control-s-weight) var(--type-control-s-size)/1.4 var(--font-sans)}
+
+/* Форма внутри карточки варианта: у писем и кода своей рамки нет — иначе карточка в карточке. */
+.vx-incard [data-st]>.card.auth{border:0;padding:0;background:none;border-radius:0}
+.g-lang{display:inline-flex;align-items:center;gap:var(--space-8);color:var(--color-text-secondary);
+  font:var(--type-small-weight) var(--type-small-size)/var(--type-small-lh) var(--font-sans)}
+.g-lang .ic{width:var(--space-16);height:var(--space-16)}
+
+/* Правила владельца 17.10: знак со словом — один .wordmark на странице (крупнее — zoom, пропорции те же),
+   своего текста нет, всё по центру, никого не копировать. Кнопка Google и согласие — общая форма login_states(). */
+.vx-links{justify-content:center}
+.vx-form{width:100%;max-width:calc(var(--tile-min) * 1.4)}
+.vx .auth--login{padding:0}
+.vx-foot{padding:var(--space-24) var(--space-page-gutter) var(--space-32)}
+@media (max-width:640px){.vx .wordmark{zoom:1.25}}
+
+/* ── 01 Пропуск ────────────────────────────────────────────────────────── */
+.ps-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-48) var(--space-page-gutter) 0}
+.ps-main>.vx-foot{padding-inline:0}
+.ps-ticket{width:100%;max-width:calc(var(--tile-min) * 1.6);background:var(--color-bg-surface);
+  border:var(--border-width) solid var(--color-border-button);border-radius:var(--radius-card)}
+.ps-top{display:grid;place-items:center;padding:var(--space-64) var(--space-40) var(--space-52)}
+.ps-top .wordmark{zoom:1.5}
+/* Линия отрыва: пунктир и два полукруглых выреза цвета страницы поверх рамки билета. */
+.ps-cut{position:relative;margin:0 var(--space-24);border-top:var(--border-width) dashed var(--color-border-button)}
+.ps-cut::before,.ps-cut::after{content:"";position:absolute;top:calc(var(--space-16) * -1);width:var(--space-32);
+  height:var(--space-32);border-radius:50%;background:var(--color-bg-page);border:var(--border-width) solid var(--color-border-button)}
+.ps-cut::before{left:calc((var(--space-40) + var(--border-width)) * -1);clip-path:inset(0 0 0 calc(50% - var(--border-width)))}
+.ps-cut::after{right:calc((var(--space-40) + var(--border-width)) * -1);clip-path:inset(0 calc(50% - var(--border-width)) 0 0)}
+.ps-bot{padding:var(--space-40)}
+@media (max-width:640px){.ps-top{padding:var(--space-48) var(--space-24) var(--space-40)}.ps-bot{padding:var(--space-32) var(--space-24)}
+  .ps-top .wordmark{zoom:1.25}}
+
+/* ── 02 Видоискатель ───────────────────────────────────────────────────── */
+.vf-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-48) var(--space-page-gutter) 0}
+.vf-main>.vx-foot{padding-inline:0}
+.vf-frame{position:relative;width:100%;max-width:calc(var(--tile-min) * 3);aspect-ratio:16/9;display:grid;place-items:center;
+  padding:var(--space-40)}
+.vf-c{position:absolute;width:var(--space-40);height:var(--space-40);border:0 solid var(--color-text-primary)}
+.vf-tl{top:0;left:0;border-top-width:2px;border-left-width:2px}
+.vf-tr{top:0;right:0;border-top-width:2px;border-right-width:2px}
+.vf-bl{bottom:0;left:0;border-bottom-width:2px;border-left-width:2px}
+.vf-br{bottom:0;right:0;border-bottom-width:2px;border-right-width:2px}
+.vf-in{display:flex;flex-direction:column;align-items:center;gap:var(--space-40);width:100%}
+.vf-in .wordmark{zoom:1.6}
+.vf-in .vx-form{max-width:calc(var(--tile-min) * 1.3)}
+@media (max-width:640px){.vf-frame{aspect-ratio:3/4;padding:var(--space-32) var(--space-24)}.vf-in .wordmark{zoom:1.25}
+  .vf-c{width:var(--space-24);height:var(--space-24)}}
+
+/* ── 03 Кадр 9:16 ──────────────────────────────────────────────────────── */
+.vt-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:var(--space-40) var(--space-page-gutter) 0}
+.vt-main>.vx-foot{padding-inline:0}
+.vt-card{width:100%;max-width:calc(var(--tile-min) * 1.4);aspect-ratio:9/16;max-height:calc(100vh - var(--space-80) * 2);
+  display:flex;flex-direction:column;padding:var(--space-40) var(--space-32);background:var(--color-bg-surface);
+  border:var(--border-width) solid var(--color-border-default);border-radius:calc(var(--radius-card) * 2)}
+.vt-mark{flex:1;display:grid;place-items:center}
+.vt-mark .wordmark{zoom:1.4}
+.vt-card .vx-form{max-width:none}
+@media (max-width:640px){.vt-card{max-height:none;padding:var(--space-32) var(--space-24)}.vt-mark .wordmark{zoom:1.25}}
+
+/* ── 04 Объектив ───────────────────────────────────────────────────────── */
+.ob-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-64);
+  padding:var(--space-64) var(--space-page-gutter) 0}
+.ob-main>.vx-foot{padding-inline:0}
+/* Второе кольцо — outline с отступом: линия, а не тень. */
+.ob-ring{width:min(100% - var(--space-40), calc(var(--tile-min) * 1.6));aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  background:var(--color-bg-surface);border:var(--border-width) solid var(--color-border-default);
+  outline:var(--border-width) solid var(--color-border-button);outline-offset:var(--space-16)}
+.ob-ring .wordmark{zoom:1.5}
+@media (max-width:640px){.ob-main{gap:var(--space-48);padding-top:var(--space-48)}.ob-ring{width:min(100% - var(--space-40), calc(var(--tile-min) * 1.1))}
+  .ob-ring .wordmark{zoom:1.15}}
+
+/* ── 05 Ось ────────────────────────────────────────────────────────────── */
+.ax-main{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:var(--space-80);padding:var(--space-64) var(--space-page-gutter)}
+.ax-main::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:var(--border-width);background:var(--color-border-button)}
+.ax-mark,.ax-form{position:relative;background:var(--color-bg-page)}
+.ax-mark{padding:var(--space-24) var(--space-32)}
+.ax-mark .wordmark{zoom:1.6}
+.ax-form{padding:var(--space-24) 0}
+@media (max-width:640px){.ax-main{gap:var(--space-48)}.ax-mark .wordmark{zoom:1.25}}
+
+/* ── 06 Горизонт ───────────────────────────────────────────────────────── */
+/* Ряды 1fr · линия · 1fr — линия ровно посередине экрана. */
+.hz-main{flex:1;display:grid;grid-template-rows:1fr auto 1fr;justify-items:center;padding:0 var(--space-page-gutter)}
+.hz-top{align-self:end;padding:var(--space-48) 0 var(--space-40)}
+.hz-top .wordmark{zoom:2}
+.hz-line{justify-self:stretch;height:var(--border-width);margin:0 calc(var(--space-page-gutter) * -1);background:var(--color-border-button)}
+.hz-bot{align-self:start;width:100%;display:flex;justify-content:center;padding:var(--space-40) 0 var(--space-48)}
+@media (max-width:640px){.hz-top .wordmark{zoom:1.4}}
+
+/* ── 07 Паспарту ───────────────────────────────────────────────────────── */
+.pp-main{flex:1;display:flex;padding:var(--space-24)}
+.pp-frame{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-48);
+  padding:var(--space-64) var(--space-24);background:var(--color-bg-surface);border:var(--border-width) solid var(--color-border-default);
+  border-radius:calc(var(--radius-card) * 2)}
+.pp-frame .wordmark{zoom:1.6}
+/* Ссылки сидят в разрыве нижней линии рамки. */
+/* Без transform: дробный сдвиг translate(-50%) мылит текст на экранах 1×. Полоса нулевой высоты на линии рамки,
+   ссылки по центру её — раскладка ставит их на целые пиксели. */
+.pp-foot{position:absolute;left:0;right:0;bottom:0;height:0;display:flex;justify-content:center;align-items:center}
+.pp-foot .vx-links{padding:0 var(--space-16);background:var(--color-bg-page)}
+@media (max-width:640px){.pp-main{padding:var(--space-12) var(--space-12) var(--space-24)}.pp-frame .wordmark{zoom:1.25}
+  .pp-foot .vx-links{max-width:calc(100% - var(--space-24))}}
+
+/* ── 08 Сетка ──────────────────────────────────────────────────────────── */
+.gd-main{flex:1;position:relative;display:grid;grid-template-columns:minmax(0,1fr);place-items:center;padding:var(--space-64) var(--space-page-gutter)}
+/* Сетка с шагом 64 от центра, гаснет к краям (маска — только прозрачность). */
+.gd-main::before{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(var(--color-border-default) var(--border-width),transparent var(--border-width)),
+    linear-gradient(90deg,var(--color-border-default) var(--border-width),transparent var(--border-width));
+  background-size:var(--space-64) var(--space-64);background-position:calc(50% - var(--space-64) * 3) calc(50% - var(--space-64) * 3);
+  -webkit-mask-image:radial-gradient(ellipse at center,black 35%,transparent 80%);mask-image:radial-gradient(ellipse at center,black 35%,transparent 80%)}
+.gd-block{position:relative;width:calc(var(--space-64) * 6 + var(--border-width));min-height:calc(var(--space-64) * 6 + var(--border-width));
+  max-width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-48);padding:var(--space-40);
+  background:var(--color-bg-surface);border:var(--border-width) solid var(--color-border-default)}
+.gd-block .wordmark{zoom:1.4}
+@media (max-width:640px){.gd-block{min-height:0;padding:var(--space-48) var(--space-24)}.gd-block .wordmark{zoom:1.2}}
+
+/* ── 09 Плакат ─────────────────────────────────────────────────────────── */
+.pt-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-64);
+  padding:var(--space-64) var(--space-page-gutter)}
+.pt-main .wordmark{zoom:3.2}
+@media (max-width:1180px){.pt-main .wordmark{zoom:2.4}}
+@media (max-width:640px){.pt-main{gap:var(--space-48)}.pt-main .wordmark{zoom:1.5}}
+
+/* ── 10 Монтаж ─────────────────────────────────────────────────────────── */
+.tl-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-40);
+  padding:var(--space-64) var(--space-page-gutter)}
+.tl-main .wordmark{zoom:1.6}
+/* Линейка: мелкие деления каждые 8, крупные каждые 40; метка воспроизведения — красная, как полоса знака. */
+.tl-ruler{position:relative;width:100%;max-width:calc(var(--tile-min) * 2.2);height:var(--space-24);
+  border-bottom:var(--border-width) solid var(--color-border-default);
+  background:repeating-linear-gradient(90deg,var(--color-border-default) 0 var(--border-width),transparent var(--border-width) var(--space-8))
+      left bottom/100% var(--space-8) no-repeat,
+    repeating-linear-gradient(90deg,var(--color-text-secondary) 0 var(--border-width),transparent var(--border-width) var(--space-40))
+      left bottom/100% var(--space-16) no-repeat}
+.tl-head{position:absolute;left:calc(var(--space-40) * 5);bottom:calc(var(--border-width) * -1);top:calc(var(--space-8) * -1);
+  width:2px;background:var(--color-brand-red)}
+.tl-head::before{content:"";position:absolute;top:0;left:50%;width:var(--space-8);height:var(--space-8);border-radius:50%;
+  transform:translateX(-50%);background:var(--color-brand-red)}
+@media (max-width:640px){.tl-main .wordmark{zoom:1.25}.tl-head{left:calc(var(--space-40) * 3)}}

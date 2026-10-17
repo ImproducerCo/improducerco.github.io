@@ -68,6 +68,11 @@ def copy_assets():
     # Geologica — шрифт строки площадок на входе (владелец 17.10, выбран из шести); в _design/ его пока нет.
     for f in (HERE / "fonts").iterdir():
         shutil.copy2(f, out / "fonts" / f.name)
+    # Вход /login/ открыт всем, а /test/ сервер отдаёт только после входа (владелец 18.10): у входа свои файлы
+    # вида в /assets/ — те же, без превью вариантов.
+    site_assets = TEST.parent / "assets"
+    shutil.rmtree(site_assets, ignore_errors=True)
+    shutil.copytree(out, site_assets, ignore=shutil.ignore_patterns("vhod"))
 
 
 # ── Общие куски ─────────────────────────────────────────────────────────────
@@ -688,7 +693,7 @@ def page_login():
             .replace("<title>Вход — прототип improducer</title>", "<title>Вход — improducer</title>")
             .replace('<a class="wordmark" href="/test/">', '<a class="wordmark" href="/">'))
     body = body.replace('<a class="wordmark" href="/test/">', '<a class="wordmark" href="/">')
-    PAGES["/login/"] = page + f'<body class="vx vx-06 {cls}">{body}{SCRIPT}</body></html>\n'
+    PAGES["/login/"] = (page + f'<body class="vx vx-06 {cls}">{body}{SCRIPT}</body></html>\n').replace("/test/assets/", "/assets/")
     # Прежний адрес прототипа ведёт на постоянный — со своим состоянием (#s=…).
     for path in ("/test/", "/test/login/"):
         PAGES[path] = REDIRECT_LOGIN
