@@ -609,6 +609,7 @@ MARK_PLATFORMS = [("Threads", "#1B2230"), ("Instagram", "#D62976"), ("Facebook",
                   ("Telegram", "#2AABEE"), ("TikTok", "#FE2C55"), ("X", "#1B2230")]
 MARK_CONTOUR = [(18, 12), (34, 36), (50, 64), (66, 36), (82, 12)]  # центр полоски знака → её высота
 MARK_PLATFORM_W = 3
+MARK_PLATFORM_STEP = 6  # просвет между полосками равен их толщине (владелец 17.10: «поближе»)
 
 
 def mark_height(cx):
@@ -619,12 +620,11 @@ def mark_height(cx):
 
 
 def mark_bars():
+    """Высоты — по контуру знака на его размахе; полоски стоят теснее, с шагом MARK_PLATFORM_STEP вокруг центра."""
     n = len(MARK_PLATFORMS)
-    step = (MARK_CONTOUR[-1][0] - MARK_CONTOUR[0][0]) / (n - 1)
-    w = MARK_PLATFORM_W
-    return [(name, MARK_CONTOUR[0][0] + step * i, mark_height(MARK_CONTOUR[0][0] + step * i), w, color)
-            for i, (name, color) in enumerate(MARK_PLATFORMS)]
-
+    x0, x1 = MARK_CONTOUR[0][0], MARK_CONTOUR[-1][0]
+    return [(name, 50 + (i - (n - 1) / 2) * MARK_PLATFORM_STEP, mark_height(x0 + (x1 - x0) * i / (n - 1)),
+             MARK_PLATFORM_W, color) for i, (name, color) in enumerate(MARK_PLATFORMS)]
 
 # Строка названий под знаком — вразнобой (владелец 17.10); RedNote убран 17.10.
 PLATFORM_CLOUD = ["TikTok", "YouTube", "Threads", "Telegram", "Facebook", "Instagram", "X"]
