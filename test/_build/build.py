@@ -7,7 +7,7 @@
 ~/Desktop/improducer/работа/2026-10-16_claude/, разбор.md: экраны S01–S27, пути F01–F08, компоненты C01–C28).
 Вид — только дизайн-система improducer (_design/: tokens.css, components.css, шрифты, знак). Продукт —
 безымянный ИИ-ассистент «improducer»: чаты, проекты, артефакты, коннекторы, планы. Тексты свои.
-Пользователь — выдуманный «Тест». Вход — настоящий Google (my.improducer.co/google), остальные формы ничего не отправляют, оплаты нет.
+Пользователь — выдуманный «Тест». Вход — настоящий Google, только имя и почта (connect.improducer.co/auth/start?for=app), остальные формы ничего не отправляют, оплаты нет.
 
 Папка _build GitHub Pages не публикует (Jekyll пропускает папки с «_»): здесь исходник,
 снаружи — собранные test/<путь>/index.html и test/assets/.
@@ -300,8 +300,8 @@ def app_page(path, title, desc, body, states=("full",), wide=False, active=None)
                    f'<div class="side-k side-k--row"><span>Недавние</span>'
                    f'<button class="icon-btn" type="button" aria-label="Фильтр">{ic("sliders")}</button></div>'
                    f'<ul class="snav recent">{recent}</ul></div>'
-                   '<div class="side-foot"><details class="acct"><summary><span class="ava">Т</span>'
-                   '<span class="who"><b>Тест</b><span class="meta">Бесплатный план</span></span>'
+                   '<div class="side-foot"><details class="acct"><summary><span class="ava" data-user="initial">Т</span>'
+                   '<span class="who"><b data-user="name">Тест</b><span class="meta">Бесплатный план</span></span>'
                    f'{ic("down")}</summary><div class="pop acct-pop">{ACCOUNT_MENU}</div></details></div>'
                    '</aside>'
                    f'<main class="main"><div class="{"main-wide" if wide else "main-in"}">{body}</div></main></div>'
@@ -653,9 +653,9 @@ def platform_cloud():
 
 # ── Вход и первый запуск ─────────────────────────────────────────────────────
 
-# Владелец 17.10: кнопка ведёт в настоящий вход Google — тот же, что у кабинета (Катя, Юля), без своего макета окна.
-# my.improducer.co/google ставит метку браузера, отправляет в Google и после входа возвращает в /test/new/.
-SIGNIN = "https://my.improducer.co/google"
+# Владелец 17.10: кнопка ведёт в настоящий вход Google — только кто это (имя и почта), без доступа к YouTube.
+# Это вход приложения (connect app_signin.ts), не вход кабинета my.improducer.co: после него — /test/new/#n=<имя>.
+SIGNIN = "https://connect.improducer.co/auth/start?for=app"
 
 
 def login_form():
@@ -714,7 +714,7 @@ CHIPS = ('<div class="chips"><a href="/test/chat/youtube/">Что дальше �
 
 def page_new():
     hello = ('<h1 class="hello"><img src="/test/assets/logo/mark.svg" alt="" width="44" height="44">'
-             '<span>Привет, Тест</span></h1>')
+             '<span>Привет, <span data-user="name">Тест</span></span></h1>')
     tmp = f'<a class="icon-btn tmp-chat" href="#" title="Временный чат" aria-label="Временный чат">{ic("ghost")}</a>'
     body = (f'<div class="home">{tmp}<div class="home-c">'
             + st("full", hello + composer())

@@ -28,6 +28,21 @@
     if (p) p.open = false;
   }
 
+  // Имя из входа Google: сервер входа приводит сюда с #n=<имя> (connect app_signin.ts). Имя держится в этой
+  // вкладке (sessionStorage), из адреса стирается. Без входа — выдуманный «Тест».
+  var n = location.hash.match(/^#n=([^&]*)/);
+  function dec(v) { try { return decodeURIComponent(v).slice(0, 60); } catch (e) { return ''; } }
+  if (n) {
+    try { if (dec(n[1])) sessionStorage.setItem('improducer-test-name', dec(n[1])); } catch (e) { /* без хранилища — имя только на этой странице */ }
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+  var name = '';
+  try { name = sessionStorage.getItem('improducer-test-name') || ''; } catch (e) { name = n ? dec(n[1]) : ''; }
+  if (name) {
+    document.querySelectorAll('[data-user="name"]').forEach(function (el) { el.textContent = name; });
+    document.querySelectorAll('[data-user="initial"]').forEach(function (el) { el.textContent = name.charAt(0).toUpperCase(); });
+  }
+
   window.addEventListener('hashchange', function () { show(current()); });
   show(current());
 
