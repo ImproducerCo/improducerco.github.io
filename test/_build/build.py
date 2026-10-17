@@ -208,7 +208,6 @@ _IC = {
     "file": '<path d="M6 3.5h5.5L15 7v9.5H6z"/><path d="M11.5 3.5V7H15"/>',
     "ghost": '<path d="M5 17V9a5 5 0 0 1 10 0v8l-1.7-1.3L11.7 17 10 15.7 8.3 17l-1.6-1.3z"/><path d="M8 9h.01M12 9h.01"/>',
     "mic": '<rect x="8" y="3" width="4" height="9" rx="2"/><path d="M5 10a5 5 0 0 0 10 0M10 15v2.5"/>',
-    "voice": '<path d="M4 8.5v3M7 6v8M10 3.5v13M13 6v8M16 8.5v3"/>',
     "settings": '<circle cx="10" cy="10" r="2.5"/><path d="M10 3v2M10 15v2M3 10h2M15 10h2M5 5l1.4 1.4M13.6 13.6 15 15M5 15l1.4-1.4M13.6 6.4 15 5"/>',
     "help": '<circle cx="10" cy="10" r="6.5"/><path d="M8.2 8a1.9 1.9 0 1 1 2.6 1.8c-.5.2-.8.6-.8 1.2M10 13.5h.01"/>',
     "globe": '<circle cx="10" cy="10" r="6.5"/><path d="M3.5 10h13M10 3.5c2 2 2 11 0 13M10 3.5c-2 2-2 11 0 13"/>',
@@ -305,11 +304,9 @@ def composer(off=False, text="", placeholder=None, nxt="/test/chat/", under=True
                   f'<details class="umenu"><summary>Проект {ic("down")}</summary><div class="pop">'
                   '<a href="/test/project/primer/">Пример проекта</a><a href="/test/cabinet/youtube/">Канал «Тест»</a>'
                   '<hr><a href="/test/projects/">Все проекты</a></div></details>'
-                  f'<details class="umenu umenu--r"><summary><b>Sonnet 5.5</b> <span class="muted">Средне</span> {ic("down")}</summary>'
-                  '<div class="pop"><p class="pi">Модель</p><a href="#">Opus 5.5</a><a href="#"><b>Sonnet 5.5</b></a>'
-                  '<a href="#">Haiku 4.5</a><hr><p class="pi">Глубина</p><a href="#">Быстро</a><a href="#"><b>Средне</b></a>'
-                  '<a href="#">Глубоко</a></div></details>'
-                  '<button class="ubtn" type="button">Авто</button></div>') if under else ""
+                  f'<details class="umenu umenu--r"><summary>Средне {ic("down")}</summary>'
+                  '<div class="pop"><p class="pi">Глубина</p><a href="#">Быстро</a><a href="#"><b>Средне</b></a>'
+                  '<a href="#">Глубоко</a></div></details></div>') if under else ""
     return (f'<div class="composer-wrap"><div class="composer{cls}"><label class="visually-hidden" for="q">Сообщение</label>'
             f'<textarea id="q" rows="2" placeholder="{E(ph)}" data-next="{nxt}"{dis}>{E(text)}</textarea>'
             f'<div class="tools"><details class="cmenu"><summary class="icon-btn" aria-label="Добавить">{ic("plus")}</summary>'
@@ -317,7 +314,6 @@ def composer(off=False, text="", placeholder=None, nxt="/test/chat/", under=True
             f'<a href="/test/cabinet/">{ic("cabinet")}<span>Площадки</span><span class="meta">YouTube ✓</span></a>'
             f'<a href="/test/settings/connectors/">{ic("sliders")}<span>Коннекторы</span></a></div></details>'
             f'<span class="tools-r"><button class="icon-btn mic" type="button" aria-label="Диктовка"{dis}>{ic("mic")}{ic("down")}</button>'
-            f'<a class="voice" href="#" aria-label="Голосовой режим">{ic("voice")}</a>'
             f'<a class="send" href="{nxt}" aria-label="Отправить"{" aria-disabled=\"true\"" if off else ""}>{ic("up")}</a>'
             f'</span></div></div>{under_html}</div>')
 
@@ -1583,13 +1579,17 @@ DECISIONS = [
     ("Цены не заданы", "У «Бесплатно» — 0 $, у остальных планов — «цена появится»; в оплате суммы нет."),
     ("6 из 12 готово", "Двенадцать функций YouTube; у «Теста» готовы подключение, анкета, фото, ДНК, ниша и аналитика "
      "уже вышедших роликов; концепция ждёт решения."),
+    ("Поле ввода без названий моделей", "Под полем — «Проект» и глубина (Быстро · Средне · Глубоко); модель выбирает система. "
+     "Голос — только диктовка, без голосового режима (владелец 17.10)."),
+    ("Боковая панель и вход — как у Claude", "Пункты «Артефакты», «Расписание», «Настроить» и карточка входа на главной "
+     "(Google, Apple, почта) остаются как в образце (владелец 17.10)."),
 ]
 
 DESIGN_TODO = [
     ("Оболочка приложения: боковая панель + рабочая область", "≥1180 — панель слева; меньше — полоса сверху и меню по кнопке",
-     "component.app.side-width = 260 (сейчас --tile-min)"),
+     "component.app.side-width = 292 (сейчас --tile-min + --space-32)"),
     ("Шапка сайта", "обычная · липкая · телефон — меню по кнопке", "без новых значений: --nav-height, --sticky-bar-*"),
-    ("Поле ввода (C15)", "пусто · текст · недоступно (лимит) · «+» · выбор модели",
+    ("Поле ввода (C15)", "пусто · текст · недоступно (лимит) · «+» · глубина",
      "component.composer: радиус = --radius-card, высота = --field-textarea-min; стрелка — красная (исключение README)"),
     ("Плашка лимита (C24)", "лимит сессии", "цвета --color-status-warn-*"),
     ("Сообщение чата (C16)", "реплика · ответ · идёт · ошибка · длинный", "component.message.author-bg = --color-bg-sunken"),
