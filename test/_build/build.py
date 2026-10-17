@@ -593,34 +593,34 @@ def page_help_start():
 
 # ── Вход и первый запуск ─────────────────────────────────────────────────────
 
+LOGIN_WHY = "Ваши анкета, ДНК и кабинет — только для вас"
+
+
 def login_form():
-    """Стандартный вход: Google, «или», почта → «Продолжить», согласие."""
+    """Вход как на живом my.improducer.co/login: Google, «или», почта → «Продолжить»."""
     return ('<div class="auth auth--login">'
             f'{gbtn("/test/onboarding/", "Войти через Google")}'
             '<div class="or">или</div>'
             '<div class="field"><label class="visually-hidden" for="em">Почта</label>'
             '<input id="em" type="email" placeholder="Электронная почта" autocomplete="email" data-next="#s=sent"></div>'
-            f'{a_btn("#s=sent", "Продолжить", True)}'
-            '<p class="small muted">Продолжая, вы принимаете <a href="/terms.html">условия</a> и '
-            '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
+            f'{a_btn("#s=sent", "Продолжить")}</div>')
 
 
 def page_login(path="/test/login/"):
-    sent = ('<div class="card auth"><span class="badge badge--ok">письмо отправлено</span>'
-            '<h2 class="screen-title">Проверьте почту</h2>'
-            '<p>Отправили ссылку для входа и код на <b>test@example.com</b>. Откройте ссылку на этом устройстве '
-            'или введите код.</p>'
+    """Своя раскладка входа — копия живого my.improducer.co/login (владелец 17.10): карточка по центру,
+    знак, одна строка, кнопки; условия — под карточкой. Шапки сайта и пояснений нет."""
+    sent = ('<div class="auth auth--login"><h2 class="screen-title">Проверьте почту</h2>'
+            '<p>Отправили ссылку для входа и код на <b>test@example.com</b>.</p>'
             f'{a_btn("#s=code", "Ввести код", True)}'
-            '<p class="small muted">Письмо не пришло? Проверьте «Спам» и «Промоакции». '
-            '<a href="#s=sent">Отправить ещё раз</a> · <a href="#s=full">Другая почта</a></p></div>')
+            '<p class="small muted">Письмо не пришло? <a href="#s=sent">Отправить ещё раз</a> · '
+            '<a href="#s=full">Другая почта</a></p></div>')
 
     def code_card(bad=False):
         inv = ' aria-invalid="true"' if bad else ""
         err = '<p class="err">Код неверный или устарел. Проверьте последнее письмо.</p>' if bad else ""
         val = ' value="000000"' if bad else ""
-        return ('<div class="card auth"><h2 class="screen-title">Введите код</h2>'
-                '<p class="small muted">Код из письма на test@example.com</p>'
-                f'<div class="field"><label for="cd">Код</label><input id="cd" inputmode="numeric"{val}{inv} '
+        return ('<div class="auth auth--login"><h2 class="screen-title">Введите код</h2>'
+                f'<div class="field"><label for="cd">Код из письма</label><input id="cd" inputmode="numeric"{val}{inv} '
                 f'placeholder="6 цифр" data-next="/test/onboarding/">{err}</div>'
                 f'{a_btn("/test/onboarding/", "Подтвердить", True)}'
                 '<p class="small muted"><a href="#s=sent">Отправить код ещё раз</a></p></div>')
@@ -630,10 +630,15 @@ def page_login(path="/test/login/"):
                                                                  "Окно Google закрыли или вход отменён. Попробуйте ещё раз.")
                  + gbtn("/test/onboarding/", "Войти через Google") + "</div>")
             + st("sent", sent) + st("code", code_card()) + st("badcode", code_card(True)))
-    h1 = st("full loading error sent code badcode", "<h1>Вход</h1>") + st("long", f"<h1>{LONG}</h1>")
-    body = f'<div class="signin"><section class="signin-form">{h1}{form}</section></div>'
-    bare_page(path, "Вход", "Вход в improducer: Google или почта.", body,
-              states=("full", "loading", "error", "sent", "code", "badcode", "long"))
+    why = (st("full loading error", f'<p class="lgn-why">{LOGIN_WHY}</p>')
+           + st("long", f'<p class="lgn-why">{LONG}</p>'))
+    body = ('<main class="lgn"><div class="lgn-card">'
+            f'<h1 class="lgn-brand">{wordmark("/test/", co=False)}</h1>{why}{form}</div>'
+            '<footer class="lgn-foot"><a href="/terms.html">Условия</a> · '
+            '<a href="/privacy.html">Конфиденциальность</a></footer></main>')
+    states = ["full", "loading", "error", "sent", "code", "badcode", "long"]
+    PAGES[path] = (head("Вход", "Вход в improducer: Google или почта.") + '<body class="site">'
+                   f'{body}{proto(states)}{SCRIPT}</body></html>\n')
 
 
 def onboarding_shell(path, n, blocks, states):
@@ -1351,7 +1356,7 @@ OPIS_SCREENS = [
      "заполнено · пусто · загрузка"),
     ("S07", "Вход", "claude.ai/login", "/test/login/",
      "Ничего: вход свой (владелец 17.10 — раскладка образца слишком похожа на Claude)",
-     "Своя страница: знак, «Вход», «Войти через Google», «или», почта → «Продолжить», согласие. Больше ничего — ни волны, ни подписей, "
+     "Копия живого входа my.improducer.co/login: карточка по центру — знак, строка, «Войти через Google», «или», почта → «Продолжить»; условия под карточкой. Больше ничего — ни волны, ни подписей, "
      "ни ссылки на свой Claude (владелец 17.10); Apple убран", "заполнено · загрузка · ошибка · длинный"),
     ("S08", "Письмо и код", "claude.ai/login (шаг 2)", "/test/login/#s=sent",
      "Письмо отправлено → ввод кода → неверный код; «письмо не пришло» и «отправить ещё раз»",
