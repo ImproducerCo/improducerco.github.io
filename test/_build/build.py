@@ -424,7 +424,6 @@ def two_ways():
 
 def page_home():
     page_login("/test/")
-    page_login("/test/login/2/", v2=True)
 
 
 def page_product():
@@ -626,37 +625,39 @@ def platform_wave():
             f'<defs>{"".join(defs)}</defs>{"".join(bars)}</svg>')
 
 
+def wave_labels():
+    return "".join(f'<li><i style="background:{c}"></i><b>{t}</b><span>{d}</span></li>' for _, t, d, c in WAVE_LABELS)
+
+
 # ── Вход и первый запуск ─────────────────────────────────────────────────────
 
-LOGIN_H1 = "Войдите в improducer"
-
-
 def login_form():
-    """Вход в стиле живого connect.improducer.co: Google, «или», почта → «Продолжить»."""
     return ('<div class="auth auth--login">'
-            f'{gbtn("/test/onboarding/", "Продолжить с Google")}'
+            f'{gbtn("/test/onboarding/")}'
             '<div class="or">или</div>'
             '<div class="field"><label class="visually-hidden" for="em">Почта</label>'
             '<input id="em" type="email" placeholder="Электронная почта" autocomplete="email" data-next="#s=sent"></div>'
-            f'{a_btn("#s=sent", "Продолжить")}</div>')
+            f'{a_btn("#s=sent", "Продолжить")}'
+            '<p class="small muted">Продолжая, вы принимаете <a href="/terms.html">условия</a> и '
+            '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
 
 
-def page_login(path="/test/login/", v2=False):
-    """Вход в одном стиле со страницей доступа к YouTube connect.improducer.co (владелец 17.10): без карточки,
-    по центру знак, заголовок, кнопки; условия внизу. Шапки сайта и пояснений нет.
-    v2 — вместо знака со словом волна площадок, под кнопками список площадок (вторая версия на выбор)."""
-    sent = ('<div class="auth auth--login"><h2 class="screen-title">Проверьте почту</h2>'
-            '<p>Отправили ссылку для входа и код на <b>test@example.com</b>.</p>'
+def page_login(path="/test/login/"):
+    sent = ('<div class="card auth"><span class="badge badge--ok">письмо отправлено</span>'
+            '<h2 class="screen-title">Проверьте почту</h2>'
+            '<p>Отправили ссылку для входа и код на <b>test@example.com</b>. Откройте ссылку на этом устройстве '
+            'или введите код.</p>'
             f'{a_btn("#s=code", "Ввести код", True)}'
-            '<p class="small muted">Письмо не пришло? <a href="#s=sent">Отправить ещё раз</a> · '
-            '<a href="#s=full">Другая почта</a></p></div>')
+            '<p class="small muted">Письмо не пришло? Проверьте «Спам» и «Промоакции». '
+            '<a href="#s=sent">Отправить ещё раз</a> · <a href="#s=full">Другая почта</a></p></div>')
 
     def code_card(bad=False):
         inv = ' aria-invalid="true"' if bad else ""
         err = '<p class="err">Код неверный или устарел. Проверьте последнее письмо.</p>' if bad else ""
         val = ' value="000000"' if bad else ""
-        return ('<div class="auth auth--login"><h2 class="screen-title">Введите код</h2>'
-                f'<div class="field"><label for="cd">Код из письма</label><input id="cd" inputmode="numeric"{val}{inv} '
+        return ('<div class="card auth"><h2 class="screen-title">Введите код</h2>'
+                '<p class="small muted">Код из письма на test@example.com</p>'
+                f'<div class="field"><label for="cd">Код</label><input id="cd" inputmode="numeric"{val}{inv} '
                 f'placeholder="6 цифр" data-next="/test/onboarding/">{err}</div>'
                 f'{a_btn("/test/onboarding/", "Подтвердить", True)}'
                 '<p class="small muted"><a href="#s=sent">Отправить код ещё раз</a></p></div>')
@@ -664,22 +665,17 @@ def page_login(path="/test/login/", v2=False):
             + st("loading", '<div class="auth auth--login">' + skel(3) + "</div>")
             + st("error", '<div class="auth auth--login">' + warn("Вход не завершён",
                                                                  "Окно Google закрыли или вход отменён. Попробуйте ещё раз.")
-                 + gbtn("/test/onboarding/", "Продолжить с Google") + "</div>")
+                 + gbtn("/test/onboarding/") + "</div>")
             + st("sent", sent) + st("code", code_card()) + st("badcode", code_card(True)))
-    h1 = (st("full loading error", f'<h1 class="lgn-h">{LOGIN_H1}</h1>')
-          + st("long", f'<h1 class="lgn-h">{LONG}</h1>'))
-    top = (f'<a class="lgn-wave" href="/test/">{platform_wave()}</a>' if v2
-           else f'<div class="lgn-brand">{wordmark("/test/", co=False)}</div>')
-    plats = ('<ul class="lgn-plat" aria-label="Площадки">'
-             + "".join(f'<li><i style="background:{c}"></i>{t}</li>' for _, t, _, c in WAVE_LABELS)
-             + '</ul>') if v2 else ""
-    body = ('<main class="lgn"><div class="lgn-in">'
-            f'{top}{h1}{form}{plats}'
-            '<footer class="lgn-foot"><a href="/terms.html">Условия</a> · '
-            '<a href="/privacy.html">Конфиденциальность</a></footer></div></main>')
-    states = ["full", "loading", "error", "sent", "code", "badcode", "long"]
-    PAGES[path] = (head("Вход", "Вход в improducer: Google или почта.") + '<body class="site">'
-                   f'{body}{proto(states)}{SCRIPT}</body></html>\n')
+    h1 = st("full loading error sent code badcode", "<h1>Вход</h1>") + st("long", f"<h1>{LONG}</h1>")
+    body = ('<div class="signin">'
+            '<section class="signin-stage" aria-label="Площадки">'
+            f'{platform_wave()}<ul class="wave-labels">{wave_labels()}</ul>'
+            '<p class="signin-claim">Один вход — все ваши площадки.</p></section>'
+            '<section class="signin-form">'
+            f'{h1}{form}</section></div>')
+    bare_page(path, "Вход", "Вход в improducer: Google или почта.", body,
+              states=("full", "loading", "error", "sent", "code", "badcode", "long"))
 
 
 def onboarding_shell(path, n, blocks, states):
@@ -1377,7 +1373,7 @@ OPIS_SCREENS = [
      "—", "Без аналога: выдача — чужая страница, в прототип не входит.", "—"),
     ("S02", "Главная", "claude.com/", "/test/",
      "Ничего: главная — это вход (владелец 17.10: на главной только вход, остальное — вода)",
-     "Та же страница, что /test/login/: только вход через Google или почту. Героя, планов, вопросов и "
+     "Та же страница, что /test/login/: волна площадок и вход через Google или почту. Героя, планов, вопросов и "
      "примера чата нет; Продукт, Цены, Помощь — по своим адресам.", "заполнено · загрузка · ошибка · длинный"),
     ("S03", "Продукт", "claude.com/product/overview", "/test/product/",
      "Полоса раздела, заголовок по центру с двумя кнопками, блоки ниже",
@@ -1397,8 +1393,8 @@ OPIS_SCREENS = [
      "заполнено · пусто · загрузка"),
     ("S07", "Вход", "claude.ai/login", "/test/login/",
      "Ничего: вход свой (владелец 17.10 — раскладка образца слишком похожа на Claude)",
-     "В стиле страницы доступа connect.improducer.co: по центру знак, «Войдите в improducer», «Продолжить с Google», «или», почта → «Продолжить»; условия внизу. Больше ничего — ни волны, ни подписей, "
-     "ни ссылки на свой Claude (владелец 17.10); Apple убран", "заполнено · загрузка · ошибка · длинный"),
+     "Своя страница: слева волна площадок из _design/ideas/platforms-wave.html с подписями YouTube · Telegram · "
+     "Instagram, справа «Вход» — Google, «или», почта → «Продолжить». Без пояснений и ссылки на свой Claude; Apple убран", "заполнено · загрузка · ошибка · длинный"),
     ("S08", "Письмо и код", "claude.ai/login (шаг 2)", "/test/login/#s=sent",
      "Письмо отправлено → ввод кода → неверный код; «письмо не пришло» и «отправить ещё раз»",
      "Ссылки из письма нет: письма не уходят", "письмо отправлено · ввод кода · неверный код"),
@@ -1509,7 +1505,7 @@ OPIS_PATHS = [
      "/test/new/ → меню аккаунта → «Помощь» → /test/help/ → статья → /test/help/start/ · 3 клика",
      "/test/help/", "—"),
     ("F08", "Работать в своём Claude", "S02 → S05 → файл · 2 клика",
-     "/test/download/ по прямой ссылке → 3 шага и адрес · 0 кликов; на входе ссылки нет (владелец 17.10)",
+     "/test/ → «Подключить коннектор →» → /test/download/#claude → 3 шага и адрес · 1 клик",
      "/test/download/", "Вместо файла приложения — адрес коннектора"),
     ("F09", "Кабинет → результат", "без аналога (свой путь)",
      "любая страница приложения → «Кабинет» → /test/cabinet/ → YouTube → /test/cabinet/youtube/ → «Концепция» → "
@@ -1535,9 +1531,8 @@ DECISIONS = [
      "Голос — только диктовка, без голосового режима (владелец 17.10)."),
     ("Боковая панель — как у Claude", "Пункты «Артефакты», «Расписание», «Настроить» остаются как в образце "
      "(владелец 17.10)."),
-    ("Главная — только вход", "Вход в стиле страницы доступа connect.improducer.co: знак, «Войдите в improducer», "
-     "Google, «или», почта → «Продолжить», условия. Две версии на выбор: /test/login/ (на главной) и /test/login/2/ — "
-     "волна площадок вместо знака и список YouTube · Telegram · Instagram под кнопками. Apple нет (владелец 17.10)."),
+    ("Главная — только вход", "На /test/ та же страница, что /test/login/: слева волна площадок, справа «Вход» — Google "
+     "или почта. Пояснений, ссылки на свой Claude и Apple нет (владелец 17.10)."),
 ]
 
 DESIGN_TODO = [
