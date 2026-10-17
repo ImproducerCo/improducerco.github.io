@@ -638,7 +638,13 @@ def platform_wave():
         bars.append(f'<rect class="wave-pulse" {box} fill="none" stroke="{color}" stroke-width="{w * .2:.2f}"/>'
                     f'<rect {box} fill="{color}"><title>{name}</title></rect>')
     names = ", ".join(n for n, _ in MARK_PLATFORMS)
-    return f'<svg class="wave" viewBox="0 0 100 100" role="img" aria-label="Площадки: {names}">{"".join(bars)}</svg>'
+    # Рамка — по полоскам, с запасом на пульс (контур растёт в 1.9 раза вширь и в 1.14 ввысь): без пустых полей
+    # SVG знак не отрывается от строки названий.
+    xs = [cx for _, cx, _, _, _ in mark_bars()]
+    left, right = min(xs) - 2.5 * MARK_PLATFORM_W, max(xs) + 2.5 * MARK_PLATFORM_W
+    top, height = MARK_CONTOUR[2][1] * -.57 + 50, MARK_CONTOUR[2][1] * 1.14
+    return (f'<svg class="wave" viewBox="{left:g} {top:g} {right - left:g} {height:g}" role="img" '
+            f'aria-label="Площадки: {names}">{"".join(bars)}</svg>')
 
 
 def platform_cloud():
@@ -691,7 +697,8 @@ def page_login(path="/test/login/"):
             f'{platform_wave()}<ul class="pcloud">{platform_cloud()}</ul></section>'
             '<section class="signin-form">'
             '<h1 class="visually-hidden">Вход в improducer</h1>'
-            '<p class="signin-claim">Один вход — все ваши площадки.</p>'
+            '<p class="signin-claim">Снимайте то, что работает</p>'
+            '<p class="signin-sub">Система каждый день разбирает ваши ролики и собирает план и сценарии вашим голосом.</p>'
             f'{form}</section></div>')
     bare_page(path, "Вход", "Вход в improducer: Google или почта.", body,
               states=("full", "loading", "error", "sent", "code", "badcode"))
@@ -1416,7 +1423,7 @@ OPIS_SCREENS = [
      "Вместо фото — знак площадок: контур знака _design/logo/mark.svg, семь полосок — по одной на площадку, все "
      "залиты её цветом, пульс 2.4 с из _design/ideas/platforms-wave.html; под ним названия TikTok, YouTube, Threads, "
      "Telegram, Facebook, Instagram, X шрифтом Geologica. "
-     "Заголовок «Один вход — все ваши площадки.», без слова «Вход»; форма — Google, «или», почта → «Продолжить»; "
+     "Заголовок «Снимайте то, что работает» и строка о том, что делает система, без слова «Вход»; форма — Google, «или», почта → «Продолжить»; "
      "Apple и «скачать приложение» убраны", "заполнено · загрузка · ошибка"),
     ("S08", "Письмо и код", "claude.ai/login (шаг 2)", "/test/login/#s=sent",
      "Письмо отправлено → ввод кода → неверный код; «письмо не пришло» и «отправить ещё раз»",
