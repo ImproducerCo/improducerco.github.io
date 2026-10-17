@@ -605,8 +605,15 @@ def page_help_start():
 # тот же ромб: полоски на том же размахе (центры 18…82), высота — по контуру знака (12 · 36 · 64 · 36 · 12 в его
 # полосках, между ними по прямой), толщина 3 (владелец 17.10 дважды: «уже»). Цвета симметрично: по краям тёмные,
 # дальше розовые, у центра синие, в центре красная YouTube. Пульс — из идеи, 2.4 с, одна фаза (test.css .wave-pulse).
-MARK_PLATFORMS = [("Threads", "#1B2230"), ("Instagram", "#D62976"), ("Facebook", "#0866FF"), ("YouTube", "#FF0000"),
-                  ("Telegram", "#2AABEE"), ("TikTok", "#FE2C55"), ("X", "#1B2230")]
+# Цвета — знаков самих площадок (владелец 17.10: «не соответствуют цветам их логотипов»); переходы — снизу вверх,
+# как в _design/ideas/platforms-wave.html.
+MARK_PLATFORMS = [("Threads", ["#000000"]),
+                  ("Instagram", ["#FEDA75", "#FA7E1E", "#D62976", "#962FBF", "#4F5BD5"]),
+                  ("Facebook", ["#0866FF"]),
+                  ("YouTube", ["#FF0000"]),
+                  ("Telegram", ["#229ED9", "#2AABEE"]),
+                  ("TikTok", ["#FE2C55", "#25F4EE"]),
+                  ("X", ["#000000"])]
 MARK_CONTOUR = [(18, 12), (34, 36), (50, 64), (66, 36), (82, 12)]  # центр полоски знака → её высота
 MARK_PLATFORM_W = 3
 MARK_PLATFORM_STEP = 6  # просвет между полосками равен их толщине (владелец 17.10: «поближе»)
@@ -631,12 +638,18 @@ PLATFORM_CLOUD = ["TikTok", "YouTube", "Threads", "Telegram", "Facebook", "Insta
 
 
 def platform_wave():
-    bars = []
-    for name, cx, h, w, color in mark_bars():
+    defs, bars = [], []
+    for i, (name, cx, h, w, colors) in enumerate(mark_bars()):
         box = f'x="{cx - w / 2:.2f}" y="{50 - h / 2:.2f}" width="{w:.2f}" height="{h:.2f}" rx="{w / 2:.2f}"'
+        if len(colors) > 1:
+            stops = "".join(f'<stop offset="{k / (len(colors) - 1):g}" stop-color="{c}"/>' for k, c in enumerate(colors))
+            defs.append(f'<linearGradient id="mp{i}" x1="0" y1="1" x2="0" y2="0">{stops}</linearGradient>')
+            paint = f"url(#mp{i})"
+        else:
+            paint = colors[0]
         # контур пульса к толщине полоски — как в идее (0.9 при 4.5)
-        bars.append(f'<rect class="wave-pulse" {box} fill="none" stroke="{color}" stroke-width="{w * .2:.2f}"/>'
-                    f'<rect {box} fill="{color}"><title>{name}</title></rect>')
+        bars.append(f'<rect class="wave-pulse" {box} fill="none" stroke="{paint}" stroke-width="{w * .2:.2f}"/>'
+                    f'<rect {box} fill="{paint}"><title>{name}</title></rect>')
     names = ", ".join(n for n, _ in MARK_PLATFORMS)
     # Рамка — по полоскам, с запасом на пульс (контур растёт в 1.9 раза вширь и в 1.14 ввысь): без пустых полей
     # SVG знак не отрывается от строки названий.
@@ -644,7 +657,7 @@ def platform_wave():
     left, right = min(xs) - 2.5 * MARK_PLATFORM_W, max(xs) + 2.5 * MARK_PLATFORM_W
     top, height = MARK_CONTOUR[2][1] * -.57 + 50, MARK_CONTOUR[2][1] * 1.14
     return (f'<svg class="wave" viewBox="{left:g} {top:g} {right - left:g} {height:g}" role="img" '
-            f'aria-label="Площадки: {names}">{"".join(bars)}</svg>')
+            f'aria-label="Площадки: {names}"><defs>{"".join(defs)}</defs>{"".join(bars)}</svg>')
 
 
 def platform_cloud():
