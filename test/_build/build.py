@@ -597,49 +597,50 @@ def page_help_start():
               states=("full", "long"))
 
 
-# Волна площадок — из знака (_design/logo/mark.svg) и идеи _design/ideas/platforms-wave.html (владелец 08.10):
-# по тонкой полоске на площадку. В покое — серые, как в знаке, высокая середина — красная. По волне по очереди
-# пробегает цвет: полоска загорается цветом своей площадки, и одновременно подсвечивается её название в строке
-# под волной (17.10: прошлая радуга из восьми кислотных полосок с ореолами — безвкусица).
-# Поля: название, высота, цвета площадки снизу вверх (несколько — градиент).
-WAVE = [("Threads", 22, ["#101010"]),
-        ("Facebook", 36, ["#0866FF"]),
-        ("Instagram", 52, ["#FEDA75", "#FA7E1E", "#D62976", "#962FBF", "#4F5BD5"]),
-        ("YouTube", 76, ["#FF0000"]),
-        ("Telegram", 60, ["#229ED9", "#2AABEE"]),
-        ("TikTok", 44, ["#FE2C55", "#25F4EE"]),
-        ("X", 30, ["#101010"]),
-        ("RedNote", 18, ["#FF2442"])]
-WAVE_STEP, WAVE_BAR, WAVE_REST, WAVE_PEAK = 8.8, 4.4, "#C9D1DC", "YouTube"
-WAVE_TURN = 1.5  # секунд на площадку; полный круг — WAVE_TURN × число площадок, задаётся в test.css (--wave-cycle)
-# Строка названий под волной — вразнобой, одним стилем (владелец 17.10).
-PLATFORM_CLOUD = ["TikTok", "YouTube", "Threads", "Telegram", "Facebook", "Instagram", "X", "RedNote"]
+# Волна площадок — строго по _design/ideas/platforms-wave.html (владелец 17.10: форму знака и его эффекты не менять,
+# даже когда полосок больше). Геометрия знака _design/logo/mark.svg: девять полосок с шагом 8; чётные — ровно полоски
+# знака (площадки), нечётные — серые между ними, высотой среднее соседей. Пульс — контур цвета площадки расходится
+# и гаснет, 2.4 с, у всех одна фаза (test.css .wave-pulse).
+WAVE_CX = [18, 26, 34, 42, 50, 58, 66, 74, 82]
+WAVE_H = [12, 24, 36, 50, 64, 50, 36, 24, 12]
+WAVE_BW, WAVE_SW, WAVE_REST = 4.5, .9, "#C9D1DC"
+# Место на волне → (название, цвета сверху вниз, градиент снизу вверх).
+WAVE_NETS = {0: ("TikTok", ["#25F4EE", "#FE2C55"], False),
+             2: ("Instagram", ["#FEDA75", "#FA7E1E", "#D62976", "#962FBF", "#4F5BD5"], True),
+             4: ("YouTube", ["#FF0000"], False),
+             6: ("Telegram", ["#2AABEE", "#229ED9"], False),
+             8: ("X", ["#1B2230"], False)}
+# Залита только средняя — красная черта знака; остальные площадки серые с пульсом своего цвета.
+WAVE_FILLED = {"YouTube"}
+# Строка названий под волной — вразнобой (владелец 17.10); RedNote убран 17.10.
+PLATFORM_CLOUD = ["TikTok", "YouTube", "Threads", "Telegram", "Facebook", "Instagram", "X"]
 
 
 def platform_wave():
-    r = WAVE_BAR / 2
-    first = 50 - WAVE_STEP * (len(WAVE) - 1) / 2
     defs, bars = [], []
-    for i, (name, h, grad) in enumerate(WAVE):
-        x, y = first + WAVE_STEP * i - WAVE_BAR / 2, 50 - h / 2
-        if len(grad) > 1:
-            stops = "".join(f'<stop offset="{k / (len(grad) - 1):.2f}" stop-color="{c}"/>' for k, c in enumerate(grad))
-            defs.append(f'<linearGradient id="w{i}" x1="0" y1="1" x2="0" y2="0">{stops}</linearGradient>')
+    for i, (cx, h) in enumerate(zip(WAVE_CX, WAVE_H)):
+        x, y = cx - WAVE_BW / 2, 50 - h / 2
+        box = f'x="{x:g}" y="{y:g}" width="{WAVE_BW}" height="{h}" rx="{WAVE_BW / 2:g}"'
+        if i not in WAVE_NETS:
+            bars.append(f'<rect {box} fill="{WAVE_REST}"/>')
+            continue
+        name, colors, up = WAVE_NETS[i]
+        if len(colors) > 1:
+            stops = "".join(f'<stop offset="{k / (len(colors) - 1):g}" stop-color="{c}"/>' for k, c in enumerate(colors))
+            defs.append(f'<linearGradient id="w{i}" x1="0" y1="{1 if up else 0}" x2="0" y2="{0 if up else 1}">'
+                        f'{stops}</linearGradient>')
             paint = f"url(#w{i})"
         else:
-            paint = grad[0]
-        rest = grad[0] if name == WAVE_PEAK else WAVE_REST
-        bars.append(f'<rect x="{x:.1f}" y="{y}" width="{WAVE_BAR}" height="{h}" rx="{r}" fill="{rest}"/>'
-                    f'<rect class="wave-lit" style="animation-delay:{i * WAVE_TURN:.1f}s" x="{x:.1f}" y="{y}" '
-                    f'width="{WAVE_BAR}" height="{h}" rx="{r}" fill="{paint}"><title>{name}</title></rect>')
-    names = ", ".join(n for n, _, _ in WAVE)
+            paint = colors[0]
+        bars.append(f'<rect class="wave-pulse" {box} fill="none" stroke="{paint}" stroke-width="{WAVE_SW}"/>'
+                    f'<rect {box} fill="{paint if name in WAVE_FILLED else WAVE_REST}"><title>{name}</title></rect>')
+    names = ", ".join(n for n, _, _ in WAVE_NETS.values())
     return (f'<svg class="wave" viewBox="0 0 100 100" role="img" aria-label="Площадки: {names}">'
             f'<defs>{"".join(defs)}</defs>{"".join(bars)}</svg>')
 
 
 def platform_cloud():
-    turn = {n: i * WAVE_TURN for i, (n, _, _) in enumerate(WAVE)}
-    return "".join(f'<li style="animation-delay:{turn[t]:.1f}s">{t}</li>' for t in PLATFORM_CLOUD)
+    return "".join(f"<li>{t}</li>" for t in PLATFORM_CLOUD)
 
 
 # ── Вход и первый запуск ─────────────────────────────────────────────────────
@@ -655,7 +656,12 @@ def login_form():
             '<a href="/privacy.html">политику конфиденциальности</a>.</p></div>')
 
 
-def page_login(path="/test/login/"):
+# Три версии входа на выбор владельцу (17.10): 1 — две колонки крупно, названия моноширинным как пишут площадки;
+# 2 — одна колонка по центру, названия пилюлями; 3 — две колонки, волна во всю колонку, названия строчными.
+LOGIN_VERSIONS = {1: "/test/login/", 2: "/test/login/2/", 3: "/test/login/3/"}
+
+
+def page_login(path="/test/login/", v=1):
     sent = ('<div class="card auth"><span class="badge badge--ok">письмо отправлено</span>'
             '<h2 class="screen-title">Проверьте почту</h2>'
             '<p>Отправили ссылку для входа и код на <b>test@example.com</b>. Откройте ссылку на этом устройстве '
@@ -682,7 +688,7 @@ def page_login(path="/test/login/"):
             + st("sent", sent) + st("code", code_card()) + st("badcode", code_card(True)))
     # Видимого заголовка нет (владелец 17.10: «слово вход убери») — только для экранных чтецов.
     h1 = '<h1 class="visually-hidden">Вход в improducer</h1>'
-    body = ('<div class="signin">'
+    body = (f'<div class="signin signin--v{v}">'
             '<section class="signin-stage" aria-label="Площадки">'
             f'{platform_wave()}<ul class="pcloud">{platform_cloud()}</ul>'
             '<p class="signin-claim">Один вход — все ваши площадки.</p></section>'
@@ -690,6 +696,10 @@ def page_login(path="/test/login/"):
             f'{h1}{form}</section></div>')
     bare_page(path, "Вход", "Вход в improducer: Google или почта.", body,
               states=("full", "loading", "error", "sent", "code", "badcode"))
+    if path == "/test/login/":
+        for n, other in LOGIN_VERSIONS.items():
+            if n != v:
+                page_login(other, n)
 
 
 def onboarding_shell(path, n, blocks, states):
@@ -1407,10 +1417,10 @@ OPIS_SCREENS = [
      "заполнено · пусто · загрузка"),
     ("S07", "Вход", "claude.ai/login", "/test/login/",
      "Ничего: вход свой (владелец 17.10 — раскладка образца слишком похожа на Claude)",
-     "Своя страница: слева волна площадок из _design/ideas/platforms-wave.html с подписями YouTube · Telegram · "
-     "Instagram, справа «Вход» — Google, «или», почта → «Продолжить». Без пояснений и ссылки на свой Claude; Apple убран. "
-     "Над формой заголовка нет. Волна — по полоске на каждую из восьми площадок в их цветах, пульсирует; под ней россыпь "
-     "названий одним стилем: YouTube, Telegram, Instagram, TikTok, Facebook, X, Threads, RedNote", "заполнено · загрузка · ошибка"),
+     "Своя страница: волна площадок строго по _design/ideas/platforms-wave.html (форма знака, 9 полосок, серые колонки, "
+     "пульс цвета площадки 2.4 с одной фазой; YouTube залита красным), под ней названия TikTok, YouTube, Threads, Telegram, "
+     "Facebook, Instagram, X и «Один вход — все ваши площадки.»; форма — Google, «или», почта → «Продолжить». Заголовка "
+     "нет. Три версии на выбор (17.10): /test/login/, /test/login/2/, /test/login/3/", "заполнено · загрузка · ошибка"),
     ("S08", "Письмо и код", "claude.ai/login (шаг 2)", "/test/login/#s=sent",
      "Письмо отправлено → ввод кода → неверный код; «письмо не пришло» и «отправить ещё раз»",
      "Ссылки из письма нет: письма не уходят", "письмо отправлено · ввод кода · неверный код"),
